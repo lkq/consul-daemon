@@ -1,23 +1,91 @@
 package com.kliu.services.docker.daemon.container.cmd;
 
+import com.github.dockerjava.api.command.CreateContainerCmd;
 import com.github.dockerjava.api.command.CreateContainerResponse;
+import com.github.dockerjava.api.model.Bind;
+import com.github.dockerjava.api.model.ExposedPort;
+import com.github.dockerjava.api.model.Ports;
+import com.github.dockerjava.api.model.Volume;
+import com.google.gson.Gson;
 import com.kliu.services.docker.daemon.container.SimpleDockerClient;
 import com.kliu.services.docker.daemon.logging.Timer;
+import com.kliu.utils.Guard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class CreateContainer {
     private static Logger logger = LoggerFactory.getLogger(CreateContainer.class);
 
-    private SimpleDockerClient simpleDockerClient;
+    private static Gson gson = new Gson();
 
-    public CreateContainer(SimpleDockerClient simpleDockerClient) {
-        this.simpleDockerClient = simpleDockerClient;
+    private final CreateContainerCmd createContainerCmd;
+
+    public CreateContainer(SimpleDockerClient simpleDockerClient, String imageNameTag, String containerName) {
+        createContainerCmd = simpleDockerClient.get().createContainerCmd(imageNameTag).withName(containerName);
     }
 
-    public String exec(String image, String name) {
+    public String exec() {
         final CreateContainerResponse[] createResponse = new CreateContainerResponse[1];
-        Timer.log(logger, "created container, image=" + image + ", name=" + name, () -> createResponse[0] = simpleDockerClient.get().createContainerCmd(image).withName(name).exec());
+        Timer.log(logger, "created container, image=" + createContainerCmd.getImage() + ", container name=" + createContainerCmd.getName(), () -> {
+            createResponse[0] = createContainerCmd.exec();
+        });
         return createResponse[0].getId();
     }
+
+    public CreateContainer withConfigVolume(String hostPath) {
+        Guard.notBlank(hostPath, "hostPath is not provided");
+        this.createContainerCmd.withBinds(new Bind(hostPath, new Volume("/consul/config")));
+        return this;
+    }
+
+    public CreateContainer withDataVolume(String hostPath) {
+        Guard.notBlank(hostPath, "hostPath is not provided");
+        this.createContainerCmd.withBinds(new Bind(hostPath, new Volume("/consul/data")));
+        return this;
+    }
+
+    public CreateContainer withEnvironmentVariable(Map<String, Object> env) {
+        this.createContainerCmd.withEnv(gson.toJson(env));
+        return this;
+    }
+
+    public CreateContainer withCommand(String... cmd) {
+        this.createContainerCmd.withCmd(cmd);
+        return this;
+    }
+
+    public CreateContainer withNetwork(String network) {
+        Guard.notBlank(network, "network is not provided");
+        this.createContainerCmd.withNetworkMode(network);
+        return this;
+    }
+
+    public CreateContainer withBindingHostPorts(int[] tcpPorts, int[] udpPorts) {
+
+        List<ExposedPort> exposedPorts = new ArrayList<>();
+        Ports bindings = new Ports();
+        if (tcpPorts != null) {
+            for (int port : tcpPorts) {
+                ExposedPort containerPort = ExposedPort.tcp(port);
+                exposedPorts.add(containerPort);
+                bindings.bind(containerPort, Ports.Binding.bindPort(port));
+            }
+        }
+
+        if (udpPorts != null) {
+            for (int port : udpPorts) {
+                ExposedPort containerPort = ExposedPort.udp(port);
+                exposedPorts.add(containerPort);
+                bindings.bind(containerPort, Ports.Binding.bindPort(port));
+            }
+        }
+        this.createContainerCmd.withExposedPorts(exposedPorts)
+                .withPortBindings(bindings);
+        return this;
+    }
+
 }

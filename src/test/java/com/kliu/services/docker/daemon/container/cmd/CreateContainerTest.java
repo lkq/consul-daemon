@@ -28,11 +28,13 @@ class CreateContainerTest {
     private CreateContainerCmd createContainerCmd;
     @Mock
     private CreateContainerResponse createContainerResponse;
+    private final String imageNameTag = "dummy-image";
+    private final String containerName = "dummy-container";
 
     @BeforeEach
     void setUp() {
         initMocks(this);
-        createContainer = new CreateContainer(simpleDockerClient);
+        createContainer = new CreateContainer(simpleDockerClient, imageNameTag, containerName);
     }
 
     @Test
@@ -42,10 +44,9 @@ class CreateContainerTest {
         given(dockerClient.createContainerCmd(anyString())).willReturn(createContainerCmd);
         given(createContainerCmd.withName(anyString())).willReturn(createContainerCmd);
         given(createContainerCmd.exec()).willReturn(createContainerResponse);
-        String containerName = "dummy-container";
         given(createContainerResponse.getId()).willReturn(containerName);
 
-        String containerID = createContainer.exec("dummy-image", containerName);
+        String containerID = createContainer.exec();
 
         assertThat(containerID, is(containerName));
     }
@@ -57,9 +58,9 @@ class CreateContainerTest {
         try {
             simpleDockerClient = new SimpleDockerClient(ConfigProvider.NET_EASY_HUB);
 
-            createContainer = new CreateContainer(simpleDockerClient);
+            createContainer = new CreateContainer(simpleDockerClient, imageNameTag, containerName);
             String expectedContainerName = "hello-world-" + System.currentTimeMillis();
-            containerID = createContainer.exec("hello-world", expectedContainerName);
+            containerID = createContainer.exec();
 
             String containerName = simpleDockerClient.get().inspectContainerCmd(containerID).exec().getName();
 

@@ -30,6 +30,7 @@ class StopContainerTest {
     private DockerClient dockerClient;
     @Mock
     private StopContainerCmd stopContainerCmd;
+    private final String helloWorldImage = "hello-world:latest";
 
     @BeforeEach
     void setUp() {
@@ -60,15 +61,14 @@ class StopContainerTest {
     @Test
     void willKeepSilenceIfContainerNotStarted() {
         String containerID = null;
-        String imageName = "hello-world:latest";
         String containerName = "hello-world-" + System.currentTimeMillis();
         try {
             simpleDockerClient = new SimpleDockerClient(ConfigProvider.NET_EASY_HUB);
             PullImage pullImage = new PullImage(simpleDockerClient);
-            CreateContainer createContainer = new CreateContainer(simpleDockerClient);
+            CreateContainer createContainer = new CreateContainer(simpleDockerClient, helloWorldImage, containerName);
             stopContainer = new StopContainer(simpleDockerClient);
-            pullImage.exec(imageName, 30);
-            containerID = createContainer.exec(imageName, containerName);
+            pullImage.exec(helloWorldImage, 30);
+            containerID = createContainer.exec();
 
             stopContainer.exec(containerName);
         } finally {
@@ -82,16 +82,15 @@ class StopContainerTest {
     @Test
     void canActuallyStopContainer() {
         String containerID = null;
-        String imageName = "hello-world:latest";
         String containerName = "hello-world-" + System.currentTimeMillis();
         try {
             simpleDockerClient = new SimpleDockerClient(ConfigProvider.NET_EASY_HUB);
             PullImage pullImage = new PullImage(simpleDockerClient);
-            CreateContainer createContainer = new CreateContainer(simpleDockerClient);
+            CreateContainer createContainer = new CreateContainer(simpleDockerClient, helloWorldImage, containerName);
             StartContainer startContainer = new StartContainer(simpleDockerClient);
             stopContainer = new StopContainer(simpleDockerClient);
-            pullImage.exec(imageName, 30);
-            containerID = createContainer.exec(imageName, containerName);
+            pullImage.exec(helloWorldImage, 30);
+            containerID = createContainer.exec();
             startContainer.exec(containerName);
 
             stopContainer.exec(containerName);

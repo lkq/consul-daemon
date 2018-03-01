@@ -26,6 +26,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 class RenameContainerCmdTest {
     private static Logger logger = LoggerFactory.getLogger(RenameContainerCmdTest.class);
+    private final String helloWorldImage = "hello-world:latest";
 
     private RenameContainer renameContainer;
     @Mock
@@ -72,10 +73,10 @@ class RenameContainerCmdTest {
         String containerID = null;
         try {
             simpleDockerClient = new SimpleDockerClient(ConfigProvider.NET_EASY_HUB);
-            new PullImage(simpleDockerClient).exec("hello-world:latest", 0);
+            new PullImage(simpleDockerClient).exec(helloWorldImage, 0);
             String oldContainerName = "hello-world-" + System.currentTimeMillis();
             String newContainerID = oldContainerName + "-1";
-            containerID = new CreateContainer(simpleDockerClient).exec("hello-world:latest", oldContainerName);
+            containerID = new CreateContainer(simpleDockerClient, helloWorldImage, oldContainerName).exec();
             boolean renamed = new RenameContainer(simpleDockerClient).exec(oldContainerName, newContainerID);
             assertThat(renamed, is(true));
 

@@ -1,5 +1,6 @@
 package com.kliu.services.docker.daemon.container.cmd;
 
+import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.kliu.services.docker.daemon.container.SimpleDockerClient;
 import com.kliu.services.docker.daemon.logging.Timer;
 import org.slf4j.Logger;
@@ -14,7 +15,9 @@ public class StartContainer {
         this.simpleDockerClient = simpleDockerClient;
     }
 
-    public void exec(String name) {
-        Timer.log(logger, "started container " + name, () -> simpleDockerClient.get().startContainerCmd(name).exec());
+    public Boolean exec(String containerID) {
+        Timer.log(logger, "started container " + containerID, () -> simpleDockerClient.get().startContainerCmd(containerID).exec());
+        InspectContainerResponse inspectResponse = simpleDockerClient.get().inspectContainerCmd(containerID).exec();
+        return inspectResponse.getState().getRunning();
     }
 }
