@@ -3,7 +3,8 @@ package com.kliu.services.docker.daemon.container.cmd;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.StopContainerCmd;
 import com.kliu.services.docker.daemon.IntegrationTest;
-import com.kliu.services.docker.daemon.config.ConfigProvider;
+import com.kliu.services.docker.daemon.TestConfigProvider;
+import com.kliu.services.docker.daemon.config.Config;
 import com.kliu.services.docker.daemon.container.SimpleDockerClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,6 +36,7 @@ class StopContainerTest {
     @BeforeEach
     void setUp() {
         initMocks(this);
+        Config.init(new TestConfigProvider());
         stopContainer = new StopContainer(simpleDockerClient);
     }
 
@@ -52,7 +54,7 @@ class StopContainerTest {
     @IntegrationTest
     @Test
     void willKeepSilenceIfContainerNotExists() {
-        SimpleDockerClient simpleDockerClient = new SimpleDockerClient(ConfigProvider.NET_EASY_HUB);
+        SimpleDockerClient simpleDockerClient = new SimpleDockerClient();
         stopContainer = new StopContainer(simpleDockerClient);
         stopContainer.exec("dummy-container-" + System.currentTimeMillis());
     }
@@ -63,7 +65,7 @@ class StopContainerTest {
         String containerID = null;
         String containerName = "hello-world-" + System.currentTimeMillis();
         try {
-            simpleDockerClient = new SimpleDockerClient(ConfigProvider.NET_EASY_HUB);
+            simpleDockerClient = new SimpleDockerClient();
             PullImage pullImage = new PullImage(simpleDockerClient);
             CreateContainer createContainer = new CreateContainer(simpleDockerClient, helloWorldImage, containerName);
             stopContainer = new StopContainer(simpleDockerClient);
@@ -84,7 +86,7 @@ class StopContainerTest {
         String containerID = null;
         String containerName = "hello-world-" + System.currentTimeMillis();
         try {
-            simpleDockerClient = new SimpleDockerClient(ConfigProvider.NET_EASY_HUB);
+            simpleDockerClient = new SimpleDockerClient();
             PullImage pullImage = new PullImage(simpleDockerClient);
             CreateContainer createContainer = new CreateContainer(simpleDockerClient, helloWorldImage, containerName);
             StartContainer startContainer = new StartContainer(simpleDockerClient);

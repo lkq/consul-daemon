@@ -1,6 +1,8 @@
 package com.kliu.services.docker.daemon.consul;
 
 import com.github.dockerjava.api.command.InspectContainerResponse;
+import com.google.gson.Gson;
+import com.kliu.services.docker.daemon.config.Config;
 import com.kliu.services.docker.daemon.container.SimpleDockerClient;
 import com.kliu.services.docker.daemon.container.cmd.*;
 import org.slf4j.Logger;
@@ -18,16 +20,10 @@ public class ConsulDockerController {
     private static int[] tcpPorts = {8300, 8301, 8302, 8400, 8500};
     private static int[] udpPorts = {8301, 8302};
 
-    private final SimpleDockerClient simpleDockerClient = new SimpleDockerClient(null);
-    private final String configPath;
-    private final String dataPath;
-
-    public ConsulDockerController(String configPath, String dataPath) {
-        this.configPath = configPath;
-        this.dataPath = dataPath;
-    }
+    private final SimpleDockerClient simpleDockerClient = new SimpleDockerClient();
 
     public boolean startConsul() {
+
         // clean up existing instance
         String containerToDelete = "consul-stopped-" + System.currentTimeMillis();
         boolean renamed = false;
@@ -37,17 +33,15 @@ public class ConsulDockerController {
 
             String imageName = new PullImage(simpleDockerClient).exec(CONSUL_IMAGE_TAG, 0);
 
-            Map<String, Object> env = new HashMap<>();
-            Map<String, Object> consulLocalConfig = new HashMap<>();
-            consulLocalConfig.put("skip_leave_on_interrupt", true);
-            env.put("CONSUL_LOCAL_CONFIG", consulLocalConfig);
+            String[] commands = createCommand();
+            Map<String, Object> env = createEnvironmentVariables();
 
             String containerID = new CreateContainer(simpleDockerClient, imageName, CONSUL_CONTAINER_NAME)
-                    .withConfigVolume(configPath)
-                    .withDataVolume(dataPath)
-                    .withNetwork("host")
+                    .withConfigVolume(Config.getConfigPath())
+                    .withDataVolume(Config.getDataPath())
+                    .withNetwork(Config.getNetwork())
                     .withEnvironmentVariable(env)
-                    .withCommand("agent", "-server", "-bootstrap-expect=3", "-retry-join=127.0.0.2")
+                    .withCommand(commands)
                     .exec();
 
             new StartContainer(simpleDockerClient).exec(containerID);
@@ -64,5 +58,26 @@ public class ConsulDockerController {
                 simpleDockerClient.get().removeContainerCmd(containerToDelete).withForce(true).exec();
             }
         }
+    }
+
+    private Map<String, Object> createEnvironmentVariables() {
+        Map<String, Object> env = new HashMap<>();
+        Map<String, Object> consulLocalConfig = new HashMap<>();
+        consulLocalConfig.put("skip_leave_on_interrupt", true);
+        env.put("CONSUL_LOCAL_CONFIG", consulLocalConfig);
+
+        logger.info("consul docker env variables: {}", new Gson().toJson(env));
+        return env;
+    }
+
+    private String[] createCommand() {
+        ConsulCommandBuilder commandBuilder = new ConsulCommandBuilder()
+                .with("agent")
+                .with("-server")
+                .with("-bootstrap-expect", Config.getBootstrapCount());
+        for (String host : Config.getRetryJoin()) {
+            commandBuilder.with("-retry-join", host);
+        }
+        return commandBuilder.build();
     }
 }

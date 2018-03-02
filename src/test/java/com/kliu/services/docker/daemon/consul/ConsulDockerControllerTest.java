@@ -1,6 +1,8 @@
 package com.kliu.services.docker.daemon.consul;
 
 import com.kliu.services.docker.daemon.IntegrationTest;
+import com.kliu.services.docker.daemon.TestConfigProvider;
+import com.kliu.services.docker.daemon.config.Config;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -13,9 +15,8 @@ class ConsulDockerControllerTest {
 
     @BeforeEach
     void setUp() {
-        String configPath = getClass().getClassLoader().getResource(".").getPath() + "/config";
-        String dataPath = getClass().getClassLoader().getResource(".").getPath() + "/data";
-        consulDockerController = new ConsulDockerController(configPath, dataPath);
+        Config.init(new TestConfigProvider());
+        consulDockerController = new ConsulDockerController();
     }
 
     @IntegrationTest

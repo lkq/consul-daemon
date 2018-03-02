@@ -6,7 +6,8 @@ import com.github.dockerjava.api.command.InspectImageResponse;
 import com.github.dockerjava.api.command.PullImageCmd;
 import com.github.dockerjava.core.command.PullImageResultCallback;
 import com.kliu.services.docker.daemon.IntegrationTest;
-import com.kliu.services.docker.daemon.config.ConfigProvider;
+import com.kliu.services.docker.daemon.TestConfigProvider;
+import com.kliu.services.docker.daemon.config.Config;
 import com.kliu.services.docker.daemon.container.SimpleDockerClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,6 +48,7 @@ class PullImageTest {
     @BeforeEach
     void setUp() {
         initMocks(this);
+        Config.init(new TestConfigProvider());
         pullImage = new PullImage(simpleDockerClient);
     }
 
@@ -80,7 +82,7 @@ class PullImageTest {
     @IntegrationTest
     @Test
     void canActuallyPullImage() {
-        simpleDockerClient = new SimpleDockerClient(ConfigProvider.NET_EASY_HUB);
+        simpleDockerClient = new SimpleDockerClient();
         pullImage = new PullImage(simpleDockerClient);
 
         String imageName = "hello-world";

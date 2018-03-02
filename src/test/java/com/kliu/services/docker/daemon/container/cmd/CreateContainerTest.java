@@ -4,7 +4,8 @@ import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerCmd;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.kliu.services.docker.daemon.IntegrationTest;
-import com.kliu.services.docker.daemon.config.ConfigProvider;
+import com.kliu.services.docker.daemon.TestConfigProvider;
+import com.kliu.services.docker.daemon.config.Config;
 import com.kliu.services.docker.daemon.container.SimpleDockerClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,11 +35,12 @@ class CreateContainerTest {
     @BeforeEach
     void setUp() {
         initMocks(this);
-        createContainer = new CreateContainer(simpleDockerClient, imageNameTag, containerName);
+        Config.init(new TestConfigProvider());
     }
 
     @Test
     void canCreateContainer() {
+
 
         given(simpleDockerClient.get()).willReturn(dockerClient);
         given(dockerClient.createContainerCmd(anyString())).willReturn(createContainerCmd);
@@ -46,6 +48,7 @@ class CreateContainerTest {
         given(createContainerCmd.exec()).willReturn(createContainerResponse);
         given(createContainerResponse.getId()).willReturn(containerName);
 
+        createContainer = new CreateContainer(simpleDockerClient, imageNameTag, containerName);
         String containerID = createContainer.exec();
 
         assertThat(containerID, is(containerName));
@@ -56,10 +59,10 @@ class CreateContainerTest {
     void canActuallyCreateContainer() {
         String containerID = null;
         try {
-            simpleDockerClient = new SimpleDockerClient(ConfigProvider.NET_EASY_HUB);
+            simpleDockerClient = new SimpleDockerClient();
 
-            createContainer = new CreateContainer(simpleDockerClient, imageNameTag, containerName);
             String expectedContainerName = "hello-world-" + System.currentTimeMillis();
+            createContainer = new CreateContainer(simpleDockerClient, "hello-world:latest", expectedContainerName);
             containerID = createContainer.exec();
 
             String containerName = simpleDockerClient.get().inspectContainerCmd(containerID).exec().getName();

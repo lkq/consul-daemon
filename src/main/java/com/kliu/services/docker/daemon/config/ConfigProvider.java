@@ -1,20 +1,51 @@
 package com.kliu.services.docker.daemon.config;
 
+import spark.utils.StringUtils;
+
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+
 public class ConfigProvider {
 
-    public static final String NET_EASY_HUB = "http://hub-mirror.c.163.com";
+    private static final String NET_EASY_HUB = "http://hub-mirror.c.163.com";
 
     public String getRegistryURL() {
-        return NET_EASY_HUB;
+        return getEnv("docker-registry", NET_EASY_HUB);
     }
 
     public String getConfigPath() {
-        // TODO get current dir
-        return ConfigProvider.class.getClassLoader().getResource(".").getPath() + "/config";
+        return Paths.get(".").toAbsolutePath().normalize().toString() + "/config";
     }
 
     public String getDataPath() {
-        // TODO get current dir
-        return ConfigProvider.class.getClassLoader().getResource(".").getPath() + "/data";
+        return Paths.get(".").toAbsolutePath().normalize().toString() + "/data";
+    }
+
+    public String getEnv(String key, String defaultValue) {
+        String value = System.getenv(key);
+        if (StringUtils.isEmpty(value)) {
+            value = System.getProperty(key, defaultValue);
+        }
+        return value;
+    }
+
+    public String getNetwork() {
+        return "host";
+    }
+
+    public String getBootstrapCount() {
+        return "3";
+    }
+
+    public List<String> getRetryJoin() {
+        String hosts = getEnv("consul-cluster-server", "");
+        String[] hostsArray = hosts.split(",");
+        List<String> hostList = new ArrayList<>();
+        for (String host : hostsArray) {
+            hostList.add(host);
+        }
+
+        return hostList;
     }
 }

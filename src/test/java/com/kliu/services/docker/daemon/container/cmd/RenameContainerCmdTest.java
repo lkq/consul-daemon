@@ -4,7 +4,8 @@ import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.InspectContainerCmd;
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.kliu.services.docker.daemon.IntegrationTest;
-import com.kliu.services.docker.daemon.config.ConfigProvider;
+import com.kliu.services.docker.daemon.TestConfigProvider;
+import com.kliu.services.docker.daemon.config.Config;
 import com.kliu.services.docker.daemon.container.SimpleDockerClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,6 +44,7 @@ class RenameContainerCmdTest {
     @BeforeEach
     void setUp() {
         initMocks(this);
+        Config.init(new TestConfigProvider());
         renameContainer = new RenameContainer(simpleDockerClient);
     }
 
@@ -61,7 +63,7 @@ class RenameContainerCmdTest {
     @IntegrationTest
     @Test
     void willSilenceIfContainerNotExists() {
-        renameContainer = new RenameContainer(new SimpleDockerClient(null));
+        renameContainer = new RenameContainer(new SimpleDockerClient());
         String currentName = "dummy-container-" + System.currentTimeMillis();
         boolean renamed = renameContainer.exec(currentName, "dummy-container");
         assertThat(renamed, is(false));
@@ -72,7 +74,7 @@ class RenameContainerCmdTest {
     void canActuallyRenameContainer() throws InterruptedException, IOException {
         String containerID = null;
         try {
-            simpleDockerClient = new SimpleDockerClient(ConfigProvider.NET_EASY_HUB);
+            simpleDockerClient = new SimpleDockerClient();
             new PullImage(simpleDockerClient).exec(helloWorldImage, 0);
             String oldContainerName = "hello-world-" + System.currentTimeMillis();
             String newContainerID = oldContainerName + "-1";

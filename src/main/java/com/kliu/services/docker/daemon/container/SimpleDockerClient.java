@@ -3,17 +3,15 @@ package com.kliu.services.docker.daemon.container;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientBuilder;
-import spark.utils.StringUtils;
+import com.kliu.services.docker.daemon.config.Config;
 
 public class SimpleDockerClient {
     private DockerClient client;
 
-    public SimpleDockerClient(String registryURL) {
+    public SimpleDockerClient() {
 
         DefaultDockerClientConfig.Builder configBuilder = DefaultDockerClientConfig.createDefaultConfigBuilder();
-        if (StringUtils.isNotEmpty(registryURL)) {
-            configBuilder.withRegistryUrl(registryURL);
-        }
+        configBuilder.withRegistryUrl(Config.getRegistryURL());
         client = DockerClientBuilder.getInstance(configBuilder.build()).build();
     }
 

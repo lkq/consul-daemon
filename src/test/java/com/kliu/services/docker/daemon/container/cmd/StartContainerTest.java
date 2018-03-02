@@ -5,7 +5,8 @@ import com.github.dockerjava.api.command.InspectContainerCmd;
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.command.StartContainerCmd;
 import com.kliu.services.docker.daemon.IntegrationTest;
-import com.kliu.services.docker.daemon.config.ConfigProvider;
+import com.kliu.services.docker.daemon.TestConfigProvider;
+import com.kliu.services.docker.daemon.config.Config;
 import com.kliu.services.docker.daemon.container.SimpleDockerClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,6 +39,7 @@ class StartContainerTest {
     @BeforeEach
     void setUp() {
         initMocks(this);
+        Config.init(new TestConfigProvider());
         startContainer = new StartContainer(simpleDockerClient);
     }
 
@@ -60,7 +62,7 @@ class StartContainerTest {
     void willActuallyStartContainer() {
         String containerID = null;
         try {
-            simpleDockerClient = new SimpleDockerClient(ConfigProvider.NET_EASY_HUB);
+            simpleDockerClient = new SimpleDockerClient();
             String imageName = "hello-world";
             String containerName = imageName + "-" + System.currentTimeMillis();
             new PullImage(simpleDockerClient).exec(imageName, 0);
