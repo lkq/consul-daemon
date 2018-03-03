@@ -48,4 +48,12 @@ public class ConfigProvider {
 
         return hostList;
     }
+
+    public int[] getTCPPort() {
+        return new int[]{8300, 8301, 8302, 8400, 8500};
+    }
+
+    public int[] getUDPPorts() {
+        return new int[]{8301, 8302};
+    }
 }

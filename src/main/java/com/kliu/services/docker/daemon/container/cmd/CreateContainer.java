@@ -49,11 +49,13 @@ public class CreateContainer {
     }
 
     public CreateContainer withEnvironmentVariable(Map<String, Object> env) {
+        Guard.toBeTrue(env != null, "environment variables are not provided");
         this.createContainerCmd.withEnv(gson.toJson(env));
         return this;
     }
 
     public CreateContainer withCommand(String... cmd) {
+        Guard.toBeTrue(cmd != null && cmd.length > 0, "commands are not provided");
         this.createContainerCmd.withCmd(cmd);
         return this;
     }
@@ -66,6 +68,9 @@ public class CreateContainer {
 
     public CreateContainer withBindingHostPorts(int[] tcpPorts, int[] udpPorts) {
 
+        if ((tcpPorts == null || tcpPorts.length == 0) && (udpPorts == null || udpPorts.length == 0)) {
+            return this;
+        }
         List<ExposedPort> exposedPorts = new ArrayList<>();
         Ports bindings = new Ports();
         if (tcpPorts != null) {

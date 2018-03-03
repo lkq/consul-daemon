@@ -17,8 +17,6 @@ public class ConsulDockerController {
 
     public static final String CONSUL_CONTAINER_NAME = "consul";
     public static final String CONSUL_IMAGE_TAG = "consul:1.0.6";
-    private static int[] tcpPorts = {8300, 8301, 8302, 8400, 8500};
-    private static int[] udpPorts = {8301, 8302};
 
     private final SimpleDockerClient simpleDockerClient = new SimpleDockerClient();
 
@@ -42,6 +40,7 @@ public class ConsulDockerController {
                     .withNetwork(Config.getNetwork())
                     .withEnvironmentVariable(env)
                     .withCommand(commands)
+                    .withBindingHostPorts(Config.getTCPPorts(), Config.getUDPPorts())
                     .exec();
 
             new StartContainer(simpleDockerClient).exec(containerID);

@@ -26,6 +26,7 @@ public class Config {
     public static String getConfigPath() {
         return provider.getConfigPath();
     }
+
     public static String getDataPath() {
         return provider.getDataPath();
     }
@@ -40,5 +41,13 @@ public class Config {
 
     public static List<String> getRetryJoin() {
         return provider.getRetryJoin();
+    }
+
+    public static int[] getTCPPorts() {
+        return provider.getTCPPort();
+    }
+
+    public static int[] getUDPPorts() {
+        return provider.getUDPPorts();
     }
 }
