@@ -3,6 +3,7 @@ package com.kliu.services.docker.daemon.consul;
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.google.gson.Gson;
 import com.kliu.services.docker.daemon.config.Config;
+import com.kliu.services.docker.daemon.container.ContainerLogger;
 import com.kliu.services.docker.daemon.container.SimpleDockerClient;
 import com.kliu.services.docker.daemon.container.cmd.*;
 import org.slf4j.Logger;
@@ -44,6 +45,9 @@ public class ConsulDockerController {
                     .exec();
 
             new StartContainer(simpleDockerClient).exec(containerID);
+
+            redirectConsulLog(containerID);
+
             InspectContainerResponse inspectContainerResponse = simpleDockerClient.get().inspectContainerCmd(containerID).exec();
             InspectContainerResponse.ContainerState state = inspectContainerResponse.getState();
             logger.info("container state: {}", state);
@@ -52,11 +56,26 @@ public class ConsulDockerController {
             } else {
                 return false;
             }
-        }finally {
+        } finally {
             if (renamed) {
                 simpleDockerClient.get().removeContainerCmd(containerToDelete).withForce(true).exec();
             }
         }
+    }
+
+    public void redirectConsulLog(String containerID) {
+
+        new Thread(() -> {
+            ContainerLogger loggingCallback = new ContainerLogger();
+
+            simpleDockerClient.get().logContainerCmd(containerID)
+                    .withStdErr(true)
+                    .withStdOut(true)
+                    .withFollowStream(true)
+                    .withTailAll()
+                    .exec(loggingCallback);
+        }).run();
+        logger.info("redirecting consul log");
     }
 
     private Map<String, Object> createEnvironmentVariables() {
