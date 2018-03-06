@@ -66,7 +66,7 @@ class StartContainerTest {
             String imageName = "hello-world";
             String containerName = imageName + "-" + System.currentTimeMillis();
             new PullImage(simpleDockerClient).exec(imageName, 0);
-            containerID = new CreateContainer(simpleDockerClient, imageName, containerName).exec();
+            containerID = new CreateContainer(dockerClient, imageName, containerName).exec();
 
             startContainer = new StartContainer(simpleDockerClient);
 

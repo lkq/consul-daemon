@@ -17,10 +17,6 @@ public class TestConfigProvider extends ConfigProvider {
     }
 
     @Override
-    public String getNetwork() {
-        return "bridge";
-    }
-
     public List<String> getRetryJoin() {
         return Arrays.asList("127.0.0.2");
     }

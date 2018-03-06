@@ -39,7 +39,7 @@ public class ConfigProvider {
     }
 
     public List<String> getRetryJoin() {
-        String hosts = getEnv("consul-cluster-server", "");
+        String hosts = getEnv("consul.cluster.servers", "");
         String[] hostsArray = hosts.split(",");
         List<String> hostList = new ArrayList<>();
         for (String host : hostsArray) {

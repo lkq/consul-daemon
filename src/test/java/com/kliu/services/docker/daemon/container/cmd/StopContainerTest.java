@@ -67,7 +67,7 @@ class StopContainerTest {
         try {
             simpleDockerClient = new SimpleDockerClient();
             PullImage pullImage = new PullImage(simpleDockerClient);
-            CreateContainer createContainer = new CreateContainer(simpleDockerClient, helloWorldImage, containerName);
+            CreateContainer createContainer = new CreateContainer(dockerClient, helloWorldImage, containerName);
             stopContainer = new StopContainer(simpleDockerClient);
             pullImage.exec(helloWorldImage, 30);
             containerID = createContainer.exec();
@@ -88,7 +88,7 @@ class StopContainerTest {
         try {
             simpleDockerClient = new SimpleDockerClient();
             PullImage pullImage = new PullImage(simpleDockerClient);
-            CreateContainer createContainer = new CreateContainer(simpleDockerClient, helloWorldImage, containerName);
+            CreateContainer createContainer = new CreateContainer(dockerClient, helloWorldImage, containerName);
             StartContainer startContainer = new StartContainer(simpleDockerClient);
             stopContainer = new StopContainer(simpleDockerClient);
             pullImage.exec(helloWorldImage, 30);

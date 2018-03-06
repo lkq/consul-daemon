@@ -1,5 +1,6 @@
 package com.kliu.services.docker.daemon.container.cmd;
 
+import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerCmd;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.model.Bind;
@@ -7,7 +8,7 @@ import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.Ports;
 import com.github.dockerjava.api.model.Volume;
 import com.google.gson.Gson;
-import com.kliu.services.docker.daemon.container.SimpleDockerClient;
+import com.kliu.services.docker.daemon.container.PortBinder;
 import com.kliu.services.docker.daemon.logging.Timer;
 import com.kliu.utils.Guard;
 import org.slf4j.Logger;
@@ -24,13 +25,14 @@ public class CreateContainer {
 
     private final CreateContainerCmd createContainerCmd;
 
-    public CreateContainer(SimpleDockerClient simpleDockerClient, String imageNameTag, String containerName) {
-        createContainerCmd = simpleDockerClient.get().createContainerCmd(imageNameTag).withName(containerName);
+    public CreateContainer(DockerClient dockerClient, String imageNameTag, String containerName) {
+        createContainerCmd = dockerClient.createContainerCmd(imageNameTag).withName(containerName);
     }
 
     public String exec() {
         final CreateContainerResponse[] createResponse = new CreateContainerResponse[1];
         Timer.log(logger, "created container, image=" + createContainerCmd.getImage() + ", container name=" + createContainerCmd.getName(), () -> {
+            logger.info("creating container: {}", createContainerCmd.toString());
             createResponse[0] = createContainerCmd.exec();
         });
         return createResponse[0].getId();
@@ -66,31 +68,17 @@ public class CreateContainer {
         return this;
     }
 
-    public CreateContainer withBindingHostPorts(int[] tcpPorts, int[] udpPorts) {
-
-        if ((tcpPorts == null || tcpPorts.length == 0) && (udpPorts == null || udpPorts.length == 0)) {
-            return this;
-        }
+    public CreateContainer withPortBinders(List<PortBinder> portBinders) {
         List<ExposedPort> exposedPorts = new ArrayList<>();
         Ports bindings = new Ports();
-        if (tcpPorts != null) {
-            for (int port : tcpPorts) {
-                ExposedPort containerPort = ExposedPort.tcp(port);
-                exposedPorts.add(containerPort);
-                bindings.bind(containerPort, Ports.Binding.bindPort(port));
-            }
+        for (PortBinder portBinder : portBinders) {
+            ExposedPort exposedPort = portBinder.getExposedPort();
+            exposedPorts.add(exposedPort);
+            bindings.bind(exposedPort, portBinder.getPortBinding());
+            logger.info("binding port {}", portBinder);
         }
 
-        if (udpPorts != null) {
-            for (int port : udpPorts) {
-                ExposedPort containerPort = ExposedPort.udp(port);
-                exposedPorts.add(containerPort);
-                bindings.bind(containerPort, Ports.Binding.bindPort(port));
-            }
-        }
-        this.createContainerCmd.withExposedPorts(exposedPorts)
-                .withPortBindings(bindings);
+        createContainerCmd.withExposedPorts(exposedPorts).withPortBindings(bindings);
         return this;
     }
-
 }

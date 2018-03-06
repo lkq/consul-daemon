@@ -48,7 +48,7 @@ class CreateContainerTest {
         given(createContainerCmd.exec()).willReturn(createContainerResponse);
         given(createContainerResponse.getId()).willReturn(containerName);
 
-        createContainer = new CreateContainer(simpleDockerClient, imageNameTag, containerName);
+        createContainer = new CreateContainer(dockerClient, imageNameTag, containerName);
         String containerID = createContainer.exec();
 
         assertThat(containerID, is(containerName));
@@ -62,7 +62,7 @@ class CreateContainerTest {
             simpleDockerClient = new SimpleDockerClient();
 
             String expectedContainerName = "hello-world-" + System.currentTimeMillis();
-            createContainer = new CreateContainer(simpleDockerClient, "hello-world:latest", expectedContainerName);
+            createContainer = new CreateContainer(dockerClient, "hello-world:latest", expectedContainerName);
             containerID = createContainer.exec();
 
             String containerName = simpleDockerClient.get().inspectContainerCmd(containerID).exec().getName();

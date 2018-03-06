@@ -1,6 +1,6 @@
 package com.kliu.services.docker.daemon.handler;
 
-import com.kliu.services.docker.daemon.consul.ConsulDockerController;
+import com.kliu.services.docker.daemon.consul.ConsulController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Request;
@@ -8,11 +8,11 @@ import spark.Response;
 
 public class HealthCheckHandler {
     private static Logger logger = LoggerFactory.getLogger(HealthCheckHandler.class);
-    private ConsulDockerController consulDockerController;
+    private ConsulController consulController;
 
-    public HealthCheckHandler(ConsulDockerController consulDockerController) {
+    public HealthCheckHandler(ConsulController consulController) {
 
-        this.consulDockerController = consulDockerController;
+        this.consulController = consulController;
     }
 
     public String handleHealthCheck(Request request, Response response) {

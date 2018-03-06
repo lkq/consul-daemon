@@ -2,6 +2,7 @@ package com.kliu.services.docker.daemon.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spark.utils.StringUtils;
 
 import java.util.List;
 
@@ -49,5 +50,17 @@ public class Config {
 
     public static int[] getUDPPorts() {
         return provider.getUDPPorts();
+    }
+
+    public static String getEnv(String key) {
+        return getEnv(key, null);
+    }
+
+    public static String getEnv(String key, String defaultValue) {
+        String value = System.getenv(key);
+        if (StringUtils.isEmpty(value)) {
+            value = System.getProperty(key, defaultValue);
+        }
+        return value;
     }
 }

@@ -1,7 +1,6 @@
 package com.kliu.services.docker.daemon;
 
 import com.kliu.services.docker.daemon.config.Config;
-import com.kliu.services.docker.daemon.config.ConfigProvider;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import java.util.logging.LogManager;
@@ -9,7 +8,10 @@ import java.util.logging.LogManager;
 public class LocalLauncher {
     public static void main(String[] args) {
         initLogging();
-        Config.init(new ConfigProvider());
+
+        System.setProperty("consul.network.interface", "en1");
+//        System.setProperty("consul.cluster.servers", "localhost");
+        Config.init(new TestConfigProvider());
         new App().start();
     }
 

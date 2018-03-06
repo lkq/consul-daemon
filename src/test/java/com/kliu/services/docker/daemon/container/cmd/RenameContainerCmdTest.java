@@ -78,7 +78,7 @@ class RenameContainerCmdTest {
             new PullImage(simpleDockerClient).exec(helloWorldImage, 0);
             String oldContainerName = "hello-world-" + System.currentTimeMillis();
             String newContainerID = oldContainerName + "-1";
-            containerID = new CreateContainer(simpleDockerClient, helloWorldImage, oldContainerName).exec();
+            containerID = new CreateContainer(dockerClient, helloWorldImage, oldContainerName).exec();
             boolean renamed = new RenameContainer(simpleDockerClient).exec(oldContainerName, newContainerID);
             assertThat(renamed, is(true));
 
