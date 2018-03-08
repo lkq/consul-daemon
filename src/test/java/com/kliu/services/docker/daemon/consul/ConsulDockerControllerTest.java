@@ -1,8 +1,8 @@
 //package com.kliu.services.docker.daemon.consul;
 //
-//import com.kliu.services.docker.daemon.IntegrationTest;
-//import com.kliu.services.docker.daemon.TestConfigProvider;
-//import com.kliu.services.docker.daemon.config.Config;
+//import IntegrationTest;
+//import TestConfigProvider;
+//import Config;
 //import org.junit.jupiter.api.BeforeEach;
 //import org.junit.jupiter.api.Test;
 //

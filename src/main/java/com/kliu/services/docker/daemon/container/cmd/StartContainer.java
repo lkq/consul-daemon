@@ -1,8 +1,8 @@
 package com.kliu.services.docker.daemon.container.cmd;
 
 import com.github.dockerjava.api.command.InspectContainerResponse;
-import com.kliu.services.docker.daemon.container.SimpleDockerClient;
 import com.kliu.services.docker.daemon.logging.Timer;
+import com.kliu.services.docker.daemon.container.SimpleDockerClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

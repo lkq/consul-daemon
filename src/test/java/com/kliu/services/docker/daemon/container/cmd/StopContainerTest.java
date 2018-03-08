@@ -2,9 +2,9 @@ package com.kliu.services.docker.daemon.container.cmd;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.StopContainerCmd;
-import com.kliu.services.docker.daemon.IntegrationTest;
 import com.kliu.services.docker.daemon.TestConfigProvider;
 import com.kliu.services.docker.daemon.config.Config;
+import com.kliu.services.docker.daemon.IntegrationTest;
 import com.kliu.services.docker.daemon.container.SimpleDockerClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

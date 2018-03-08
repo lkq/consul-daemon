@@ -4,6 +4,8 @@ import com.amazonaws.util.EC2MetadataUtils;
 
 public class AWSClientImpl implements AWSClient {
 
+    AWSClientImpl() {}
+
     public boolean isAws() {
         return true;
     }

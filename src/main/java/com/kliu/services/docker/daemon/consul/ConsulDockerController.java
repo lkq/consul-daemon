@@ -2,9 +2,9 @@
 //
 //import com.github.dockerjava.api.command.InspectContainerResponse;
 //import com.google.gson.Gson;
-//import com.kliu.services.docker.daemon.config.Config;
-//import com.kliu.services.docker.daemon.container.ContainerLogger;
-//import com.kliu.services.docker.daemon.container.SimpleDockerClient;
+//import Config;
+//import ContainerLogger;
+//import SimpleDockerClient;
 //import com.kliu.services.docker.daemon.container.cmd.*;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;

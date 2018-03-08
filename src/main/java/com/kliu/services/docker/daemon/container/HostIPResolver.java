@@ -1,7 +1,7 @@
 package com.kliu.services.docker.daemon.container;
 
-import com.kliu.services.docker.daemon.aws.AWSClient;
 import com.kliu.services.docker.daemon.config.Config;
+import com.kliu.services.docker.daemon.aws.AWSClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.utils.StringUtils;
