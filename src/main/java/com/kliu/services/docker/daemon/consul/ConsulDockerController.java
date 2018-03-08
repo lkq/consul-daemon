@@ -89,7 +89,7 @@
 //    }
 //
 //    private String[] createCommand() {
-//        StartCommandBuilder commandBuilder = new StartCommandBuilder()
+//        ConsulCommandBuilder commandBuilder = new ConsulCommandBuilder()
 //                .with("agent")
 //                .with("-server")
 ////                .with(new BindAddress())

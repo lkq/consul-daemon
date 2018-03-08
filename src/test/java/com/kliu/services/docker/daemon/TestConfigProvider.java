@@ -2,9 +2,6 @@ package com.kliu.services.docker.daemon;
 
 import com.kliu.services.docker.daemon.config.ConfigProvider;
 
-import java.util.Arrays;
-import java.util.List;
-
 public class TestConfigProvider extends ConfigProvider {
     public String getConfigPath() {
         // TODO get current dir
@@ -17,7 +14,8 @@ public class TestConfigProvider extends ConfigProvider {
     }
 
     @Override
-    public List<String> getRetryJoin() {
-        return Arrays.asList("127.0.0.2");
+    public String getNetwork() {
+        return "";
     }
+
 }

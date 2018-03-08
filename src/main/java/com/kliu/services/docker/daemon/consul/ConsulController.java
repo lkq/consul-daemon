@@ -53,7 +53,7 @@ public class ConsulController {
                 .withDataVolume(context.getDataPath())
                 .withNetwork(context.getNetwork())
                 .withEnvironmentVariable(context.getEnvironmentVariables())
-                .withCommand(context.getStartCommands())
+                .withCommand(context.getConsulCommands())
                 .withPortBinders(context.getPortBinders())
                 .exec();
 

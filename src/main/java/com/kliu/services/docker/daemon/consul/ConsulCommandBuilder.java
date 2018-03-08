@@ -9,17 +9,17 @@ import spark.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StartCommandBuilder {
-    private static Logger logger = LoggerFactory.getLogger(StartCommandBuilder.class);
+public class ConsulCommandBuilder {
+    private static Logger logger = LoggerFactory.getLogger(ConsulCommandBuilder.class);
 
     List<OptionBuilder> optionBuilders = new ArrayList<>();
 
-    public StartCommandBuilder with(OptionBuilder option) {
+    public ConsulCommandBuilder with(OptionBuilder option) {
         optionBuilders.add(option);
         return this;
     }
 
-    public StartCommandBuilder with(String option) {
+    public ConsulCommandBuilder with(String option) {
         optionBuilders.add(new SimpleOption(option));
         return this;
     }
@@ -33,7 +33,6 @@ public class StartCommandBuilder {
             }
         }
 
-        logger.info("consul commands: {}", commands);
         return commands.toArray(new String[0]);
     }
 }
