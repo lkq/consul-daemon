@@ -1,10 +1,10 @@
 package com.kliu.services.docker.daemon.consul.option;
 
-public class BootstrapCount implements OptionBuilder {
+public class BootstrapExpectOption implements ConsulOption {
 
     private int count;
 
-    public BootstrapCount(int count) {
+    public BootstrapExpectOption(int count) {
         this.count = count;
     }
 

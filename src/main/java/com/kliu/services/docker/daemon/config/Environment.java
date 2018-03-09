@@ -1,6 +1,6 @@
 package com.kliu.services.docker.daemon.config;
 
-import com.kliu.services.docker.daemon.aws.AWSClientFactory;
+import com.kliu.services.docker.daemon.aws.AWSClient;
 import spark.utils.StringUtils;
 
 public class Environment {
@@ -11,7 +11,7 @@ public class Environment {
             value = System.getProperty(key, defaultValue);
         }
         if (StringUtils.isEmpty(value)) {
-            value = AWSClientFactory.get().getTag(key, defaultValue);
+            value = AWSClient.instance().getTag(key, defaultValue);
         }
         return value;
     }

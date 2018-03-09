@@ -1,5 +1,5 @@
 package com.kliu.services.docker.daemon.consul.option;
 
-public interface OptionBuilder {
+public interface ConsulOption {
     String build();
 }

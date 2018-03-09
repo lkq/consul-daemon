@@ -5,11 +5,11 @@ import spark.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RetryJoin implements OptionBuilder {
+public class RetryJoinOption implements ConsulOption {
 
     private final List<String> clusterHosts;
 
-    public RetryJoin(String hosts) {
+    public RetryJoinOption(String hosts) {
         clusterHosts = getClusterHosts(hosts);
     }
 

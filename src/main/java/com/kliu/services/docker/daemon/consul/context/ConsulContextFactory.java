@@ -2,8 +2,8 @@ package com.kliu.services.docker.daemon.consul.context;
 
 import com.kliu.services.docker.daemon.config.Environment;
 import com.kliu.services.docker.daemon.consul.ConsulCommandBuilder;
-import com.kliu.services.docker.daemon.consul.option.BootstrapCount;
-import com.kliu.services.docker.daemon.consul.option.RetryJoin;
+import com.kliu.services.docker.daemon.consul.option.BootstrapExpectOption;
+import com.kliu.services.docker.daemon.consul.option.RetryJoinOption;
 import com.kliu.services.docker.daemon.container.PortBinder;
 
 import java.nio.file.Paths;
@@ -19,11 +19,11 @@ public class ConsulContextFactory {
 
     public ConsulContext createConsulContext() {
         String hosts = Environment.getEnv("consul.cluster.hosts", "");
-        RetryJoin retryJoin = new RetryJoin(hosts);
+        RetryJoinOption retryJoinOption = new RetryJoinOption(hosts);
 
         String[] command = createDefaultCommand()
-                .with(new BootstrapCount(retryJoin.getHostCount()))
-                .with(retryJoin)
+                .with(new BootstrapExpectOption(retryJoinOption.getHostCount()))
+                .with(retryJoinOption)
                 .build();
         return createDefaultContext()
                 .withNetwork(HOST_NETWORK)
@@ -32,7 +32,7 @@ public class ConsulContextFactory {
 
     public ConsulContext createMacConsulClusterContext() {
         String[] command = createDefaultCommand()
-                .with(new RetryJoin("127.0.0.2 127.0.0.3 127.0.0.4"))
+                .with(new RetryJoinOption("127.0.0.2 127.0.0.3 127.0.0.4"))
                 .build();
         return createDefaultContext()
                 .withPortBinders(getPortBinders())
