@@ -10,6 +10,10 @@ public class BootstrapCount implements OptionBuilder {
 
     @Override
     public String build() {
-        return "-bootstrap-expect=" + count;
+        if (count > 0) {
+            return "-bootstrap-expect=" + count;
+        } else {
+            return "";
+        }
     }
 }

@@ -5,4 +5,6 @@ public interface AWSClient {
     boolean isAws();
 
     String getPrivateIP();
+
+    String getTag(String key, String defaultValue);
 }

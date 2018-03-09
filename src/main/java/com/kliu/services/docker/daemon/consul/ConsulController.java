@@ -1,5 +1,6 @@
 package com.kliu.services.docker.daemon.consul;
 
+import com.kliu.services.docker.daemon.consul.context.ConsulContext;
 import com.kliu.services.docker.daemon.container.ContainerLogRedirector;
 import com.kliu.services.docker.daemon.container.SimpleDockerClient;
 import org.slf4j.Logger;
@@ -49,12 +50,11 @@ public class ConsulController {
             dockerClient.removeContainer(tempContainerName);
         }
         String containerID = dockerClient.createContainer(context.getImageName(), context.getContainerName())
-                .withConfigVolume(context.getConfigPath())
                 .withDataVolume(context.getDataPath())
-                .withNetwork(context.getNetwork())
                 .withEnvironmentVariable(context.getEnvironmentVariables())
-                .withCommand(context.getConsulCommands())
+                .withNetwork(context.getNetwork())
                 .withPortBinders(context.getPortBinders())
+                .withCommand(context.getCommand())
                 .exec();
 
         dockerClient.startContainer(containerID);

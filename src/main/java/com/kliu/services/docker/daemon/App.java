@@ -1,8 +1,8 @@
 package com.kliu.services.docker.daemon;
 
-import com.kliu.services.docker.daemon.consul.ConsulContext;
 import com.kliu.services.docker.daemon.consul.ConsulController;
 import com.kliu.services.docker.daemon.consul.ConsulHealthChecker;
+import com.kliu.services.docker.daemon.consul.context.ConsulContext;
 import com.kliu.services.docker.daemon.container.ContainerLogRedirector;
 import com.kliu.services.docker.daemon.container.SimpleDockerClient;
 import com.kliu.services.docker.daemon.handler.HealthCheckHandler;

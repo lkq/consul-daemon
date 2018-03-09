@@ -7,11 +7,12 @@ import com.github.dockerjava.api.model.Bind;
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.Ports;
 import com.github.dockerjava.api.model.Volume;
-import com.kliu.services.docker.daemon.logging.Timer;
 import com.kliu.services.docker.daemon.container.PortBinder;
+import com.kliu.services.docker.daemon.logging.Timer;
 import com.kliu.utils.Guard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spark.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,16 +43,18 @@ public class CreateContainer {
     }
 
     public CreateContainer withDataVolume(String hostPath) {
-        Guard.notBlank(hostPath, "host-path is not provided");
-        logger.info("data-volume={}", hostPath);
-        this.createContainerCmd.withBinds(new Bind(hostPath, new Volume("/consul/data")));
+        if (StringUtils.isNotEmpty(hostPath)) {
+            logger.info("data-volume={}", hostPath);
+            this.createContainerCmd.withBinds(new Bind(hostPath, new Volume("/consul/data")));
+        }
         return this;
     }
 
     public CreateContainer withEnvironmentVariable(List<String> env) {
-        Guard.toBeTrue(env != null, "environment variables are not provided");
-        logger.info("environment={}", env);
-        this.createContainerCmd.withEnv(env.toArray(new String[0]));
+        if (env != null && env.size() > 0) {
+            logger.info("environment={}", env);
+            this.createContainerCmd.withEnv(env.toArray(new String[0]));
+        }
         return this;
     }
 
@@ -63,23 +66,26 @@ public class CreateContainer {
     }
 
     public CreateContainer withNetwork(String network) {
-        Guard.notBlank(network, "network is not provided");
-        logger.info("network={}", network);
-        this.createContainerCmd.withNetworkMode(network);
+        if (StringUtils.isNotEmpty(network)) {
+            logger.info("network={}", network);
+            this.createContainerCmd.withNetworkMode(network);
+        }
         return this;
     }
 
     public CreateContainer withPortBinders(List<PortBinder> portBinders) {
-        List<ExposedPort> exposedPorts = new ArrayList<>();
-        Ports bindings = new Ports();
-        for (PortBinder portBinder : portBinders) {
-            ExposedPort exposedPort = portBinder.getExposedPort();
-            exposedPorts.add(exposedPort);
-            bindings.bind(exposedPort, portBinder.getPortBinding());
-            logger.info("binding port: {}", portBinder);
-        }
+        if (portBinders != null && portBinders.size() > 0) {
+            List<ExposedPort> exposedPorts = new ArrayList<>();
+            Ports bindings = new Ports();
+            for (PortBinder portBinder : portBinders) {
+                ExposedPort exposedPort = portBinder.getExposedPort();
+                exposedPorts.add(exposedPort);
+                bindings.bind(exposedPort, portBinder.getPortBinding());
+                logger.info("binding port: {}", portBinder);
+            }
 
-        createContainerCmd.withExposedPorts(exposedPorts).withPortBindings(bindings);
+            createContainerCmd.withExposedPorts(exposedPorts).withPortBindings(bindings);
+        }
         return this;
     }
 }

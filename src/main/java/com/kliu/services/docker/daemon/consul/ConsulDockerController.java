@@ -98,6 +98,6 @@
 ////        for (String host : Config.getRetryJoin()) {
 ////            commandBuilder.with("-retry-join", host);
 ////        }
-//        return commandBuilder.build();
+//        return commandBuilder.get();
 //    }
 //}

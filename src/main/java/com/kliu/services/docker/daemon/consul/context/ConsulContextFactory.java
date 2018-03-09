@@ -1,78 +1,67 @@
 package com.kliu.services.docker.daemon.consul.context;
 
-import com.kliu.services.docker.daemon.config.env.Platform;
+import com.kliu.services.docker.daemon.config.Environment;
 import com.kliu.services.docker.daemon.consul.ConsulCommandBuilder;
-import com.kliu.services.docker.daemon.container.PortBinder;
 import com.kliu.services.docker.daemon.consul.option.BootstrapCount;
+import com.kliu.services.docker.daemon.consul.option.RetryJoin;
+import com.kliu.services.docker.daemon.container.PortBinder;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ConsulContextFactory {
+    private static final String NET_EASY_HUB = "http://hub-mirror.c.163.com";
 
     public static final String CONSUL_IMAGE = "consul:1.0.6";
     public static final String CONTAINER_NAME = "consul";
     public static final String HOST_NETWORK = "host";
 
-    public ConsulContext create() {
-        switch (Platform.get()) {
-            case LINUX_AWS:
-                return createAwsConsulContext();
-            case MAC:
-                return createMacConsulContext();
-            case LINUX:
-                return createLinuxConsulContext();
-            default:
-                throw new RuntimeException("unsupported platform: " + Platform.get());
-        }
-    }
+    public ConsulContext createConsulContext() {
+        String hosts = Environment.getEnv("consul.cluster.hosts", "");
+        RetryJoin retryJoin = new RetryJoin(hosts);
 
-    private ConsulContext createLinuxConsulContext() {
-
-        String[] command = new ConsulCommandBuilder()
-                .with("agent")
-                .with("-server")
-                .with("-ui")
-                .with(new BootstrapCount(3))
+        String[] command = createDefaultCommand()
+                .with(new BootstrapCount(retryJoin.getHostCount()))
+                .with(retryJoin)
                 .build();
-        return new ConsulContext()
-                .withImageName(CONSUL_IMAGE)
-                .withContainerName(CONTAINER_NAME)
-                .withEnvironmentVariables(getEnvironmentVariables())
-                .withDataPath(Paths.get(".").toAbsolutePath().normalize().toString() + "/data")
+        return createDefaultContext()
                 .withNetwork(HOST_NETWORK)
                 .withCommand(command);
     }
 
-    private ConsulContext createMacConsulContext() {
-        String[] command = new ConsulCommandBuilder()
-                .with("agent")
-                .with("-server")
-                .with("-ui")
-                .with(new BootstrapCount(3))
+    public ConsulContext createMacConsulClusterContext() {
+        String[] command = createDefaultCommand()
+                .with(new RetryJoin("127.0.0.2 127.0.0.3 127.0.0.4"))
                 .build();
-        return new ConsulContext()
-                .withImageName(CONSUL_IMAGE)
-                .withContainerName(CONTAINER_NAME)
-                .withEnvironmentVariables(getEnvironmentVariables())
-                .withDataPath(Paths.get(".").toAbsolutePath().normalize().toString() + "/data")
+        return createDefaultContext()
+                .withPortBinders(getPortBinders())
                 .withCommand(command);
     }
 
-    private ConsulContext createAwsConsulContext() {
-        String[] command = new ConsulCommandBuilder()
-                .with("agent")
-                .with("-server")
-                .with("-ui")
-                .with(new BootstrapCount(3))
+    public ConsulContext createMacConsulContext() {
+        String[] command = createDefaultCommand()
+                .with("-client=0.0.0.0")
+                .with("-bootstrap")
                 .build();
+        return createDefaultContext()
+                .withPortBinders(getPortBinders())
+                .withCommand(command);
+    }
+
+    private ConsulContext createDefaultContext() {
         return new ConsulContext()
                 .withImageName(CONSUL_IMAGE)
                 .withContainerName(CONTAINER_NAME)
                 .withEnvironmentVariables(getEnvironmentVariables())
-                .withDataPath(Paths.get(".").toAbsolutePath().normalize().toString() + "/data")
-                .withCommand(command);
+                .withDataPath(Paths.get(".").toAbsolutePath().normalize().toString() + "/data");
+    }
+
+    private ConsulCommandBuilder createDefaultCommand() {
+        return new ConsulCommandBuilder()
+                .with("agent")
+                .with("-server")
+                .with("-ui");
     }
 
     private List<PortBinder> getPortBinders() {

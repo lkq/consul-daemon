@@ -10,4 +10,9 @@ public class AWSClientStub implements AWSClient {
     public String getPrivateIP() {
         return null;
     }
+
+    @Override
+    public String getTag(String key, String defaultValue) {
+        return defaultValue;
+    }
 }
