@@ -19,7 +19,7 @@ public class App {
     public App() {
 
         consulController = new ConsulController(
-                new SimpleDockerClient(DockerClientFactory.get()),
+                SimpleDockerClient.create(DockerClientFactory.get()),
                 new ConsulHealthChecker(),
                 new ContainerLogRedirector());
     }

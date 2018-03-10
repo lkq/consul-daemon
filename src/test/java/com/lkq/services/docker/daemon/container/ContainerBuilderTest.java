@@ -53,7 +53,7 @@ class ContainerBuilderTest {
         String containerID = null;
         DockerClient client = DockerClientFactory.get();
         try {
-            SimpleDockerClient simpleDockerClient = new SimpleDockerClient(client);
+            SimpleDockerClient simpleDockerClient = SimpleDockerClient.create(client);
 
             String expectedContainerName = "hello-world-" + System.currentTimeMillis();
             ContainerBuilder containerBuilder = new ContainerBuilder(client, "hello-world:latest", expectedContainerName);

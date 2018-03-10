@@ -10,8 +10,6 @@ public class LocalLauncher {
     public static void main(String[] args) {
         initLogging();
 
-        System.setProperty("consul.network.interface", "en1");
-//        System.setProperty("consul.cluster.servers", "localhost");
         Config.init(new TestConfigProvider());
         new App().start(new ConsulContextFactory().createMacConsulContext());
     }

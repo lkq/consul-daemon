@@ -1,7 +1,7 @@
 package com.lkq.services.docker.daemon.container;
 
-import com.lkq.services.docker.daemon.config.Config;
 import com.lkq.services.docker.daemon.aws.AWSClient;
+import com.lkq.services.docker.daemon.config.Environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.utils.StringUtils;
@@ -50,7 +50,7 @@ public class HostIPResolver {
     }
 
     private String getByNetworkInterface() {
-        String networkInterfaceName = Config.getEnv("consul.network.interface");
+        String networkInterfaceName = Environment.getEnv("consul.network.interface", "");
         try {
             if (StringUtils.isNotEmpty(networkInterfaceName)) {
                 logger.info("getting address from network interface: {}", networkInterfaceName);

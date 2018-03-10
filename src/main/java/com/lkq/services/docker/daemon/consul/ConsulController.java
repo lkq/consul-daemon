@@ -49,7 +49,7 @@ public class ConsulController {
             dockerClient.renameContainer(context.getContainerName(), tempContainerName);
             dockerClient.removeContainer(tempContainerName);
         }
-        String containerID = dockerClient.containerBuilder(context.getImageName(), context.getContainerName())
+        String containerID = dockerClient.createContainerBuilder(context.getImageName(), context.getContainerName())
                 .withDataVolume(context.getDataPath())
                 .withEnvironmentVariable(context.getEnvironmentVariables())
                 .withNetwork(context.getNetwork())

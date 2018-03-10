@@ -35,7 +35,7 @@ class SimpleDockerClientTest {
     @BeforeEach
     void setUp() {
         initMocks(this);
-        simpleDockerClient = new SimpleDockerClient(dockerClient);
+        simpleDockerClient = SimpleDockerClient.create(dockerClient);
     }
 
     @Test
@@ -70,12 +70,12 @@ class SimpleDockerClientTest {
     @Test
     void testContainerLifeCycle() {
         String containerID = null;
-        SimpleDockerClient client = new SimpleDockerClient(DockerClientFactory.get());
+        SimpleDockerClient client = SimpleDockerClient.create(DockerClientFactory.get());
         try {
             String imageName = "hello-world";
             String containerName = imageName + "-" + System.currentTimeMillis();
             client.pullImage(imageName);
-            containerID = client.containerBuilder(imageName, containerName).build();
+            containerID = client.createContainerBuilder(imageName, containerName).build();
             Boolean started = client.startContainer(containerID);
             assertTrue(started);
         } finally {
@@ -90,7 +90,7 @@ class SimpleDockerClientTest {
     @Test
     void willReturnFalseIfContainerNotExists() {
         String currentName = "dummy-container-" + System.currentTimeMillis();
-        SimpleDockerClient client = new SimpleDockerClient(DockerClientFactory.get());
+        SimpleDockerClient client = SimpleDockerClient.create(DockerClientFactory.get());
         boolean renamed = client.renameContainer(currentName, "dummy-container");
         assertThat(renamed, is(false));
     }
@@ -99,12 +99,12 @@ class SimpleDockerClientTest {
     @Test
     void canActuallyRenameContainer() throws InterruptedException, IOException {
         String containerID = null;
-        SimpleDockerClient client = new SimpleDockerClient(DockerClientFactory.get());
+        SimpleDockerClient client = SimpleDockerClient.create(DockerClientFactory.get());
         try {
             client.pullImage(helloWorldImage);
             String oldContainerName = "hello-world-" + System.currentTimeMillis();
             String newContainerName = oldContainerName + "-1";
-            containerID = client.containerBuilder(helloWorldImage, oldContainerName).build();
+            containerID = client.createContainerBuilder(helloWorldImage, oldContainerName).build();
             boolean renamed = client.renameContainer(oldContainerName, newContainerName);
 
             assertThat(renamed, is(true));

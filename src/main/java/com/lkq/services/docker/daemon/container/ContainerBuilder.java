@@ -2,12 +2,10 @@ package com.lkq.services.docker.daemon.container;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerCmd;
-import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.model.Bind;
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.Ports;
 import com.github.dockerjava.api.model.Volume;
-import com.lkq.services.docker.daemon.logging.Timer;
 import com.kliu.utils.Guard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,19 +18,14 @@ import java.util.List;
 public class ContainerBuilder {
     private static Logger logger = LoggerFactory.getLogger(ContainerBuilder.class);
 
-    private final CreateContainerCmd createContainerCmd;
+    private CreateContainerCmd createContainerCmd;
 
     public ContainerBuilder(DockerClient dockerClient, String imageNameTag, String containerName) {
         createContainerCmd = dockerClient.createContainerCmd(imageNameTag).withName(containerName);
     }
 
     public String build() {
-        final CreateContainerResponse[] createResponse = new CreateContainerResponse[1];
-        Timer.log(logger, "created container, image=" + createContainerCmd.getImage() + ", container-name=" + createContainerCmd.getName(), () -> {
-            logger.info("creating container: {}", createContainerCmd.toString());
-            createResponse[0] = createContainerCmd.exec();
-        });
-        return createResponse[0].getId();
+        return createContainerCmd.exec().getId();
     }
 
     public ContainerBuilder withConfigVolume(String hostPath) {
