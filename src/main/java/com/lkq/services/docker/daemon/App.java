@@ -4,6 +4,7 @@ import com.lkq.services.docker.daemon.consul.ConsulController;
 import com.lkq.services.docker.daemon.consul.ConsulHealthChecker;
 import com.lkq.services.docker.daemon.consul.context.ConsulContext;
 import com.lkq.services.docker.daemon.container.ContainerLogRedirector;
+import com.lkq.services.docker.daemon.container.DockerClientFactory;
 import com.lkq.services.docker.daemon.container.SimpleDockerClient;
 import com.lkq.services.docker.daemon.handler.HealthCheckHandler;
 import com.lkq.services.docker.daemon.routes.v1.Routes;
@@ -16,8 +17,9 @@ public class App {
 //docker run --name=consul -d -p 8300-8302:8300-8302 -p 8301:8301/udp -p 8302:8302/udp -p 8400:8400 -p 8500:8500 -p 8600:53/udp -h node3 gliderlabs/consul-server:0.6 -server -ui -advertise 192.168.99.103 -join node1 -join node2 -join node3
 
     public App() {
+
         consulController = new ConsulController(
-                new SimpleDockerClient(),
+                new SimpleDockerClient(DockerClientFactory.get()),
                 new ConsulHealthChecker(),
                 new ContainerLogRedirector());
     }

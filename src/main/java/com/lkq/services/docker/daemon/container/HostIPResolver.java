@@ -64,7 +64,7 @@ public class HostIPResolver {
                     }
                 }
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
             logger.error("failed to get bind address from network interface " + networkInterfaceName, e);
         }
         return null;

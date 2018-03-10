@@ -27,28 +27,28 @@
 //        String containerToDelete = "consul-stopped-" + System.currentTimeMillis();
 //        boolean renamed = false;
 //        try {
-//            new StopContainer(simpleDockerClient).exec(CONSUL_CONTAINER_NAME);
-//            renamed = new RenameContainer(simpleDockerClient).exec(CONSUL_CONTAINER_NAME, containerToDelete);
+//            new StopContainer(simpleDockerClient).build(CONSUL_CONTAINER_NAME);
+//            renamed = new RenameContainer(simpleDockerClient).build(CONSUL_CONTAINER_NAME, containerToDelete);
 //
-//            String imageName = new PullImage(simpleDockerClient).exec(CONSUL_IMAGE_TAG, 0);
+//            String imageName = new PullImage(simpleDockerClient).build(CONSUL_IMAGE_TAG, 0);
 //
 //            String[] commands = createCommand();
 //            Map<String, Object> env = createEnvironmentVariables();
 //
-//            String containerID = new CreateContainer(simpleDockerClient, imageName, CONSUL_CONTAINER_NAME)
+//            String containerID = new ContainerBuilder(simpleDockerClient, imageName, CONSUL_CONTAINER_NAME)
 //                    .withConfigVolume(Config.getConfigPath())
 //                    .withDataVolume(Config.getDataPath())
 //                    .withNetwork(Config.getNetwork())
 //                    .withEnvironmentVariable(env)
 //                    .withCommand(commands)
 //                    .withPortBinders(Config.getTCPPorts(), Config.getUDPPorts())
-//                    .exec();
+//                    .build();
 //
-//            new StartContainer(simpleDockerClient).exec(containerID);
+//            new StartContainer(simpleDockerClient).build(containerID);
 //
 //            redirectConsulLog(containerID);
 //
-//            InspectContainerResponse inspectContainerResponse = simpleDockerClient.get().inspectContainerCmd(containerID).exec();
+//            InspectContainerResponse inspectContainerResponse = simpleDockerClient.get().inspectContainerCmd(containerID).build();
 //            InspectContainerResponse.ContainerState state = inspectContainerResponse.getState();
 //            logger.info("container state: {}", state);
 //            if (state != null && state.getRunning() != null) {
@@ -58,7 +58,7 @@
 //            }
 //        } finally {
 //            if (renamed) {
-//                simpleDockerClient.get().removeContainerCmd(containerToDelete).withForce(true).exec();
+//                simpleDockerClient.get().removeContainerCmd(containerToDelete).withForce(true).build();
 //            }
 //        }
 //    }
@@ -73,7 +73,7 @@
 //                    .withStdOut(true)
 //                    .withFollowStream(true)
 //                    .withTailAll()
-//                    .exec(loggingCallback);
+//                    .build(loggingCallback);
 //        }).run();
 //        logger.info("redirecting consul log");
 //    }

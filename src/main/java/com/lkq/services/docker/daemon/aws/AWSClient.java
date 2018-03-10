@@ -29,7 +29,7 @@ public class AWSClient {
         if (isAws == null) {
             try {
                 isAws = StringUtils.isNotEmpty(EC2MetadataUtils.getInstanceId());
-            } catch (Throwable ignored) {
+            } catch (Exception ignored) {
                 isAws = false;
             }
         }

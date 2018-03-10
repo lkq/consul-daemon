@@ -18,7 +18,7 @@ public class ContainerLogRedirector {
                         .withFollowStream(true)
                         .withTailAll()
                         .exec(loggingCallback);
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 logger.error("failed to redirect container log");
             }
         }).run();

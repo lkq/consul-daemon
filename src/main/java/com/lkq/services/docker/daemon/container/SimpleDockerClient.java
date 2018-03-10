@@ -3,24 +3,20 @@ package com.lkq.services.docker.daemon.container;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.exception.NotModifiedException;
-import com.github.dockerjava.core.DefaultDockerClientConfig;
-import com.github.dockerjava.core.DockerClientBuilder;
-import com.lkq.services.docker.daemon.config.Config;
-import com.lkq.services.docker.daemon.container.cmd.CreateContainer;
+import com.github.dockerjava.core.command.PullImageResultCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.utils.StringUtils;
+
+import java.util.concurrent.TimeUnit;
 
 public class SimpleDockerClient {
     private static Logger logger = LoggerFactory.getLogger(SimpleDockerClient.class);
 
     private DockerClient client;
 
-    public SimpleDockerClient() {
-
-        DefaultDockerClientConfig.Builder configBuilder = DefaultDockerClientConfig.createDefaultConfigBuilder();
-        configBuilder.withRegistryUrl(Config.getRegistryURL());
-        client = DockerClientBuilder.getInstance(configBuilder.build()).build();
+    public SimpleDockerClient(DockerClient client) {
+        this.client = client;
     }
 
     public DockerClient get() {
@@ -36,7 +32,7 @@ public class SimpleDockerClient {
             } else {
                 return state.getRunning();
             }
-        } catch (Throwable ignored) {
+        } catch (Exception ignored) {
         }
         return false;
     }
@@ -45,7 +41,7 @@ public class SimpleDockerClient {
         try {
             InspectContainerResponse container = client.inspectContainerCmd(containerId).exec();
             return StringUtils.isNotEmpty(container.getId());
-        } catch (Throwable ignored) {
+        } catch (Exception ignored) {
         }
         return false;
     }
@@ -54,18 +50,25 @@ public class SimpleDockerClient {
         try {
             client.removeContainerCmd(containerId).withForce(true).exec();
             return true;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             logger.info("failed to remove container: " + containerId, e);
         }
         return false;
     }
 
-    public CreateContainer createContainer(String imageName, String containerName) {
-        return new CreateContainer(client, imageName, containerName);
+    public ContainerBuilder containerBuilder(String imageName, String containerName) {
+        return new ContainerBuilder(client, imageName, containerName);
     }
 
-    public void startContainer(String containerID) {
-        client.startContainerCmd(containerID).exec();
+    public Boolean startContainer(String containerID) {
+        try {
+            client.startContainerCmd(containerID).exec();
+            InspectContainerResponse inspectResponse = client.inspectContainerCmd(containerID).exec();
+            return inspectResponse.getState().getRunning();
+        } catch (Exception e) {
+            logger.info("failed to start ");
+        }
+        return false;
     }
 
     public boolean stopContainer(String containerId) {
@@ -74,18 +77,27 @@ public class SimpleDockerClient {
             return true;
         } catch (NotModifiedException e) {
             logger.info("container [{}] is not running", containerId);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             logger.info("failed to stop container [" + containerId + "]", e);
         }
         return false;
     }
 
-    public boolean renameContainer(String containerName, String tempContainerName) {
+    public boolean renameContainer(String containerName, String newName) {
         try {
-            client.renameContainerCmd(containerName).withName(tempContainerName).exec();
+            client.renameContainerCmd(containerName).withName(newName).exec();
             return true;
-        } catch (Throwable e) {
-            logger.info("failed to rename container from [" + containerName + "] to [" + tempContainerName + "]", e);
+        } catch (Exception e) {
+            logger.info("failed to rename container from [" + containerName + "] to [" + newName + "]", e);
+        }
+        return false;
+    }
+
+    public boolean pullImage(String image) {
+        try {
+            return client.pullImageCmd(image).exec(new PullImageResultCallback()).awaitCompletion(0, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            logger.info("failed to pull image: " + image);
         }
         return false;
     }
