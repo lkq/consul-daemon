@@ -30,7 +30,7 @@
         </encoder>
     </appender>
 
-    <logger name="com.kliu.services.docker.daemon.container.ContainerLogger" level="info" additivity="false">
+    <logger name="com.lkq.services.docker.daemon.container.ContainerLogger" level="info" additivity="false">
         <appender-ref ref="ConsulLogAppend"/>
     </logger>
 
