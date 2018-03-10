@@ -4,39 +4,33 @@ import spark.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RetryJoinOption implements ConsulOption {
 
-    private final List<String> clusterHosts;
+    private String host;
 
-    public RetryJoinOption(String hosts) {
-        clusterHosts = getClusterHosts(hosts);
+    public static List<RetryJoinOption> fromHosts(List<String> hosts) {
+        return hosts.stream().filter(StringUtils::isNotEmpty).map(RetryJoinOption::new).collect(Collectors.toList());
+    }
+
+    public static List<RetryJoinOption> fromHosts(String hosts) {
+        ArrayList<String> hostList = new ArrayList<>();
+        String[] split = hosts.split(" ");
+        for (String host : split) {
+            if (StringUtils.isNotEmpty(host)) {
+                hostList.add(host);
+            }
+        }
+        return fromHosts(hostList);
+    }
+
+    public RetryJoinOption(String host) {
+        this.host = host;
     }
 
     @Override
     public String build() {
-
-        StringBuilder retryJoin = new StringBuilder();
-        for (String host : clusterHosts) {
-            if (StringUtils.isNotEmpty(host)) {
-                retryJoin.append(" -retry-join ").append(host);
-            }
-        }
-        return retryJoin.toString();
-    }
-
-    public int getHostCount() {
-        return clusterHosts.size();
-    }
-
-    private List<String> getClusterHosts(String hosts) {
-        String[] clusterHosts = hosts.split(" ");
-        List<String> hostList = new ArrayList<>();
-        for (String clusterHost : clusterHosts) {
-            if (StringUtils.isNotEmpty(clusterHost.trim())) {
-                hostList.add(clusterHost.trim());
-            }
-        }
-        return hostList;
+        return "-retry-join=" + host;
     }
 }

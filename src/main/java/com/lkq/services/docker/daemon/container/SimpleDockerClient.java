@@ -117,8 +117,18 @@ public class SimpleDockerClient {
         try {
             return client.pullImageCmd(image).exec(new PullImageResultCallback()).awaitCompletion(0, TimeUnit.SECONDS);
         } catch (Exception e) {
-            logger.info("failed to pull image: " + image);
+            logger.info("failed to pull image: {}, reason: {}", image, e.getMessage());
         }
         return false;
+    }
+
+    @Timing
+    public InspectContainerResponse inspectContainer(String containerName) {
+        try {
+            return client.inspectContainerCmd(containerName).exec();
+        } catch (Exception e) {
+            logger.info("failed to inspect container: {}, reason: {}", containerName, e.getMessage());
+        }
+        return null;
     }
 }

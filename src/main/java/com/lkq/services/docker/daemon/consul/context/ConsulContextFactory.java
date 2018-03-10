@@ -19,23 +19,24 @@ public class ConsulContextFactory {
 
     public ConsulContext createConsulContext() {
         String hosts = Environment.getEnv("consul.cluster.hosts", "");
-        RetryJoinOption retryJoinOption = new RetryJoinOption(hosts);
+        List<RetryJoinOption> retryJoinOptions = RetryJoinOption.fromHosts(hosts);
 
         String[] command = createDefaultCommand()
-                .with(new BootstrapExpectOption(retryJoinOption.getHostCount()))
-                .with(retryJoinOption)
+                .with(new BootstrapExpectOption(retryJoinOptions.size()))
+                .with(retryJoinOptions)
                 .build();
-        return createDefaultContext()
+        return createDefaultContext(CONTAINER_NAME)
                 .withNetwork(HOST_NETWORK)
+                .withDataPath(Paths.get(".").toAbsolutePath().normalize().toString() + "/data")
                 .withCommand(command);
     }
 
-    public ConsulContext createMacConsulClusterContext() {
+    public ConsulContext createMacClusterMemberContext(String containerName, int bootstrapCount, List<RetryJoinOption> retryJoinOptions) {
         String[] command = createDefaultCommand()
-                .with(new RetryJoinOption("127.0.0.2 127.0.0.3 127.0.0.4"))
+                .with(retryJoinOptions)
+                .with(new BootstrapExpectOption(bootstrapCount))
                 .build();
-        return createDefaultContext()
-                .withPortBinders(getPortBinders())
+        return createDefaultContext(containerName)
                 .withCommand(command);
     }
 
@@ -44,17 +45,16 @@ public class ConsulContextFactory {
                 .with("-client=0.0.0.0")
                 .with("-bootstrap")
                 .build();
-        return createDefaultContext()
+        return createDefaultContext(CONTAINER_NAME)
                 .withPortBinders(getPortBinders())
                 .withCommand(command);
     }
 
-    private ConsulContext createDefaultContext() {
+    private ConsulContext createDefaultContext(String containerName) {
         return new ConsulContext()
                 .withImageName(CONSUL_IMAGE)
-                .withContainerName(CONTAINER_NAME)
-                .withEnvironmentVariables(getEnvironmentVariables())
-                .withDataPath(Paths.get(".").toAbsolutePath().normalize().toString() + "/data");
+                .withContainerName(containerName)
+                .withEnvironmentVariables(getEnvironmentVariables());
     }
 
     private ConsulCommandBuilder createDefaultCommand() {
