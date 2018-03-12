@@ -2,6 +2,7 @@ package com.lkq.services.docker.daemon;
 
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.lkq.services.docker.daemon.config.Config;
+import com.lkq.services.docker.daemon.config.Environment;
 import com.lkq.services.docker.daemon.consul.ConsulController;
 import com.lkq.services.docker.daemon.consul.context.ConsulContext;
 import com.lkq.services.docker.daemon.consul.context.ConsulContextFactory;
@@ -10,7 +11,6 @@ import com.lkq.services.docker.daemon.container.SimpleDockerClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
-import spark.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.logging.LogManager;
 public class LaunchClusterMembers {
     private static Logger logger;
 
-    private String[] clusterMembers = {"consul-member1", "consul-member2", "consul-member3"};
+    private String[] clusterNodes = {"consul_node0", "consul_node1", "consul_node2"};
 
     public static void main(String[] args) {
         initLogging();
@@ -28,7 +28,6 @@ public class LaunchClusterMembers {
 
         Config.init(new TestConfigProvider());
         App app = new App();
-
 
         ConsulContextFactory contextFactory = new ConsulContextFactory();
         SimpleDockerClient dockerClient = app.getDockerClient();
@@ -55,29 +54,43 @@ public class LaunchClusterMembers {
 
     private void joinCluster(ConsulController consulController, SimpleDockerClient dockerClient, ConsulContextFactory contextFactory) {
 
-        List<String> memberIPs = new ArrayList<>();
-        String nodeName = null;
-        for (String member : clusterMembers) {
-            InspectContainerResponse memberNode = dockerClient.inspectContainer(member);
-            if (memberNode == null || memberNode.getState().getRunning() == null || ! memberNode.getState().getRunning()) {
-                // find the first member not running
-                if (StringUtils.isEmpty(nodeName)) {
-                    nodeName = member;
+        int nodeIndex = Integer.valueOf(Environment.getEnv("node-index", "-1"));
+        if (nodeIndex < 0) {
+            throw new RuntimeException("please provide node-name by -Dnode-index=<node index>");
+        }
+        String startingNodeName = clusterNodes[nodeIndex];
+        List<String> runningNodeIPs = new ArrayList<>();
+        for (String nodeName : clusterNodes) {
+            if (!nodeName.equals(startingNodeName)) {
+                InspectContainerResponse memberNode = dockerClient.inspectContainer(nodeName);
+                if (memberNode != null && memberNode.getState().getRunning() != null && memberNode.getState().getRunning()) {
+                    // collect cluster member ips
+                    String nodeIP = memberNode.getNetworkSettings().getNetworks().get("bridge").getIpAddress();
+                    logger.info("cluster node: {} ip: {}", nodeName, nodeIP);
+                    runningNodeIPs.add(nodeIP);
+                } else {
+                    logger.info("node not found: {}", nodeName);
                 }
-            } else {
-                // collect cluster member ips
-                String hostIP = memberNode.getNetworkSettings().getNetworks().get("bridge").getIpAddress();
-                logger.info("collecting cluster member ip: {}", hostIP);
-                memberIPs.add(hostIP);
             }
         }
 
-        if (StringUtils.isEmpty(nodeName)) {
-            throw new RuntimeException("reach max cluster size, please stop a running member first");
+        InspectContainerResponse existingNode = dockerClient.inspectContainer(startingNodeName);
+        if (existingNode != null && existingNode.getState().getRunning() != null && existingNode.getState().getRunning()) {
+            logger.info("attaching logging to existing consul node: {}", startingNodeName);
+            consulController.attachLogging(existingNode.getId());
         } else {
-            logger.info("starting consul cluster member {}", nodeName);
-            ConsulContext context = contextFactory.createMacClusterMemberContext(nodeName, clusterMembers.length, RetryJoinOption.fromHosts(memberIPs));
+            logger.info("starting consul cluster member: {}", startingNodeName);
+            ConsulContext context = contextFactory.createMacClusterMemberContext(startingNodeName, RetryJoinOption.fromHosts(runningNodeIPs), 3);
+            if (nodeIndex == 0) {
+                context.withPortBinders(contextFactory.getPortBinders());
+            }
             consulController.start(context);
+
+            Runtime.getRuntime().addShutdownHook(
+                    new Thread(() -> {
+                        dockerClient.stopContainer(startingNodeName);
+                    })
+            );
         }
     }
 }

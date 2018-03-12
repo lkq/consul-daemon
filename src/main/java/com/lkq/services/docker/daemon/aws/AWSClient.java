@@ -41,15 +41,18 @@ public class AWSClient {
     }
 
     public String getTag(String key, String defaultValue) {
-        AmazonEC2 amazonEC2 = AmazonEC2ClientBuilder.defaultClient();
-        Filter tagKeyFilter = new Filter();
-        tagKeyFilter.setName(key);
-        DescribeTagsRequest request = new DescribeTagsRequest(Arrays.asList(tagKeyFilter));
-        DescribeTagsResult result = amazonEC2.describeTags(request);
-        List<TagDescription> tags = result.getTags();
-        logger.info("tag key={}, tag values= {}", key, tags);
-        if (tags.size() > 0) {
-            return tags.get(0).getValue();
+        try {
+            AmazonEC2 amazonEC2 = AmazonEC2ClientBuilder.defaultClient();
+            Filter tagKeyFilter = new Filter();
+            tagKeyFilter.setName(key);
+            DescribeTagsRequest request = new DescribeTagsRequest(Arrays.asList(tagKeyFilter));
+            DescribeTagsResult result = amazonEC2.describeTags(request);
+            List<TagDescription> tags = result.getTags();
+            logger.info("tag key={}, tag values= {}", key, tags);
+            if (tags.size() > 0) {
+                return tags.get(0).getValue();
+            }
+        } catch (Exception ignored) {
         }
         return defaultValue;
     }

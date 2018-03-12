@@ -5,6 +5,7 @@ import com.lkq.services.docker.daemon.consul.ConsulCommandBuilder;
 import com.lkq.services.docker.daemon.consul.option.BootstrapExpectOption;
 import com.lkq.services.docker.daemon.consul.option.RetryJoinOption;
 import com.lkq.services.docker.daemon.container.PortBinder;
+import spark.utils.StringUtils;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -17,12 +18,19 @@ public class ConsulContextFactory {
     public static final String CONTAINER_NAME = "consul";
     public static final String HOST_NETWORK = "host";
 
+    public static final int CLUSTER_MEMBER_COUNT = 3;
+
     public ConsulContext createConsulContext() {
-        String hosts = Environment.getEnv("consul.cluster.hosts", "");
-        List<RetryJoinOption> retryJoinOptions = RetryJoinOption.fromHosts(hosts);
+        List<RetryJoinOption> retryJoinOptions = new ArrayList<>();
+        String retryJoin = Environment.getEnv("consul.cluster.members", "");
+        if (StringUtils.isEmpty(retryJoin)) {
+            retryJoinOptions.add(new RetryJoinOption("provider=aws tag_key=consul-role tag_value=server"));
+        } else {
+            retryJoinOptions.addAll(RetryJoinOption.fromHosts(retryJoin));
+        }
 
         String[] command = createDefaultCommand()
-                .with(new BootstrapExpectOption(retryJoinOptions.size()))
+                .with(new BootstrapExpectOption(CLUSTER_MEMBER_COUNT))
                 .with(retryJoinOptions)
                 .build();
         return createDefaultContext(CONTAINER_NAME)
@@ -31,10 +39,10 @@ public class ConsulContextFactory {
                 .withCommand(command);
     }
 
-    public ConsulContext createMacClusterMemberContext(String containerName, int bootstrapCount, List<RetryJoinOption> retryJoinOptions) {
+    public ConsulContext createMacClusterMemberContext(String containerName, List<RetryJoinOption> retryJoinOptions, int bootstrapExpectedCount) {
         String[] command = createDefaultCommand()
                 .with(retryJoinOptions)
-                .with(new BootstrapExpectOption(bootstrapCount))
+                .with(new BootstrapExpectOption(bootstrapExpectedCount))
                 .build();
         return createDefaultContext(containerName)
                 .withCommand(command);
@@ -64,7 +72,7 @@ public class ConsulContextFactory {
                 .with("-ui");
     }
 
-    private List<PortBinder> getPortBinders() {
+    public List<PortBinder> getPortBinders() {
         List<PortBinder> portBinders = new ArrayList<>();
         portBinders.add(new PortBinder(8300, PortBinder.Protocol.TCP));
         portBinders.add(new PortBinder(8301, PortBinder.Protocol.TCP));

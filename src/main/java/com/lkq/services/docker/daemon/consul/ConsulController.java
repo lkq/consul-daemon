@@ -61,7 +61,7 @@ public class ConsulController {
         attachLogging(containerID);
     }
 
-    private void attachLogging(String containerID) {
+    public void attachLogging(String containerID) {
         logger.info("attaching container log: {}", containerID);
         logRedirector.attach(containerID, dockerClient);
     }

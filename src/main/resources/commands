@@ -9,7 +9,7 @@ docker run -it -p 8500:8500 consul agent -server -bind='{{ GetPrivateIP }}' -boo
 docker run -it --net=host consul agent -server -bind='{{ GetPrivateIP }}' -bootstrap
 
 // this works
-docker run -it -p 8500:8500 --name node4 -h node4 consul agent -server -bootstrap  -ui -client=0.0.0.0 -bind='{{ GetPrivateIP }}'
+docker run -it -p 8500:8500 --name node4 -h node4 consul agent -server -bootstrap  -ui -client=0.0.0.0 -bind='{{ GetPrivateIP }}'\
 //docker run -it -p 8500:8500 consul agent -server -bootstrap  -ui -bind='{{ GetPrivateIP }}'
 
 docker run -it -p 8000:8000 appserver:centos7 python -m SimpleHTTPServer
