@@ -19,6 +19,7 @@ public class ConsulContextFactory {
     public static final String HOST_NETWORK = "host";
 
     public static final int CLUSTER_MEMBER_COUNT = 3;
+    public static final String BIND_CLIENT_IP = "-client=0.0.0.0";
 
     public ConsulContext createConsulContext() {
         List<RetryJoinOption> retryJoinOptions = new ArrayList<>();
@@ -40,22 +41,20 @@ public class ConsulContextFactory {
     }
 
     public ConsulContext createMacClusterMemberContext(String containerName, List<RetryJoinOption> retryJoinOptions, int bootstrapExpectedCount) {
-        String[] command = createDefaultCommand()
+        ConsulCommandBuilder commandBuilder = createDefaultCommand()
                 .with(retryJoinOptions)
-                .with(new BootstrapExpectOption(bootstrapExpectedCount))
-                .build();
+                .with(new BootstrapExpectOption(bootstrapExpectedCount));
         return createDefaultContext(containerName)
-                .withCommand(command);
+                .withCommandBuilder(commandBuilder);
     }
 
     public ConsulContext createMacConsulContext() {
-        String[] command = createDefaultCommand()
-                .with("-client=0.0.0.0")
-                .with("-bootstrap")
-                .build();
+        ConsulCommandBuilder commandBuilder = createDefaultCommand()
+                .with(BIND_CLIENT_IP)
+                .with("-bootstrap");
         return createDefaultContext(CONTAINER_NAME)
                 .withPortBinders(getPortBinders())
-                .withCommand(command);
+                .withCommandBuilder(commandBuilder);
     }
 
     private ConsulContext createDefaultContext(String containerName) {

@@ -1,5 +1,7 @@
 package com.lkq.services.docker.daemon.consul.context;
 
+import com.kliu.utils.Guard;
+import com.lkq.services.docker.daemon.consul.ConsulCommandBuilder;
 import com.lkq.services.docker.daemon.container.PortBinder;
 
 import java.util.List;
@@ -13,6 +15,7 @@ public class ConsulContext {
     private List<PortBinder> portBinders;
     private String dataPath;
     private String[] command;
+    private ConsulCommandBuilder commandBuilder;
 
     public String getImageName() {
         return imageName;
@@ -69,11 +72,25 @@ public class ConsulContext {
     }
 
     public String[] getCommand() {
+        if (commandBuilder != null) {
+            return commandBuilder.build();
+        }
         return command;
     }
 
     public ConsulContext withCommand(String[] command) {
+        Guard.toBeTrue(commandBuilder == null, "command builder already provided");
         this.command = command;
+        return this;
+    }
+
+    public ConsulCommandBuilder getCommandBuilder() {
+        return commandBuilder;
+    }
+
+    public ConsulContext withCommandBuilder(ConsulCommandBuilder commandBuilder) {
+        Guard.toBeTrue(command == null || command.length == 0, "command already provided");
+        this.commandBuilder = commandBuilder;
         return this;
     }
 }

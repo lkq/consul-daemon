@@ -59,6 +59,30 @@ public class LaunchClusterMembers {
             throw new RuntimeException("please provide node-name by -Dnode-index=<node index>");
         }
         String startingNodeName = clusterNodes[nodeIndex];
+        List<String> runningNodeIPs = collectRunningNodeIPs(dockerClient, startingNodeName);
+
+        InspectContainerResponse existingNode = dockerClient.inspectContainer(startingNodeName);
+        if (existingNode != null && existingNode.getState().getRunning() != null && existingNode.getState().getRunning()) {
+            logger.info("attaching logging to existing consul node: {}", startingNodeName);
+            consulController.attachLogging(existingNode.getId());
+        } else {
+            logger.info("starting consul cluster member: {}", startingNodeName);
+            ConsulContext context = contextFactory.createMacClusterMemberContext(startingNodeName, RetryJoinOption.fromHosts(runningNodeIPs), 3);
+            if (nodeIndex == 0) {
+                context.withPortBinders(contextFactory.getPortBinders());
+                context.getCommandBuilder().with(ConsulContextFactory.BIND_CLIENT_IP);
+            }
+            consulController.start(context);
+
+            Runtime.getRuntime().addShutdownHook(
+                    new Thread(() -> {
+                        dockerClient.stopContainer(startingNodeName);
+                    })
+            );
+        }
+    }
+
+    private List<String> collectRunningNodeIPs(SimpleDockerClient dockerClient, String startingNodeName) {
         List<String> runningNodeIPs = new ArrayList<>();
         for (String nodeName : clusterNodes) {
             if (!nodeName.equals(startingNodeName)) {
@@ -73,24 +97,6 @@ public class LaunchClusterMembers {
                 }
             }
         }
-
-        InspectContainerResponse existingNode = dockerClient.inspectContainer(startingNodeName);
-        if (existingNode != null && existingNode.getState().getRunning() != null && existingNode.getState().getRunning()) {
-            logger.info("attaching logging to existing consul node: {}", startingNodeName);
-            consulController.attachLogging(existingNode.getId());
-        } else {
-            logger.info("starting consul cluster member: {}", startingNodeName);
-            ConsulContext context = contextFactory.createMacClusterMemberContext(startingNodeName, RetryJoinOption.fromHosts(runningNodeIPs), 3);
-            if (nodeIndex == 0) {
-                context.withPortBinders(contextFactory.getPortBinders());
-            }
-            consulController.start(context);
-
-            Runtime.getRuntime().addShutdownHook(
-                    new Thread(() -> {
-                        dockerClient.stopContainer(startingNodeName);
-                    })
-            );
-        }
+        return runningNodeIPs;
     }
 }
