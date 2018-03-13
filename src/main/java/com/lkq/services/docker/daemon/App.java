@@ -25,7 +25,7 @@ public class App {
     public void start(ConsulContext context) {
 
         consulController.start(context);
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> consulController.stop(context)));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> consulController.stop(context.getContainerName())));
 
         new Routes(new HealthCheckHandler(consulController)).ignite();
 

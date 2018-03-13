@@ -73,14 +73,7 @@ public class LaunchClusterMembers {
                 context.getCommandBuilder().with(ConsulContextFactory.BIND_CLIENT_IP);
             }
             consulController.start(context);
-            try {
-                Thread.sleep(10000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-//            consulController.stop(context);
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> consulController.stop(context)));
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> consulController.stop(context.getContainerName())));
         }
     }
 
