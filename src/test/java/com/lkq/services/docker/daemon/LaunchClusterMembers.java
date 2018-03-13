@@ -73,12 +73,14 @@ public class LaunchClusterMembers {
                 context.getCommandBuilder().with(ConsulContextFactory.BIND_CLIENT_IP);
             }
             consulController.start(context);
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
-            Runtime.getRuntime().addShutdownHook(
-                    new Thread(() -> {
-                        dockerClient.stopContainer(startingNodeName);
-                    })
-            );
+//            consulController.stop(context);
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> consulController.stop(context)));
         }
     }
 

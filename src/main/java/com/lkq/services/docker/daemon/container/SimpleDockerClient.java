@@ -1,8 +1,10 @@
 package com.lkq.services.docker.daemon.container;
 
 import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.command.ExecCreateCmdResponse;
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.exception.NotModifiedException;
+import com.github.dockerjava.core.command.ExecStartResultCallback;
 import com.github.dockerjava.core.command.PullImageResultCallback;
 import com.lkq.services.docker.daemon.logging.Timing;
 import com.lkq.services.docker.daemon.logging.TimingProxyFactory;
@@ -10,6 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.utils.StringUtils;
 
+import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 public class SimpleDockerClient {
@@ -130,5 +134,25 @@ public class SimpleDockerClient {
             logger.info("failed to inspect container: {}, reason: {}", containerName, e.getMessage());
         }
         return null;
+    }
+
+    public void execute(String containerName, String[] command) {
+        try {
+            logger.info("executing command, container: {}, command: {}", containerName, command);
+            ExecCreateCmdResponse response = client.execCreateCmd(containerName)
+                    .withCmd(command)
+                    .withAttachStdout(true)
+                    .withAttachStderr(true)
+                    .exec();
+            ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+            ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+            ExecStartResultCallback resultCallback = client.execStartCmd(response.getId())
+                    .exec(new ExecStartResultCallback(stdout, stderr));
+            resultCallback.awaitCompletion();
+            logger.info("execute result stdout: " + stdout.toString());
+            logger.info("execute result stderr: " + stderr.toString());
+        } catch (Exception e) {
+            logger.info("failed to execute commands, container: " + containerName + ", command: " + Arrays.toString(command), e);
+        }
     }
 }

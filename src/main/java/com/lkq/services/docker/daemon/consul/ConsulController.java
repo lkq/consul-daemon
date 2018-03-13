@@ -65,4 +65,15 @@ public class ConsulController {
         logger.info("attaching container log: {}", containerID);
         logRedirector.attach(containerID, dockerClient);
     }
+
+    public void stop(ConsulContext context) {
+        String nodeName = context.getContainerName();
+        dockerClient.execute(nodeName, new String[]{"consul", "leave"});
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        dockerClient.stopContainer(nodeName);
+    }
 }
