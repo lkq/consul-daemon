@@ -10,6 +10,7 @@ public class ConsulContext {
 
     private String imageName;
     private String containerName;
+    private String hostName;
     private String network;
     private List<String> environmentVariables;
     private List<PortBinder> portBinders;
@@ -68,6 +69,15 @@ public class ConsulContext {
 
     public ConsulContext withDataPath(String dataPath) {
         this.dataPath = dataPath;
+        return this;
+    }
+
+    public String getHostName() {
+        return hostName;
+    }
+
+    public ConsulContext withHostName(String hostName) {
+        this.hostName = hostName;
         return this;
     }
 

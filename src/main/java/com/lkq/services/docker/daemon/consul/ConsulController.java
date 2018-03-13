@@ -52,6 +52,7 @@ public class ConsulController {
         String containerID = dockerClient.createContainerBuilder(context.getImageName(), context.getContainerName())
                 .withDataVolume(context.getDataPath())
                 .withEnvironmentVariable(context.getEnvironmentVariables())
+                .withHostName(context.getHostName())
                 .withNetwork(context.getNetwork())
                 .withPortBinders(context.getPortBinders())
                 .withCommand(context.getCommand())

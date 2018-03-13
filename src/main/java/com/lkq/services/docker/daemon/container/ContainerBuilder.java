@@ -57,6 +57,14 @@ public class ContainerBuilder {
         return this;
     }
 
+    public ContainerBuilder withHostName(String hostName) {
+        if (StringUtils.isNotEmpty(hostName)) {
+            logger.info("hostName={}", hostName);
+            this.createContainerCmd.withHostName(hostName);
+        }
+        return this;
+    }
+
     public ContainerBuilder withNetwork(String network) {
         if (StringUtils.isNotEmpty(network)) {
             logger.info("network={}", network);

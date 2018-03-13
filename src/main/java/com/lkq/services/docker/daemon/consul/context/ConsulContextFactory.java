@@ -45,6 +45,7 @@ public class ConsulContextFactory {
                 .with(retryJoinOptions)
                 .with(new BootstrapExpectOption(bootstrapExpectedCount));
         return createDefaultContext(containerName)
+                .withHostName(containerName)
                 .withDataPath(Config.getCurrentPath() + "/" + containerName)
                 .withCommandBuilder(commandBuilder);
     }
@@ -54,6 +55,7 @@ public class ConsulContextFactory {
                 .with(BIND_CLIENT_IP)
                 .with("-bootstrap");
         return createDefaultContext(CONTAINER_NAME)
+                .withHostName(CONTAINER_NAME)
                 .withPortBinders(getPortBinders())
                 .withCommandBuilder(commandBuilder);
     }
