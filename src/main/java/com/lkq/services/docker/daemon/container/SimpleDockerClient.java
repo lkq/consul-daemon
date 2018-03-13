@@ -149,8 +149,7 @@ public class SimpleDockerClient {
             ExecStartResultCallback resultCallback = client.execStartCmd(response.getId())
                     .exec(new ExecStartResultCallback(stdout, stderr));
             resultCallback.awaitCompletion();
-            logger.info("execute result stdout: " + stdout.toString());
-            logger.info("execute result stderr: " + stderr.toString());
+            logger.info("execute result: stdout={}, stderr={}", stdout.toString(), stderr.toString());
         } catch (Exception e) {
             logger.info("failed to execute commands, container: " + containerName + ", command: " + Arrays.toString(command), e);
         }

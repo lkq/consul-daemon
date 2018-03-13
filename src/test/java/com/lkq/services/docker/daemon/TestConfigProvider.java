@@ -8,7 +8,7 @@ public class TestConfigProvider extends ConfigProvider {
         return ConfigProvider.class.getClassLoader().getResource(".").getPath() + "/config";
     }
 
-    public String getDataPath() {
+    public String getCurrentPath() {
         // TODO get current dir
         return ConfigProvider.class.getClassLoader().getResource(".").getPath() + "/data";
     }

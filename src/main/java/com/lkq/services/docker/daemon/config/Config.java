@@ -28,8 +28,8 @@ public class Config {
         return provider.getConfigPath();
     }
 
-    public static String getDataPath() {
-        return provider.getDataPath();
+    public static String getCurrentPath() {
+        return provider.getCurrentPath();
     }
 
     public static String getNetwork() {

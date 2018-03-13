@@ -68,11 +68,6 @@ public class ConsulController {
 
     public void stop(String containerName) {
         dockerClient.execute(containerName, new String[]{"consul", "leave"});
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         dockerClient.stopContainer(containerName);
     }
 }

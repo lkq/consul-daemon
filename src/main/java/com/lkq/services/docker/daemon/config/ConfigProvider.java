@@ -18,8 +18,8 @@ public class ConfigProvider {
         return Paths.get(".").toAbsolutePath().normalize().toString() + "/config";
     }
 
-    public String getDataPath() {
-        return Paths.get(".").toAbsolutePath().normalize().toString() + "/data";
+    public String getCurrentPath() {
+        return Paths.get(".").toAbsolutePath().normalize().toString();
     }
 
     public String getEnv(String key, String defaultValue) {
