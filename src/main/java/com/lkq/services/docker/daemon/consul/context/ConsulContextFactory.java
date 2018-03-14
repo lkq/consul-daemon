@@ -1,12 +1,10 @@
 package com.lkq.services.docker.daemon.consul.context;
 
-import com.lkq.services.docker.daemon.config.Config;
-import com.lkq.services.docker.daemon.config.Environment;
+import com.lkq.services.docker.daemon.env.Environment;
 import com.lkq.services.docker.daemon.consul.ConsulCommandBuilder;
 import com.lkq.services.docker.daemon.consul.option.BootstrapExpectOption;
 import com.lkq.services.docker.daemon.consul.option.RetryJoinOption;
 import com.lkq.services.docker.daemon.container.PortBinder;
-import spark.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,21 +20,14 @@ public class ConsulContextFactory {
     public static final String BIND_CLIENT_IP = "-client=0.0.0.0";
 
     public ConsulContext createConsulContext() {
-        List<RetryJoinOption> retryJoinOptions = new ArrayList<>();
-        String retryJoin = Environment.getEnv("consul.cluster.members", "");
-        if (StringUtils.isEmpty(retryJoin)) {
-            retryJoinOptions.add(new RetryJoinOption("provider=aws tag_key=consul-role tag_value=server"));
-        } else {
-            retryJoinOptions.addAll(RetryJoinOption.fromHosts(retryJoin));
-        }
 
         String[] command = createDefaultCommand()
                 .with(new BootstrapExpectOption(CLUSTER_MEMBER_COUNT))
-                .with(retryJoinOptions)
+                .with(RetryJoinOption.fromHosts(Environment.get().clusterMembers()))
                 .build();
         return createDefaultContext(CONTAINER_NAME)
                 .withNetwork(HOST_NETWORK)
-                .withDataPath(Config.getCurrentPath() + "/data")
+                .withDataPath(Environment.get().getDataPath())
                 .withCommand(command);
     }
 
@@ -46,7 +37,6 @@ public class ConsulContextFactory {
                 .with(new BootstrapExpectOption(bootstrapExpectedCount));
         return createDefaultContext(containerName)
                 .withHostName(containerName)
-                .withDataPath(Config.getCurrentPath() + "/" + containerName)
                 .withCommandBuilder(commandBuilder);
     }
 

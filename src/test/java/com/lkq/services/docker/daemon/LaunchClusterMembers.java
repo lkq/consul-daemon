@@ -1,8 +1,7 @@
 package com.lkq.services.docker.daemon;
 
 import com.github.dockerjava.api.command.InspectContainerResponse;
-import com.lkq.services.docker.daemon.config.Config;
-import com.lkq.services.docker.daemon.config.Environment;
+import com.lkq.services.docker.daemon.env.EnvironmentProvider;
 import com.lkq.services.docker.daemon.consul.ConsulController;
 import com.lkq.services.docker.daemon.consul.context.ConsulContext;
 import com.lkq.services.docker.daemon.consul.context.ConsulContextFactory;
@@ -26,7 +25,7 @@ public class LaunchClusterMembers {
 
         logger = LoggerFactory.getLogger(LaunchClusterMembers.class);
 
-        Config.init(new TestConfigProvider());
+        EnvironmentProvider.set(new LocalEnvironment());
         App app = new App();
 
         ConsulContextFactory contextFactory = new ConsulContextFactory();
@@ -54,7 +53,7 @@ public class LaunchClusterMembers {
 
     private void joinCluster(ConsulController consulController, SimpleDockerClient dockerClient, ConsulContextFactory contextFactory) {
 
-        int nodeIndex = Integer.valueOf(Environment.getEnv("node-index", "-1"));
+        int nodeIndex = Integer.valueOf(System.getProperty("node-index", "-1"));
         if (nodeIndex < 0) {
             throw new RuntimeException("please provide node-name by -Dnode-index=<node index>");
         }
@@ -70,10 +69,10 @@ public class LaunchClusterMembers {
             ConsulContext context = contextFactory.createMacClusterMemberContext(startingNodeName, RetryJoinOption.fromHosts(runningNodeIPs), 3);
             if (nodeIndex == 0) {
                 context.withPortBinders(contextFactory.getPortBinders());
-                context.getCommandBuilder().with(ConsulContextFactory.BIND_CLIENT_IP);
+                context.commandBuilder().with(ConsulContextFactory.BIND_CLIENT_IP);
             }
             consulController.start(context);
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> consulController.stop(context.getContainerName())));
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> consulController.stop(context.containerName())));
         }
     }
 

@@ -4,8 +4,6 @@ import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerCmd;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.lkq.services.docker.daemon.IntegrationTest;
-import com.lkq.services.docker.daemon.TestConfigProvider;
-import com.lkq.services.docker.daemon.config.Config;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import spark.utils.StringUtils;
@@ -25,7 +23,6 @@ class ContainerBuilderTest {
     @BeforeEach
     void setUp() {
         initMocks(this);
-        Config.init(new TestConfigProvider());
     }
 
     @Test

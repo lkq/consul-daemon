@@ -18,7 +18,7 @@ public class ConsulContext {
     private String[] command;
     private ConsulCommandBuilder commandBuilder;
 
-    public String getImageName() {
+    public String imageName() {
         return imageName;
     }
 
@@ -27,7 +27,7 @@ public class ConsulContext {
         return this;
     }
 
-    public String getContainerName() {
+    public String containerName() {
         return containerName;
     }
 
@@ -36,7 +36,7 @@ public class ConsulContext {
         return this;
     }
 
-    public String getNetwork() {
+    public String network() {
         return network;
     }
 
@@ -45,7 +45,7 @@ public class ConsulContext {
         return this;
     }
 
-    public List<String> getEnvironmentVariables() {
+    public List<String> environmentVariables() {
         return environmentVariables;
     }
 
@@ -54,7 +54,7 @@ public class ConsulContext {
         return this;
     }
 
-    public List<PortBinder> getPortBinders() {
+    public List<PortBinder> portBinders() {
         return portBinders;
     }
 
@@ -63,7 +63,7 @@ public class ConsulContext {
         return this;
     }
 
-    public String getDataPath() {
+    public String dataPath() {
         return dataPath;
     }
 
@@ -72,7 +72,7 @@ public class ConsulContext {
         return this;
     }
 
-    public String getHostName() {
+    public String hostName() {
         return hostName;
     }
 
@@ -81,7 +81,7 @@ public class ConsulContext {
         return this;
     }
 
-    public String[] getCommand() {
+    public String[] command() {
         if (commandBuilder != null) {
             return commandBuilder.build();
         }
@@ -94,7 +94,7 @@ public class ConsulContext {
         return this;
     }
 
-    public ConsulCommandBuilder getCommandBuilder() {
+    public ConsulCommandBuilder commandBuilder() {
         return commandBuilder;
     }
 

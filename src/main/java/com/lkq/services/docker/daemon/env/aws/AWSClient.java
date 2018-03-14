@@ -1,4 +1,4 @@
-package com.lkq.services.docker.daemon.aws;
+package com.lkq.services.docker.daemon.env.aws;
 
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.utils.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -18,8 +19,11 @@ public class AWSClient {
     private static AWSClient instance = new AWSClient();
 
     private Boolean isAws;
+    private final AmazonEC2 amazonEC2;
 
-    private AWSClient(){}
+    private AWSClient(){
+        amazonEC2 = AmazonEC2ClientBuilder.defaultClient();
+    }
 
     public static AWSClient instance() {
         return instance;
@@ -40,9 +44,8 @@ public class AWSClient {
         return EC2MetadataUtils.getPrivateIpAddress();
     }
 
-    public String getTag(String key, String defaultValue) {
+    public String getTagValue(String key, String defaultValue) {
         try {
-            AmazonEC2 amazonEC2 = AmazonEC2ClientBuilder.defaultClient();
             Filter tagKeyFilter = new Filter();
             tagKeyFilter.setName(key);
             DescribeTagsRequest request = new DescribeTagsRequest(Arrays.asList(tagKeyFilter));
@@ -55,5 +58,33 @@ public class AWSClient {
         } catch (Exception ignored) {
         }
         return defaultValue;
+    }
+
+    public List<String> getInstanceIPByTag(String key) {
+        Filter filter = new Filter().withName("tag-key").withValues(key);
+        return getInstanceIPByFilter(filter);
+    }
+
+    public List<String> getInstanceIPByTagValue(String key, String value) {
+        Filter filter = new Filter().withName("tag:" + key).withValues(value);
+        return getInstanceIPByFilter(filter);
+    }
+
+    private List<String> getInstanceIPByFilter(Filter filter) {
+        List<String> instanceIPs = new ArrayList<>();
+        try {
+            DescribeInstancesRequest request = new DescribeInstancesRequest()
+                    .withFilters(filter);
+            DescribeInstancesResult instancesResult = amazonEC2.describeInstances(request);
+            List<Reservation> reservations = instancesResult.getReservations();
+            for (Reservation reservation : reservations) {
+                for (Instance instance : reservation.getInstances()) {
+                    instanceIPs.add(instance.getPrivateIpAddress());
+                }
+            }
+        } catch (Exception e) {
+            logger.info("failed to get instance ip by " + filter, e);
+        }
+        return instanceIPs;
     }
 }
