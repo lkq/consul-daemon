@@ -77,11 +77,31 @@
         </dependency>
     </dependencies>
 
+
+    <profiles>
+        <profile>
+            <id>testAll</id>
+            <properties>
+                <excludeTests/>
+            </properties>
+        </profile>
+    </profiles>
+
+    <properties>
+        <excludeTests>IntegrationTest</excludeTests>
+    </properties>
+
     <build>
         <plugins>
+
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.19.1</version>
+                <configuration>
+                    <properties>
+                        <excludeTags>${excludeTests}</excludeTags>
+                    </properties>
+                </configuration>
                 <dependencies>
                     <dependency>
                         <groupId>org.junit.platform</groupId>
