@@ -1,10 +1,9 @@
 package com.lkq.services.docker.daemon.consul.context;
 
-import com.lkq.services.docker.daemon.env.Environment;
 import com.lkq.services.docker.daemon.consul.ConsulCommandBuilder;
 import com.lkq.services.docker.daemon.consul.option.BootstrapExpectOption;
 import com.lkq.services.docker.daemon.consul.option.RetryJoinOption;
-import com.lkq.services.docker.daemon.container.PortBinder;
+import com.lkq.services.docker.daemon.env.Environment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,34 +18,21 @@ public class ConsulContextFactory {
     public static final int CLUSTER_MEMBER_COUNT = 3;
     public static final String BIND_CLIENT_IP = "-client=0.0.0.0";
 
-    public ConsulContext createConsulContext() {
+    public ConsulContext createConsulContext(String nodeName) {
 
-        String[] command = createDefaultCommand()
+        ConsulCommandBuilder commandBuilder = createDefaultCommand()
                 .with(new BootstrapExpectOption(CLUSTER_MEMBER_COUNT))
-                .with(RetryJoinOption.fromHosts(Environment.get().clusterMembers()))
-                .build();
-        return createDefaultContext(CONTAINER_NAME)
+                .with(RetryJoinOption.fromHosts(Environment.get().clusterMembers()));
+        return createDefaultContext(nodeName)
                 .withNetwork(HOST_NETWORK)
                 .withDataPath(Environment.get().getDataPath())
-                .withCommand(command);
-    }
-
-    public ConsulContext createMacClusterMemberContext(String containerName, List<RetryJoinOption> retryJoinOptions, int bootstrapExpectedCount) {
-        ConsulCommandBuilder commandBuilder = createDefaultCommand()
-                .with(retryJoinOptions)
-                .with(new BootstrapExpectOption(bootstrapExpectedCount));
-        return createDefaultContext(containerName)
-                .withHostName(containerName)
                 .withCommandBuilder(commandBuilder);
     }
 
-    public ConsulContext createMacConsulContext() {
-        ConsulCommandBuilder commandBuilder = createDefaultCommand()
-                .with(BIND_CLIENT_IP)
-                .with("-bootstrap");
-        return createDefaultContext(CONTAINER_NAME)
-                .withHostName(CONTAINER_NAME)
-                .withPortBinders(getPortBinders())
+    public ConsulContext createMacConsulContext(String nodeName) {
+        ConsulCommandBuilder commandBuilder = createDefaultCommand();
+        return createDefaultContext(nodeName)
+                .withHostName(nodeName)
                 .withCommandBuilder(commandBuilder);
     }
 
@@ -62,18 +48,6 @@ public class ConsulContextFactory {
                 .with("agent")
                 .with("-server")
                 .with("-ui");
-    }
-
-    public List<PortBinder> getPortBinders() {
-        List<PortBinder> portBinders = new ArrayList<>();
-        portBinders.add(new PortBinder(8300, PortBinder.Protocol.TCP));
-        portBinders.add(new PortBinder(8301, PortBinder.Protocol.TCP));
-        portBinders.add(new PortBinder(8302, PortBinder.Protocol.TCP));
-        portBinders.add(new PortBinder(8400, PortBinder.Protocol.TCP));
-        portBinders.add(new PortBinder(8500, PortBinder.Protocol.TCP));
-        portBinders.add(new PortBinder(8301, PortBinder.Protocol.UDP));
-        portBinders.add(new PortBinder(8302, PortBinder.Protocol.UDP));
-        return portBinders;
     }
 
     public List<String> getEnvironmentVariables() {

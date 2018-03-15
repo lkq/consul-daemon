@@ -9,7 +9,7 @@ import java.util.logging.LogManager;
 public class Launcher {
     public static void main(String[] args) {
         initLogging();
-        ConsulContext context = new ConsulContextFactory().createConsulContext();
+        ConsulContext context = new ConsulContextFactory().createConsulContext(ConsulContextFactory.CONTAINER_NAME);
         new App().start(context);
     }
 

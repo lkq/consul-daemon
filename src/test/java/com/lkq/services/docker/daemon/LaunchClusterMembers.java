@@ -1,6 +1,7 @@
 package com.lkq.services.docker.daemon;
 
 import com.github.dockerjava.api.command.InspectContainerResponse;
+import com.lkq.services.docker.daemon.consul.option.BootstrapExpectOption;
 import com.lkq.services.docker.daemon.env.EnvironmentProvider;
 import com.lkq.services.docker.daemon.consul.ConsulController;
 import com.lkq.services.docker.daemon.consul.context.ConsulContext;
@@ -66,9 +67,12 @@ public class LaunchClusterMembers {
             consulController.attachLogging(existingNode.getId());
         } else {
             logger.info("starting consul cluster member: {}", startingNodeName);
-            ConsulContext context = contextFactory.createMacClusterMemberContext(startingNodeName, RetryJoinOption.fromHosts(runningNodeIPs), 3);
+            ConsulContext context = contextFactory.createMacConsulContext(startingNodeName);
+            context.commandBuilder()
+                    .with(new BootstrapExpectOption(3))
+                    .with(RetryJoinOption.fromHosts(runningNodeIPs));
             if (nodeIndex == 0) {
-                context.withPortBinders(contextFactory.getPortBinders());
+                context.withPortBinders(new ConsulPorts().getPortBinders());
                 context.commandBuilder().with(ConsulContextFactory.BIND_CLIENT_IP);
             }
             consulController.start(context);

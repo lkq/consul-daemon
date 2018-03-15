@@ -41,7 +41,7 @@ public class TimingProxyFactory {
             }
             Object result = method.invoke(target, objects);
             if (timingAnnotation != null) {
-                logger.info("{} response time: {} ms", method.getName(), System.currentTimeMillis() - startTime);
+                logger.info("{} execution time: {} ms", method.getName(), System.currentTimeMillis() - startTime);
             }
             return result;
         }

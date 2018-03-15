@@ -39,7 +39,6 @@ public class ConsulCommandBuilder {
             }
         }
 
-        logger.info("command: {}", commands);
         return commands.toArray(new String[0]);
     }
 
