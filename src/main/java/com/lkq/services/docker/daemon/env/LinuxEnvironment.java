@@ -47,4 +47,9 @@ public class LinuxEnvironment implements Environment {
         }
         return value;
     }
+
+    @Override
+    public String nodeName() {
+        return getEnv(Environment.ENV_NODE_NAME, "consul_node_" + System.currentTimeMillis());
+    }
 }

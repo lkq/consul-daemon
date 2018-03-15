@@ -3,6 +3,7 @@ package com.lkq.services.docker.daemon;
 import com.lkq.services.docker.daemon.consul.command.AgentCommandBuilder;
 import com.lkq.services.docker.daemon.consul.context.ConsulContext;
 import com.lkq.services.docker.daemon.consul.context.ConsulContextFactory;
+import com.lkq.services.docker.daemon.env.Environment;
 import com.lkq.services.docker.daemon.env.EnvironmentProvider;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
@@ -19,7 +20,7 @@ public class LocalLauncher {
                 .ui(true)
                 .clientIP("0.0.0.0")
                 .bootstrap(true);
-        ConsulContext context = new ConsulContextFactory().createDefaultContext(ConsulContextFactory.CONTAINER_NAME);
+        ConsulContext context = new ConsulContextFactory().createDefaultContext(Environment.get().nodeName());
         context.portBinders(new ConsulPorts().getPortBinders());
         context.withCommandBuilder(builder);
         new App().start(context);

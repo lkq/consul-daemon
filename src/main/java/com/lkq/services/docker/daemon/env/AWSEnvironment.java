@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 public class AWSEnvironment implements Environment {
+
     @Override
     public ConsulRole consulRole() {
         String tagValue = AWSClient.instance().getTagValue(ENV_CONSUL_ROLE, "");
@@ -28,5 +29,10 @@ public class AWSEnvironment implements Environment {
     @Override
     public String getNetwork() {
         return "host";
+    }
+
+    @Override
+    public String nodeName() {
+        return AWSClient.instance().getTagValue(ENV_NODE_NAME, "consul_node_" + System.currentTimeMillis());
     }
 }

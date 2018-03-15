@@ -25,4 +25,9 @@ public class LocalEnvironment implements Environment {
     public String getNetwork() {
         return "";
     }
+
+    @Override
+    public String nodeName() {
+        return "consul";
+    }
 }

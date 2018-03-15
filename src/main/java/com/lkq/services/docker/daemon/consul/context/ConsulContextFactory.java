@@ -10,20 +10,17 @@ public class ConsulContextFactory {
     private static final String NET_EASY_HUB = "http://hub-mirror.c.163.com";
 
     public static final String CONSUL_IMAGE = "consul:1.0.6";
-    public static final String CONTAINER_NAME = "consul";
-    public static final String HOST_NETWORK = "host";
-
-    public static final int CLUSTER_MEMBER_COUNT = 3;
     public static final String BIND_CLIENT_IP = "0.0.0.0";
 
-    public ConsulContext createClusterNodeContext(String nodeName) {
+    public ConsulContext createClusterNodeContext() {
 
+        List<String> retryJoin = Environment.get().clusterMembers();
         AgentCommandBuilder commandBuilder = new AgentCommandBuilder()
                 .server(true)
-                .bootstrapExpect(CLUSTER_MEMBER_COUNT)
-                .retryJoin(Environment.get().clusterMembers());
+                .bootstrapExpect(retryJoin.size())
+                .retryJoin(retryJoin);
 
-        return createDefaultContext(nodeName).withCommandBuilder(commandBuilder);
+        return createDefaultContext(Environment.get().nodeName()).withCommandBuilder(commandBuilder);
     }
 
     public ConsulContext createDefaultContext(String nodeName) {
