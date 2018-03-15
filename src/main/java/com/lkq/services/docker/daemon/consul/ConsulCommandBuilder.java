@@ -2,17 +2,22 @@ package com.lkq.services.docker.daemon.consul;
 
 import com.lkq.services.docker.daemon.consul.option.ConsulOption;
 import com.lkq.services.docker.daemon.consul.option.SimpleOption;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import spark.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ConsulCommandBuilder {
-    private static Logger logger = LoggerFactory.getLogger(ConsulCommandBuilder.class);
 
     List<ConsulOption> options = new ArrayList<>();
+
+    public ConsulCommandBuilder(String... cmd) {
+        for (String c : cmd) {
+            if (StringUtils.isNotEmpty(c)) {
+                options.add(new SimpleOption(c));
+            }
+        }
+    }
 
     public ConsulCommandBuilder with(ConsulOption option) {
         options.add(option);

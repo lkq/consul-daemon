@@ -20,4 +20,9 @@ public class LocalEnvironment implements Environment {
     public String getDataPath() {
         return "";
     }
+
+    @Override
+    public String getNetwork() {
+        return "";
+    }
 }

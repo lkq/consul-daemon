@@ -18,37 +18,27 @@ public class ConsulContextFactory {
     public static final int CLUSTER_MEMBER_COUNT = 3;
     public static final String BIND_CLIENT_IP = "-client=0.0.0.0";
 
-    public ConsulContext createConsulContext(String nodeName) {
+    public ConsulContext createConsulClusterNodeContext(String nodeName) {
 
-        ConsulCommandBuilder commandBuilder = createDefaultCommand()
+        ConsulContext context = createDefaultContext(nodeName);
+        context.commandBuilder()
+                .with("-server")
                 .with(new BootstrapExpectOption(CLUSTER_MEMBER_COUNT))
                 .with(RetryJoinOption.fromHosts(Environment.get().clusterMembers()));
-        return createDefaultContext(nodeName)
-                .withNetwork(HOST_NETWORK)
-                .withDataPath(Environment.get().getDataPath())
-                .withCommandBuilder(commandBuilder);
+        return context;
     }
 
-    public ConsulContext createMacConsulContext(String nodeName) {
-        ConsulCommandBuilder commandBuilder = createDefaultCommand();
-        return createDefaultContext(nodeName)
-                .withHostName(nodeName)
-                .withCommandBuilder(commandBuilder);
-    }
-
-    private ConsulContext createDefaultContext(String containerName) {
+    public ConsulContext createDefaultContext(String nodeName) {
         return new ConsulContext()
                 .withImageName(CONSUL_IMAGE)
-                .withContainerName(containerName)
+                .withContainerName(nodeName)
+                .withHostName(nodeName)
+                .withNetwork(Environment.get().getNetwork())
+                .withDataPath(Environment.get().getDataPath())
+                .withCommandBuilder(new ConsulCommandBuilder("agent"))
                 .withEnvironmentVariables(getEnvironmentVariables());
     }
 
-    private ConsulCommandBuilder createDefaultCommand() {
-        return new ConsulCommandBuilder()
-                .with("agent")
-                .with("-server")
-                .with("-ui");
-    }
 
     public List<String> getEnvironmentVariables() {
         List<String> env = new ArrayList<>();

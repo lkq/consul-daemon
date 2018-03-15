@@ -10,9 +10,11 @@ public class LocalLauncher {
     public static void main(String[] args) {
         initLogging();
 
-        ConsulContext context = new ConsulContextFactory().createMacConsulContext(ConsulContextFactory.CONTAINER_NAME);
+        ConsulContext context = new ConsulContextFactory().createDefaultContext(ConsulContextFactory.CONTAINER_NAME);
         context.withPortBinders(new ConsulPorts().getPortBinders());
         context.commandBuilder()
+                .with("-server")
+                .with("-ui")
                 .with("-client=0.0.0.0")
                 .with("-bootstrap");
         new App().start(context);

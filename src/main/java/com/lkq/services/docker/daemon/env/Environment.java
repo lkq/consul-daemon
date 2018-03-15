@@ -4,9 +4,14 @@ import java.util.List;
 
 public interface Environment {
 
+    String ENV_CONSUL_ROLE = "consul.role";
+    String ENV_CONSUL_CLUSTER_MEMBER = "consul.cluster.member";
+
     static Environment get() {
         return EnvironmentProvider.get();
     }
+
+
 
     enum ConsulRole {
         CLIENT,
@@ -16,15 +21,6 @@ public interface Environment {
     ConsulRole consulRole();
     List<String> clusterMembers();
     String getDataPath();
+    String getNetwork();
 
-//    public static String getEnv(String key, String defaultValue) {
-//        String value = System.getenv(key);
-//        if (StringUtils.isEmpty(value)) {
-//            value = System.getProperty(key, defaultValue);
-//        }
-//        if (StringUtils.isEmpty(value)) {
-//            value = AWSClient.instance().getTagValue(key, defaultValue);
-//        }
-//        return value;
-//    }
 }

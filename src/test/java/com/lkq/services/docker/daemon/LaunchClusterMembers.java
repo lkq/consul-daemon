@@ -67,8 +67,10 @@ public class LaunchClusterMembers {
             consulController.attachLogging(existingNode.getId());
         } else {
             logger.info("starting consul cluster member: {}", startingNodeName);
-            ConsulContext context = contextFactory.createMacConsulContext(startingNodeName);
+            ConsulContext context = contextFactory.createDefaultContext(startingNodeName);
             context.commandBuilder()
+                    .with("-server")
+                    .with("-ui")
                     .with(new BootstrapExpectOption(3))
                     .with(RetryJoinOption.fromHosts(runningNodeIPs));
             if (nodeIndex == 0) {

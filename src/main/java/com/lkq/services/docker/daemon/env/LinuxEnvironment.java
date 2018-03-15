@@ -7,9 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LinuxEnvironment implements Environment {
+
     @Override
     public Environment.ConsulRole consulRole() {
-        String tagValue = getEnv("consul.role", "");
+        String tagValue = getEnv(ENV_CONSUL_ROLE, "");
         if ("server".equals(tagValue)) {
             return Environment.ConsulRole.SERVER;
         }
@@ -18,7 +19,7 @@ public class LinuxEnvironment implements Environment {
 
     @Override
     public List<String> clusterMembers() {
-        String members = getEnv("consul.cluster.member", "");
+        String members = getEnv(ENV_CONSUL_CLUSTER_MEMBER, "");
         ArrayList<String> clusterMembers = new ArrayList<>();
         String[] split = members.split(" ");
         for (String host : split) {
@@ -32,6 +33,11 @@ public class LinuxEnvironment implements Environment {
     @Override
     public String getDataPath() {
         return Paths.get(".").toAbsolutePath().normalize().toString() + "/data";
+    }
+
+    @Override
+    public String getNetwork() {
+        return "host";
     }
 
     private String getEnv(String key, String defaultValue) {

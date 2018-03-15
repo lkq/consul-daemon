@@ -8,7 +8,7 @@ import java.util.List;
 public class AWSEnvironment implements Environment {
     @Override
     public ConsulRole consulRole() {
-        String tagValue = AWSClient.instance().getTagValue("consul.role", "");
+        String tagValue = AWSClient.instance().getTagValue(ENV_CONSUL_ROLE, "");
         if ("server".equals(tagValue)) {
             return ConsulRole.SERVER;
         }
@@ -17,11 +17,16 @@ public class AWSEnvironment implements Environment {
 
     @Override
     public List<String> clusterMembers() {
-        return AWSClient.instance().getInstanceIPByTagValue("consul.role", "server");
+        return AWSClient.instance().getInstanceIPByTagValue(ENV_CONSUL_ROLE, "server");
     }
 
     @Override
     public String getDataPath() {
         return Paths.get(".").toAbsolutePath().normalize().toString() + "/data";
+    }
+
+    @Override
+    public String getNetwork() {
+        return "host";
     }
 }
