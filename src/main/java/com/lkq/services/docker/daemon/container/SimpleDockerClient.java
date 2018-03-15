@@ -75,7 +75,7 @@ public class SimpleDockerClient {
     }
 
     @Timing
-    public ContainerBuilder createContainerBuilder(String imageName, String containerName) {
+    public ContainerBuilder createContainer(String imageName, String containerName) {
         return new ContainerBuilder(client, imageName, containerName);
     }
 

@@ -1,13 +1,12 @@
 package com.lkq.services.docker.daemon;
 
 import com.github.dockerjava.api.command.InspectContainerResponse;
-import com.lkq.services.docker.daemon.consul.option.BootstrapExpectOption;
-import com.lkq.services.docker.daemon.env.EnvironmentProvider;
 import com.lkq.services.docker.daemon.consul.ConsulController;
+import com.lkq.services.docker.daemon.consul.command.AgentCommandBuilder;
 import com.lkq.services.docker.daemon.consul.context.ConsulContext;
 import com.lkq.services.docker.daemon.consul.context.ConsulContextFactory;
-import com.lkq.services.docker.daemon.consul.option.RetryJoinOption;
 import com.lkq.services.docker.daemon.container.SimpleDockerClient;
+import com.lkq.services.docker.daemon.env.EnvironmentProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -68,17 +67,18 @@ public class LaunchClusterMembers {
         } else {
             logger.info("starting consul cluster member: {}", startingNodeName);
             ConsulContext context = contextFactory.createDefaultContext(startingNodeName);
-            context.commandBuilder()
-                    .with("-server")
-                    .with("-ui")
-                    .with(new BootstrapExpectOption(3))
-                    .with(RetryJoinOption.fromHosts(runningNodeIPs));
+            AgentCommandBuilder builder = new AgentCommandBuilder()
+                    .server(true)
+                    .ui(true)
+                    .bootstrapExpect(3)
+                    .clientIP(ConsulContextFactory.BIND_CLIENT_IP)
+                    .retryJoin(runningNodeIPs);
+            context.withCommandBuilder(builder);
             if (nodeIndex == 0) {
-                context.withPortBinders(new ConsulPorts().getPortBinders());
-                context.commandBuilder().with(ConsulContextFactory.BIND_CLIENT_IP);
+                context.portBinders(new ConsulPorts().getPortBinders());
             }
             consulController.start(context);
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> consulController.stop(context.containerName())));
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> consulController.stop(context.nodeName())));
         }
     }
 

@@ -1,7 +1,6 @@
 package com.lkq.services.docker.daemon.consul.context;
 
-import com.kliu.utils.Guard;
-import com.lkq.services.docker.daemon.consul.ConsulCommandBuilder;
+import com.lkq.services.docker.daemon.consul.command.CommandBuilder;
 import com.lkq.services.docker.daemon.container.PortBinder;
 
 import java.util.List;
@@ -9,30 +8,29 @@ import java.util.List;
 public class ConsulContext {
 
     private String imageName;
-    private String containerName;
+    private String nodeName;
     private String hostName;
     private String network;
     private List<String> environmentVariables;
     private List<PortBinder> portBinders;
     private String dataPath;
-    private String[] command;
-    private ConsulCommandBuilder commandBuilder;
+    private CommandBuilder commands;
 
     public String imageName() {
         return imageName;
     }
 
-    public ConsulContext withImageName(String imageName) {
+    public ConsulContext imageName(String imageName) {
         this.imageName = imageName;
         return this;
     }
 
-    public String containerName() {
-        return containerName;
+    public String nodeName() {
+        return nodeName;
     }
 
-    public ConsulContext withContainerName(String containerName) {
-        this.containerName = containerName;
+    public ConsulContext nodeName(String nodeName) {
+        this.nodeName = nodeName;
         return this;
     }
 
@@ -40,7 +38,7 @@ public class ConsulContext {
         return network;
     }
 
-    public ConsulContext withNetwork(String network) {
+    public ConsulContext network(String network) {
         this.network = network;
         return this;
     }
@@ -49,7 +47,7 @@ public class ConsulContext {
         return environmentVariables;
     }
 
-    public ConsulContext withEnvironmentVariables(List<String> environmentVariables) {
+    public ConsulContext environmentVariables(List<String> environmentVariables) {
         this.environmentVariables = environmentVariables;
         return this;
     }
@@ -58,7 +56,7 @@ public class ConsulContext {
         return portBinders;
     }
 
-    public ConsulContext withPortBinders(List<PortBinder> portBinders) {
+    public ConsulContext portBinders(List<PortBinder> portBinders) {
         this.portBinders = portBinders;
         return this;
     }
@@ -67,7 +65,7 @@ public class ConsulContext {
         return dataPath;
     }
 
-    public ConsulContext withDataPath(String dataPath) {
+    public ConsulContext dataPath(String dataPath) {
         this.dataPath = dataPath;
         return this;
     }
@@ -76,31 +74,17 @@ public class ConsulContext {
         return hostName;
     }
 
-    public ConsulContext withHostName(String hostName) {
+    public ConsulContext hostName(String hostName) {
         this.hostName = hostName;
         return this;
     }
 
-    public String[] command() {
-        if (commandBuilder != null) {
-            return commandBuilder.build();
-        }
-        return command;
+    public CommandBuilder commandBuilder() {
+        return commands;
     }
 
-    public ConsulContext withCommand(String[] command) {
-        Guard.toBeTrue(commandBuilder == null, "command builder already provided");
-        this.command = command;
-        return this;
-    }
-
-    public ConsulCommandBuilder commandBuilder() {
-        return commandBuilder;
-    }
-
-    public ConsulContext withCommandBuilder(ConsulCommandBuilder commandBuilder) {
-        Guard.toBeTrue(command == null || command.length == 0, "command already provided");
-        this.commandBuilder = commandBuilder;
+    public ConsulContext withCommandBuilder(CommandBuilder commandBuilder) {
+        this.commands = commandBuilder;
         return this;
     }
 }

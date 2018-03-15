@@ -28,13 +28,13 @@ public class ConsulController {
         if (!consulHealthChecker.isHealthy()) {
             startNewInstance(context);
         } else {
-            attachLogging(context.containerName());
+            attachLogging(context.nodeName());
         }
     }
 
     private void startNewInstance(ConsulContext context) {
         logger.info("going to start new consul container");
-        if (dockerClient.containerExists(context.containerName())) {
+        if (dockerClient.containerExists(context.nodeName())) {
             /**
              * if an existing consul container is already running, stop and remove it
              * TODO:
@@ -44,18 +44,18 @@ public class ConsulController {
              *
              */
             logger.info("found an old consul container, going to stop and remove");
-            dockerClient.stopContainer(context.containerName());
-            String tempContainerName = context.containerName() + "-remove-" + System.currentTimeMillis();
-            dockerClient.renameContainer(context.containerName(), tempContainerName);
+            dockerClient.stopContainer(context.nodeName());
+            String tempContainerName = context.nodeName() + "-remove-" + System.currentTimeMillis();
+            dockerClient.renameContainer(context.nodeName(), tempContainerName);
             dockerClient.removeContainer(tempContainerName);
         }
-        String containerID = dockerClient.createContainerBuilder(context.imageName(), context.containerName())
+        String containerID = dockerClient.createContainer(context.imageName(), context.nodeName())
                 .withDataVolume(context.dataPath())
                 .withEnvironmentVariable(context.environmentVariables())
                 .withHostName(context.hostName())
                 .withNetwork(context.network())
                 .withPortBinders(context.portBinders())
-                .withCommand(context.command())
+                .withCommand(context.commandBuilder().commands())
                 .build();
 
         dockerClient.startContainer(containerID);

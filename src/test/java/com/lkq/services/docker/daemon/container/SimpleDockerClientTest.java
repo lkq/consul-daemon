@@ -75,7 +75,7 @@ class SimpleDockerClientTest {
             String imageName = "hello-world";
             String containerName = imageName + "-" + System.currentTimeMillis();
             client.pullImage(imageName);
-            containerID = client.createContainerBuilder(imageName, containerName).build();
+            containerID = client.createContainer(imageName, containerName).build();
             Boolean started = client.startContainer(containerID);
             assertTrue(started);
         } finally {
@@ -104,7 +104,7 @@ class SimpleDockerClientTest {
             client.pullImage(helloWorldImage);
             String oldContainerName = "hello-world-" + System.currentTimeMillis();
             String newContainerName = oldContainerName + "-1";
-            containerID = client.createContainerBuilder(helloWorldImage, oldContainerName).build();
+            containerID = client.createContainer(helloWorldImage, oldContainerName).build();
             boolean renamed = client.renameContainer(oldContainerName, newContainerName);
 
             assertThat(renamed, is(true));

@@ -1,7 +1,9 @@
 package com.lkq.services.docker.daemon;
 
+import com.lkq.services.docker.daemon.consul.command.AgentCommandBuilder;
 import com.lkq.services.docker.daemon.consul.context.ConsulContext;
 import com.lkq.services.docker.daemon.consul.context.ConsulContextFactory;
+import com.lkq.services.docker.daemon.env.EnvironmentProvider;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import java.util.logging.LogManager;
@@ -10,13 +12,16 @@ public class LocalLauncher {
     public static void main(String[] args) {
         initLogging();
 
+        EnvironmentProvider.set(new LocalEnvironment());
+
+        AgentCommandBuilder builder = new AgentCommandBuilder()
+                .server(true)
+                .ui(true)
+                .clientIP("0.0.0.0")
+                .bootstrap(true);
         ConsulContext context = new ConsulContextFactory().createDefaultContext(ConsulContextFactory.CONTAINER_NAME);
-        context.withPortBinders(new ConsulPorts().getPortBinders());
-        context.commandBuilder()
-                .with("-server")
-                .with("-ui")
-                .with("-client=0.0.0.0")
-                .with("-bootstrap");
+        context.portBinders(new ConsulPorts().getPortBinders());
+        context.withCommandBuilder(builder);
         new App().start(context);
     }
 
