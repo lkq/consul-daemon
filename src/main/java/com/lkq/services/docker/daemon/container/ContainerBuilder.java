@@ -6,7 +6,6 @@ import com.github.dockerjava.api.model.Bind;
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.Ports;
 import com.github.dockerjava.api.model.Volume;
-import com.kliu.utils.Guard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.utils.StringUtils;
@@ -29,7 +28,6 @@ public class ContainerBuilder {
     }
 
     public ContainerBuilder withConfigVolume(String hostPath) {
-        Guard.notBlank(hostPath, "host-path is not provided");
         this.createContainerCmd.withBinds(new Bind(hostPath, new Volume("/consul/config")));
         return this;
     }
@@ -51,7 +49,6 @@ public class ContainerBuilder {
     }
 
     public ContainerBuilder withCommand(String... cmd) {
-        Guard.toBeTrue(cmd != null && cmd.length > 0, "commands are not provided");
         logger.info("command={}", Arrays.asList(cmd));
         this.createContainerCmd.withCmd(cmd);
         return this;

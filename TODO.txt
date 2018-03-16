@@ -1,1 +1,2 @@
 out put console log when container failed to start
+health check

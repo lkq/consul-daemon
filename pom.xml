@@ -10,13 +10,12 @@
 
     <dependencies>
 
-        <dependency>
-            <groupId>com.kliu.utils</groupId>
-            <artifactId>guard</artifactId>
-            <version>0.2.1</version>
-        </dependency>
-
         <!--third party dependency-->
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-client</artifactId>
+            <version>9.3.6.v20151106</version>
+        </dependency>
         <dependency>
             <groupId>com.github.docker-java</groupId>
             <artifactId>docker-java</artifactId>
