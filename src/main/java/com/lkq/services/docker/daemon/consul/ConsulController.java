@@ -1,7 +1,7 @@
 package com.lkq.services.docker.daemon.consul;
 
 import com.lkq.services.docker.daemon.consul.context.ConsulContext;
-import com.lkq.services.docker.daemon.container.ContainerLogRedirector;
+import com.lkq.services.docker.daemon.container.ContainerLogger;
 import com.lkq.services.docker.daemon.container.SimpleDockerClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,14 +14,11 @@ public class ConsulController {
 
     private SimpleDockerClient dockerClient;
     private ConsulHealthChecker consulHealthChecker;
-    private ContainerLogRedirector logRedirector;
 
     public ConsulController(SimpleDockerClient dockerClient,
-                            ConsulHealthChecker consulHealthChecker,
-                            ContainerLogRedirector logRedirector) {
+                            ConsulHealthChecker consulHealthChecker) {
         this.dockerClient = dockerClient;
         this.consulHealthChecker = consulHealthChecker;
-        this.logRedirector = logRedirector;
     }
 
     public void start(ConsulContext context) {
@@ -64,7 +61,7 @@ public class ConsulController {
 
     public void attachLogging(String containerID) {
         logger.info("attaching container log: {}", containerID);
-        logRedirector.attach(containerID, dockerClient);
+        dockerClient.attachLogging(containerID, new ContainerLogger());
     }
 
     public void stop(String containerName) {

@@ -3,7 +3,6 @@ package com.lkq.services.docker.daemon;
 import com.lkq.services.docker.daemon.consul.ConsulController;
 import com.lkq.services.docker.daemon.consul.ConsulHealthChecker;
 import com.lkq.services.docker.daemon.consul.context.ConsulContext;
-import com.lkq.services.docker.daemon.container.ContainerLogRedirector;
 import com.lkq.services.docker.daemon.container.DockerClientFactory;
 import com.lkq.services.docker.daemon.container.SimpleDockerClient;
 import com.lkq.services.docker.daemon.handler.HealthCheckHandler;
@@ -23,8 +22,7 @@ public class App {
         dockerClient = SimpleDockerClient.create(DockerClientFactory.get());
         consulController = new ConsulController(
                 dockerClient,
-                new ConsulHealthChecker(),
-                new ContainerLogRedirector());
+                new ConsulHealthChecker());
     }
 
     public void start(ConsulContext context) {
