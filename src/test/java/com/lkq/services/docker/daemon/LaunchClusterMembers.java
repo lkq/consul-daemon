@@ -7,6 +7,7 @@ import com.lkq.services.docker.daemon.consul.context.ConsulContext;
 import com.lkq.services.docker.daemon.consul.context.ConsulContextFactory;
 import com.lkq.services.docker.daemon.container.SimpleDockerClient;
 import com.lkq.services.docker.daemon.env.EnvironmentProvider;
+import com.lkq.services.docker.daemon.exception.ConsulDaemonException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -55,7 +56,7 @@ public class LaunchClusterMembers {
 
         int nodeIndex = Integer.valueOf(System.getProperty("node-index", "-1"));
         if (nodeIndex < 0) {
-            throw new RuntimeException("please provide node-name by -Dnode-index=<node index>");
+            throw new ConsulDaemonException("please provide node-name by -Dnode-index=<node index>");
         }
         String startingNodeName = clusterNodes[nodeIndex];
         List<String> runningNodeIPs = collectRunningNodeIPs(dockerClient, startingNodeName);

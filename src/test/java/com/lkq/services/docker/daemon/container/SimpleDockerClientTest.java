@@ -3,6 +3,7 @@ package com.lkq.services.docker.daemon.container;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.command.StartContainerCmd;
+import com.lkq.services.docker.daemon.exception.ConsulDaemonException;
 import com.lkq.services.docker.daemon.IntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,7 +61,7 @@ class SimpleDockerClientTest {
 
     @Test
     void willReturnFalseIfExceptionHappens() {
-        given(dockerClient.renameContainerCmd(anyString())).willThrow(new RuntimeException("mock exception"));
+        given(dockerClient.renameContainerCmd(anyString())).willThrow(new ConsulDaemonException("mock exception"));
         boolean renamed = simpleDockerClient.renameContainer("dummy-container", "new-name");
 
         assertFalse(renamed);

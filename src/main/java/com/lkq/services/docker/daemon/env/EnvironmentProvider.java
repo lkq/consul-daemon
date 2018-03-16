@@ -20,7 +20,7 @@ public class EnvironmentProvider {
 
     public static void set(Environment env) {
         if (EnvironmentProvider.env != null) {
-            throw new RuntimeException("environment already initialized");
+            throw new ConsulDaemonException("environment already initialized");
         }
         EnvironmentProvider.env = env;
     }
