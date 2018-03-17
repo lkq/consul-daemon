@@ -1,6 +1,6 @@
 package com.lkq.services.docker.daemon.handler;
 
-import com.lkq.services.docker.daemon.consul.ConsulController;
+import com.google.gson.Gson;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.ContentResponse;
 import org.slf4j.Logger;
@@ -8,33 +8,47 @@ import org.slf4j.LoggerFactory;
 import spark.Request;
 import spark.Response;
 
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class HealthCheckHandler {
     private static Logger logger = LoggerFactory.getLogger(HealthCheckHandler.class);
-    private ConsulController consulController;
     private HttpClient httpClient;
+    private String healthPath = "http://localhost:8500/v1/health/node/";
+    private String nodeName;
 
-    public HealthCheckHandler(ConsulController consulController, HttpClient httpClient) {
-
-        this.consulController = consulController;
+    public HealthCheckHandler(String nodeName, HttpClient httpClient) {
+        this.nodeName = nodeName;
         this.httpClient = httpClient;
     }
 
     public String handleHealthCheck(Request request, Response response) {
         String full = request.queryParams("full");
         try {
-            ContentResponse healthCheckResponse = httpClient.GET("http://localhost:8500/v1/health/service/consul?pretty");
-            logger.info("health check result: {}", healthCheckResponse.getContentAsString());
-            return healthCheckResponse.getContentAsString();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (TimeoutException e) {
-            e.printStackTrace();
+            ContentResponse statusResponse = httpClient.GET(healthPath + nodeName);
+            String content = statusResponse.getContentAsString();
+            if (full == null) {
+                return getSimpleHealth(content);
+            }
+            logger.info("health check result: {}", content);
+            return content;
+        } catch (Exception e) {
+            logger.error("failed to get node health", e);
         }
-        return null;
+        return "false";
+    }
+
+    private String getSimpleHealth(String content) {
+        List nodeHealth = new Gson().fromJson(content, ArrayList.class);
+        if (nodeHealth.size() > 1) {
+            logger.info("skipping node health {}", nodeHealth.subList(1, nodeHealth.size()));
+        }
+        if (nodeHealth.size() > 0) {
+            Map health = (Map) nodeHealth.get(0);
+            String status = (String) health.get("Status");
+            return String.valueOf("passing".equals(status));
+        }
+        return "false";
     }
 }

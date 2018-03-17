@@ -38,7 +38,7 @@ public class App {
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> consulController.stop(context.nodeName())));
 
-        new Routes(new HealthCheckHandler(consulController, httpClient)).ignite();
+        new Routes(new HealthCheckHandler(context.nodeName(), httpClient)).ignite();
 
     }
 
