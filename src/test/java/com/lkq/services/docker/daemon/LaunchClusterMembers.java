@@ -19,7 +19,7 @@ import java.util.logging.LogManager;
 public class LaunchClusterMembers {
     private static Logger logger;
 
-    private String[] clusterNodes = {"consul_node0", "consul_node1", "consul_node2"};
+    private String[] clusterNodes = {"consul-node0", "consul-node1", "consul-node2"};
 
     public static void main(String[] args) {
         initLogging();

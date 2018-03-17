@@ -5,7 +5,7 @@ import com.lkq.services.docker.daemon.consul.ConsulHealthChecker;
 import com.lkq.services.docker.daemon.consul.context.ConsulContext;
 import com.lkq.services.docker.daemon.container.DockerClientFactory;
 import com.lkq.services.docker.daemon.container.SimpleDockerClient;
-import com.lkq.services.docker.daemon.handler.HealthCheckHandler;
+import com.lkq.services.docker.daemon.health.HealthCheckHandler;
 import com.lkq.services.docker.daemon.routes.v1.Routes;
 import org.eclipse.jetty.client.HttpClient;
 import org.slf4j.Logger;

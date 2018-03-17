@@ -33,6 +33,6 @@ public class AWSEnvironment implements Environment {
 
     @Override
     public String nodeName() {
-        return AWSClient.instance().getTagValue(ENV_NODE_NAME, "consul_node_" + System.currentTimeMillis());
+        return AWSClient.instance().getTagValue(ENV_NODE_NAME);
     }
 }

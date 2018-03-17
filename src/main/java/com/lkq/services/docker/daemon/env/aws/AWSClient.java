@@ -4,6 +4,7 @@ import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
 import com.amazonaws.services.ec2.model.*;
 import com.amazonaws.util.EC2MetadataUtils;
+import com.lkq.services.docker.daemon.exception.ConsulDaemonException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.utils.StringUtils;
@@ -21,7 +22,7 @@ public class AWSClient {
     private Boolean isAws;
     private final AmazonEC2 amazonEC2;
 
-    private AWSClient(){
+    private AWSClient() {
         amazonEC2 = AmazonEC2ClientBuilder.defaultClient();
     }
 
@@ -46,18 +47,24 @@ public class AWSClient {
 
     public String getTagValue(String key, String defaultValue) {
         try {
-            Filter tagKeyFilter = new Filter();
-            tagKeyFilter.setName(key);
-            DescribeTagsRequest request = new DescribeTagsRequest(Arrays.asList(tagKeyFilter));
-            DescribeTagsResult result = amazonEC2.describeTags(request);
-            List<TagDescription> tags = result.getTags();
-            logger.info("tag key={}, tag values= {}", key, tags);
-            if (tags.size() > 0) {
-                return tags.get(0).getValue();
-            }
+            String value = getTagValue(key);
+            if (value != null) return value;
         } catch (Exception ignored) {
         }
         return defaultValue;
+    }
+
+    public String getTagValue(String key) {
+        Filter tagKeyFilter = new Filter();
+        tagKeyFilter.setName(key);
+        DescribeTagsRequest request = new DescribeTagsRequest(Arrays.asList(tagKeyFilter));
+        DescribeTagsResult result = amazonEC2.describeTags(request);
+        List<TagDescription> tags = result.getTags();
+        logger.info("tag key={}, tag values= {}", key, tags);
+        if (tags.size() > 0) {
+            return tags.get(0).getValue();
+        }
+        throw new ConsulDaemonException("tag not found");
     }
 
     public List<String> getInstanceIPByTag(String key) {
