@@ -11,16 +11,17 @@ import com.lkq.services.docker.daemon.container.SimpleDockerClient;
 import com.lkq.services.docker.daemon.env.Environment;
 import com.lkq.services.docker.daemon.env.EnvironmentProvider;
 import com.lkq.services.docker.daemon.health.ConsulHealthChecker;
+import com.lkq.services.docker.daemon.logging.JulToSlf4jBridge;
 import com.lkq.services.docker.daemon.routes.v1.Routes;
 import com.lkq.services.docker.daemon.utils.HttpClientFactory;
-import org.slf4j.bridge.SLF4JBridgeHandler;
-
-import java.util.logging.LogManager;
 
 public class LocalLauncher {
     public static void main(String[] args) {
-        initLogging();
+        JulToSlf4jBridge.setup();
+        new LocalLauncher().launch();
+    }
 
+    private void launch() {
         EnvironmentProvider.set(new MacEnvironment());
 
         AgentCommandBuilder builder = new AgentCommandBuilder()
@@ -49,12 +50,5 @@ public class LocalLauncher {
         Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
 
         app.start(Environment.get().forceRestart());
-    }
-
-    private static void initLogging() {
-        // redirect jul to slf4j
-        LogManager.getLogManager().reset();
-        SLF4JBridgeHandler.removeHandlersForRootLogger();
-        SLF4JBridgeHandler.install();
     }
 }
