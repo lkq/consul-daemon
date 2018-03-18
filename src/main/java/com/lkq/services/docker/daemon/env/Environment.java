@@ -24,7 +24,7 @@ public interface Environment {
     String dataPath();
     String network();
     Boolean forceRestart();
-    String jarVersion();
+    String appVersion();
     int servicePort();
     int consulAPIPort();
 

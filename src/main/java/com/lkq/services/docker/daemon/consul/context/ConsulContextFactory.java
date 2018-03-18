@@ -20,7 +20,7 @@ public class ConsulContextFactory {
                 .bootstrapExpect(retryJoin.size())
                 .retryJoin(retryJoin);
 
-        return createDefaultContext(Environment.get().nodeName()).withCommandBuilder(commandBuilder);
+        return createDefaultContext(Environment.get().nodeName()).commandBuilder(commandBuilder);
     }
 
     public ConsulContext createDefaultContext(String nodeName) {

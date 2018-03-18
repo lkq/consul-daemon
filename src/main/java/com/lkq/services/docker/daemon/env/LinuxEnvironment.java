@@ -67,7 +67,7 @@ public class LinuxEnvironment implements Environment {
     }
 
     @Override
-    public String jarVersion() {
+    public String appVersion() {
         String jarPath = getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
         try {
             JarFile jarFile = new JarFile(jarPath);

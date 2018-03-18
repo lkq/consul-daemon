@@ -75,7 +75,7 @@ public class LaunchClusterMembers {
                     .bootstrapExpect(3)
                     .clientIP(ConsulContextFactory.BIND_CLIENT_IP)
                     .retryJoin(runningNodeIPs);
-            context.withCommandBuilder(builder);
+            context.commandBuilder(builder);
             if (nodeIndex == 0) {
                 context.portBinders(new ConsulPorts().getPortBinders());
             }

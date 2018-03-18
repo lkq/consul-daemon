@@ -77,6 +77,10 @@
     </dependencies>
 
 
+    <properties>
+        <excludeTests>IntegrationTest</excludeTests>
+    </properties>
+
     <profiles>
         <profile>
             <id>testAll</id>
@@ -85,10 +89,6 @@
             </properties>
         </profile>
     </profiles>
-
-    <properties>
-        <excludeTests>IntegrationTest</excludeTests>
-    </properties>
 
     <build>
         <plugins>

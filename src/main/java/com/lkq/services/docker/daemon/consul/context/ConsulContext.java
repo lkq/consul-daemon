@@ -83,7 +83,7 @@ public class ConsulContext {
         return commands;
     }
 
-    public ConsulContext withCommandBuilder(CommandBuilder commandBuilder) {
+    public ConsulContext commandBuilder(CommandBuilder commandBuilder) {
         this.commands = commandBuilder;
         return this;
     }

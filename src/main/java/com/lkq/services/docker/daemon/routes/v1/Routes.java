@@ -1,17 +1,17 @@
 package com.lkq.services.docker.daemon.routes.v1;
 
-import com.lkq.services.docker.daemon.health.HealthCheckHandler;
-import spark.Spark;
+import com.lkq.services.docker.daemon.health.ConsulHealthChecker;
+import spark.Service;
 
 public class Routes {
 
-    private HealthCheckHandler healthCheckHandler;
+    private ConsulHealthChecker consulHealthChecker;
 
-    public Routes(HealthCheckHandler healthCheckHandler) {
-        this.healthCheckHandler = healthCheckHandler;
+    public Routes(ConsulHealthChecker consulHealthChecker) {
+        this.consulHealthChecker = consulHealthChecker;
     }
 
-    public void ignite() {
-        Spark.get("/consul-daemon/health", healthCheckHandler::handleHealthCheck);
+    public void ignite(Service service) {
+        service.get("/consul-daemon/health", consulHealthChecker::getNodeHealth);
     }
 }

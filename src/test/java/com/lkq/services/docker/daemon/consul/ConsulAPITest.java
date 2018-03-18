@@ -17,9 +17,8 @@ import static org.mockito.MockitoAnnotations.initMocks;
 class ConsulAPITest {
     private static int apiServerPort;
     private ConsulAPI consulAPI;
-    private HttpClient httpClient;
     private static Service apiServer;
-    private ConsulResponseParser responseParser;
+    private ConsulResponseParser responseParser = new ConsulResponseParser();
 
     @BeforeAll
     static void startTestServer() {
@@ -27,7 +26,7 @@ class ConsulAPITest {
         apiServerPort = getTestPort();
         apiServer.port(apiServerPort);
         apiServer.put("/v1/kv/test-key", (req, res) -> "true");
-        apiServer.get("/v1/kv/test-key", (req, res) -> "test-value");
+        apiServer.get("/v1/kv/test-key", (req, res) -> "[{\"Value\":\"test-value\"}]");
         apiServer.init();
     }
 

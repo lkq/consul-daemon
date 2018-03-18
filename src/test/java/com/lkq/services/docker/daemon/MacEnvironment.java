@@ -33,11 +33,11 @@ public class MacEnvironment extends LinuxEnvironment {
 
     @Override
     public Boolean forceRestart() {
-        return false;
+        return null;
     }
 
     @Override
-    public String jarVersion() {
+    public String appVersion() {
         return "1.2.3";
     }
 }

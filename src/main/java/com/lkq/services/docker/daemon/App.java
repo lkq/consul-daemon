@@ -1,73 +1,84 @@
 package com.lkq.services.docker.daemon;
 
-import com.lkq.services.docker.daemon.consul.ConsulAPI;
 import com.lkq.services.docker.daemon.consul.ConsulController;
-import com.lkq.services.docker.daemon.consul.ConsulHealthChecker;
-import com.lkq.services.docker.daemon.consul.ConsulResponseParser;
 import com.lkq.services.docker.daemon.consul.context.ConsulContext;
-import com.lkq.services.docker.daemon.container.DockerClientFactory;
-import com.lkq.services.docker.daemon.container.SimpleDockerClient;
-import com.lkq.services.docker.daemon.env.Environment;
-import com.lkq.services.docker.daemon.health.HealthCheckHandler;
-import com.lkq.services.docker.daemon.routes.v1.Routes;
-import com.lkq.services.docker.daemon.utils.HttpClientFactory;
+import com.lkq.services.docker.daemon.health.ConsulHealthChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.utils.StringUtils;
-
-import static spark.Spark.port;
 
 public class App {
     private static Logger logger = LoggerFactory.getLogger(App.class);
 
     private ConsulContext context;
+    private final String appVersion;
     private ConsulController consulController;
+    private ConsulHealthChecker consulHealthChecker;
+    private WebServer webServer;
 
-    public App(ConsulContext context) {
+    /**
+     * application entry point, a place to put together different pieces and make it run
+     *
+     * @param context
+     * @param consulController
+     * @param consulHealthChecker
+     * @param webServer
+     * @param appVersion
+     */
+    public App(ConsulContext context, ConsulController consulController, ConsulHealthChecker consulHealthChecker, WebServer webServer, String appVersion) {
         this.context = context;
+        this.appVersion = appVersion;
+        this.consulHealthChecker = consulHealthChecker;
+        this.consulController = consulController;
+        this.webServer = webServer;
     }
 
-    public void start() {
+    /**
+     * start the application
+     *
+     * @param cleanStart weather should do a clean start or not,
+     *                   if not specified, will determined by the registered consul daemon version and current appVersion.
+     */
+    public void start(Boolean cleanStart) {
 
-        String jarVersion = Environment.get().jarVersion();
+        String registeredVersion = consulHealthChecker.registeredConsulDaemonVersion();
 
-        ConsulAPI consulAPI = new ConsulAPI(new HttpClientFactory().create(), new ConsulResponseParser(), Environment.get().consulAPIPort());
-        ConsulHealthChecker consulHealthChecker = new ConsulHealthChecker(consulAPI, context.nodeName(), jarVersion);
-
-        SimpleDockerClient dockerClient = SimpleDockerClient.create(DockerClientFactory.get());
-        consulController = new ConsulController(dockerClient, consulHealthChecker);
-
-        String currentDaemonVersion = consulHealthChecker.getCurrentDaemonVersion();
-        boolean forceRestart = shouldForceRestart(jarVersion, currentDaemonVersion);
-        logger.info("old version: {}, new version: {}, force restart: {}", currentDaemonVersion, jarVersion, forceRestart);
-        consulController.start(context, forceRestart);
+        cleanStart = shouldCleanStart(appVersion, registeredVersion, cleanStart);
+        logger.info("old version: {}, new version: {}, force restart: {}", registeredVersion, appVersion, cleanStart);
+        if (cleanStart) {
+            consulController.stopAndRemoveExistingInstance(context.nodeName());
+            consulController.startNewInstance(context);
+        }
+        consulController.attachLogging(context.nodeName());
         // TODO: find a better solution to block until consul started
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        consulHealthChecker.registerDaemonVersion(jarVersion);
-        port(Environment.get().servicePort());
-        new Routes(new HealthCheckHandler(context.nodeName(), new HttpClientFactory().create())).ignite();
+        consulHealthChecker.registerConsulDaemonVersion(appVersion);
+
+        webServer.start();
 
     }
 
-    private boolean shouldForceRestart(String jarVersion, String currentDaemonVersion) {
-        Boolean forceRestart = Environment.get().forceRestart();
-        if (forceRestart == null) {
-            if (StringUtils.isNotEmpty(currentDaemonVersion) && currentDaemonVersion.startsWith(jarVersion)) {
-                return false;
-            } else {
-                return true;
+    private boolean shouldCleanStart(String appVersion, String registeredVersion, Boolean cleanStart) {
+        if (cleanStart == null) {
+            if (StringUtils.isNotEmpty(registeredVersion)) {
+                String version = registeredVersion.split("@")[0];
+                if (version.equals(appVersion)) {
+                    return false;
+                }
             }
+            return true;
         } else {
-            return forceRestart;
+            return cleanStart;
         }
     }
 
     public void stop() {
         consulController.stop(context.nodeName());
+        webServer.stop();
     }
 
 }

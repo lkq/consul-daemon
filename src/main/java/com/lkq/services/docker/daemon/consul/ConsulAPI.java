@@ -4,6 +4,7 @@ import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.ContentResponse;
 import org.eclipse.jetty.client.util.StringContentProvider;
 import org.eclipse.jetty.http.HttpMethod;
+import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +17,7 @@ public class ConsulAPI {
 
     private String API_V1;
     private String API_V1_KV;
+    private String API_V1_HEALTH_NODE;
 
     private final HttpClient httpClient;
     private final ConsulResponseParser responseParser;
@@ -25,6 +27,19 @@ public class ConsulAPI {
         this.responseParser = responseParser;
         this.API_V1 = API_HOST + ":" + port + "/v1/";
         this.API_V1_KV = API_V1 + "kv/";
+        this.API_V1_HEALTH_NODE = API_V1 + "/health/node/";
+    }
+
+    public Map<String, String> getNodeHealth(String nodeName) {
+        try {
+            ContentResponse response = httpClient.GET(API_V1_HEALTH_NODE + nodeName);
+            if (response.getStatus() == HttpStatus.OK_200) {
+                return responseParser.parse(response.getContentAsString());
+            }
+        } catch (Exception e) {
+            logger.error("failed to get node health: {}, cause={}", nodeName, e.getMessage());
+        }
+        return null;
     }
 
     public boolean putKeyValue(String key, String value) {

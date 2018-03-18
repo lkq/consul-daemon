@@ -3,6 +3,7 @@ package com.lkq.services.docker.daemon.consul;
 import com.lkq.services.docker.daemon.consul.context.ConsulContext;
 import com.lkq.services.docker.daemon.container.ContainerLogger;
 import com.lkq.services.docker.daemon.container.SimpleDockerClient;
+import com.lkq.services.docker.daemon.health.ConsulHealthChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +24,7 @@ public class ConsulController {
 
     public void start(ConsulContext context, boolean forceRestart) {
         if (forceRestart) {
-            removeExistingInstance(context);
+            stopAndRemoveExistingInstance(context.nodeName());
             startNewInstance(context);
         } else if (!consulHealthChecker.isHealthy()) {
             startNewInstance(context);
@@ -31,7 +32,7 @@ public class ConsulController {
         attachLogging(context.nodeName());
     }
 
-    private void startNewInstance(ConsulContext context) {
+    public void startNewInstance(ConsulContext context) {
         logger.info("going to start new consul container");
         String containerID = dockerClient.createContainer(context.imageName(), context.nodeName())
                 .withDataVolume(context.dataPath())
@@ -45,20 +46,12 @@ public class ConsulController {
         dockerClient.startContainer(containerID);
     }
 
-    private void removeExistingInstance(ConsulContext context) {
-        if (dockerClient.containerExists(context.nodeName())) {
-            /**
-             * if an existing consul container is already running, stop and remove it
-             * TODO:
-             * on consul-daemon startup, it should register its version in the consul instance,
-             * when restarting, it should check the registered consul-daemon version,
-             * if it's the same, then consul-daemon should attach the log to it without remove and recreate.
-             *
-             */
-            logger.info("found an old consul container, going to stop and remove");
-            dockerClient.stopContainer(context.nodeName());
-            String tempContainerName = context.nodeName() + "-remove-" + System.currentTimeMillis();
-            dockerClient.renameContainer(context.nodeName(), tempContainerName);
+    public void stopAndRemoveExistingInstance(String nodeName) {
+        if (dockerClient.containerExists(nodeName)) {
+            logger.info("removing existing consul container: {}", nodeName);
+            dockerClient.stopContainer(nodeName);
+            String tempContainerName = nodeName + "-remove-" + System.currentTimeMillis();
+            dockerClient.renameContainer(nodeName, tempContainerName);
             dockerClient.removeContainer(tempContainerName);
         }
     }
