@@ -19,6 +19,7 @@ class ConsulAPITest {
     private ConsulAPI consulAPI;
     private HttpClient httpClient;
     private static Service apiServer;
+    private ConsulResponseParser responseParser;
 
     @BeforeAll
     static void startTestServer() {
@@ -43,7 +44,7 @@ class ConsulAPITest {
         initMocks(this);
         HttpClient client = new HttpClient();
         client.start();
-        consulAPI = new ConsulAPI(client, apiServerPort);
+        consulAPI = new ConsulAPI(client, responseParser, apiServerPort);
     }
 
     @Test

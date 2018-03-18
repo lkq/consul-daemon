@@ -10,7 +10,9 @@ public class Launcher {
     public static void main(String[] args) {
         initLogging();
         ConsulContext context = new ConsulContextFactory().createClusterNodeContext();
-        new App().start(context);
+        App app = new App(context);
+        app.start();
+        Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
     }
 
     private static void initLogging() {

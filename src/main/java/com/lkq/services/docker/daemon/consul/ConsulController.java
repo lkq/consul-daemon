@@ -21,16 +21,31 @@ public class ConsulController {
         this.consulHealthChecker = consulHealthChecker;
     }
 
-    public void start(ConsulContext context) {
-        if (!consulHealthChecker.isHealthy()) {
+    public void start(ConsulContext context, boolean forceRestart) {
+        if (forceRestart) {
+            removeExistingInstance(context);
             startNewInstance(context);
-        } else {
-            attachLogging(context.nodeName());
+        } else if (!consulHealthChecker.isHealthy()) {
+            startNewInstance(context);
         }
+        attachLogging(context.nodeName());
     }
 
     private void startNewInstance(ConsulContext context) {
         logger.info("going to start new consul container");
+        String containerID = dockerClient.createContainer(context.imageName(), context.nodeName())
+                .withDataVolume(context.dataPath())
+                .withEnvironmentVariable(context.environmentVariables())
+                .withHostName(context.hostName())
+                .withNetwork(context.network())
+                .withPortBinders(context.portBinders())
+                .withCommand(context.commandBuilder().commands())
+                .build();
+
+        dockerClient.startContainer(containerID);
+    }
+
+    private void removeExistingInstance(ConsulContext context) {
         if (dockerClient.containerExists(context.nodeName())) {
             /**
              * if an existing consul container is already running, stop and remove it
@@ -46,21 +61,9 @@ public class ConsulController {
             dockerClient.renameContainer(context.nodeName(), tempContainerName);
             dockerClient.removeContainer(tempContainerName);
         }
-        String containerID = dockerClient.createContainer(context.imageName(), context.nodeName())
-                .withDataVolume(context.dataPath())
-                .withEnvironmentVariable(context.environmentVariables())
-                .withHostName(context.hostName())
-                .withNetwork(context.network())
-                .withPortBinders(context.portBinders())
-                .withCommand(context.commandBuilder().commands())
-                .build();
-
-        dockerClient.startContainer(containerID);
-        attachLogging(containerID);
     }
 
     public void attachLogging(String containerID) {
-        logger.info("attaching container log: {}", containerID);
         dockerClient.attachLogging(containerID, new ContainerLogger());
     }
 

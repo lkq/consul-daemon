@@ -1,11 +1,16 @@
 package com.lkq.services.docker.daemon;
 
-import com.lkq.services.docker.daemon.env.Environment;
+import com.lkq.services.docker.daemon.env.LinuxEnvironment;
 
 import java.util.Collections;
 import java.util.List;
 
-public class LocalEnvironment implements Environment {
+public class MacEnvironment extends LinuxEnvironment {
+    @Override
+    public String nodeName() {
+        return "consul";
+    }
+
     @Override
     public ConsulRole consulRole() {
         return ConsulRole.SERVER;
@@ -17,17 +22,22 @@ public class LocalEnvironment implements Environment {
     }
 
     @Override
-    public String getDataPath() {
+    public String dataPath() {
         return "";
     }
 
     @Override
-    public String getNetwork() {
+    public String network() {
         return "";
     }
 
     @Override
-    public String nodeName() {
-        return "consul";
+    public Boolean forceRestart() {
+        return false;
+    }
+
+    @Override
+    public String jarVersion() {
+        return "1.2.3";
     }
 }

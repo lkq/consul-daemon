@@ -28,8 +28,8 @@ public class ConsulContextFactory {
                 .imageName(CONSUL_IMAGE)
                 .nodeName(nodeName)
                 .hostName(nodeName)
-                .network(Environment.get().getNetwork())
-                .dataPath(Environment.get().getDataPath())
+                .network(Environment.get().network())
+                .dataPath(Environment.get().dataPath())
                 .environmentVariables(getEnvironmentVariables());
     }
 

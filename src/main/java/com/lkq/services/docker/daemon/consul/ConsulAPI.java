@@ -7,6 +7,8 @@ import org.eclipse.jetty.http.HttpMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+
 public class ConsulAPI {
     private static Logger logger = LoggerFactory.getLogger(ConsulAPI.class);
 
@@ -16,9 +18,11 @@ public class ConsulAPI {
     private String API_V1_KV;
 
     private final HttpClient httpClient;
+    private final ConsulResponseParser responseParser;
 
-    public ConsulAPI(HttpClient httpClient, int port) {
+    public ConsulAPI(HttpClient httpClient, ConsulResponseParser responseParser, int port) {
         this.httpClient = httpClient;
+        this.responseParser = responseParser;
         this.API_V1 = API_HOST + ":" + port + "/v1/";
         this.API_V1_KV = API_V1 + "kv/";
     }
@@ -33,19 +37,22 @@ public class ConsulAPI {
                 return Boolean.valueOf(response.getContentAsString());
             }
         } catch (Exception e) {
-            logger.error("failed to put kv: " + key + "=" + value, e);
+            logger.error("failed to put kv: {}={}, cause={}", key, value, e.getMessage());
         }
         return false;
     }
 
     public String getKeyValue(String key) {
         try {
-            ContentResponse response = httpClient.GET(API_V1_KV + key);
+            String uri = API_V1_KV + key;
+            logger.debug("getting key value from: {}", uri);
+            ContentResponse response = httpClient.GET(uri);
             if (response.getStatus() == 200) {
-                return response.getContentAsString();
+                Map<String, String> kvMap = responseParser.parse(response.getContentAsString());
+                return kvMap.get("Value");
             }
         } catch (Exception e) {
-            logger.error("failed to get kv: " + key, e);
+            logger.error("failed to get kv: {}, cause: {}", key, e.getMessage());
         }
         return null;
     }

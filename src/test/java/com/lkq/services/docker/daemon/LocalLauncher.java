@@ -13,7 +13,7 @@ public class LocalLauncher {
     public static void main(String[] args) {
         initLogging();
 
-        EnvironmentProvider.set(new LocalEnvironment());
+        EnvironmentProvider.set(new MacEnvironment());
 
         AgentCommandBuilder builder = new AgentCommandBuilder()
                 .server(true)
@@ -23,7 +23,10 @@ public class LocalLauncher {
         ConsulContext context = new ConsulContextFactory().createDefaultContext(Environment.get().nodeName());
         context.portBinders(new ConsulPorts().getPortBinders());
         context.withCommandBuilder(builder);
-        new App().start(context);
+        App app = new App(context);
+        app.start();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
     }
 
     private static void initLogging() {

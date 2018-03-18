@@ -1,52 +1,73 @@
 package com.lkq.services.docker.daemon;
 
+import com.lkq.services.docker.daemon.consul.ConsulAPI;
 import com.lkq.services.docker.daemon.consul.ConsulController;
 import com.lkq.services.docker.daemon.consul.ConsulHealthChecker;
+import com.lkq.services.docker.daemon.consul.ConsulResponseParser;
 import com.lkq.services.docker.daemon.consul.context.ConsulContext;
 import com.lkq.services.docker.daemon.container.DockerClientFactory;
 import com.lkq.services.docker.daemon.container.SimpleDockerClient;
+import com.lkq.services.docker.daemon.env.Environment;
 import com.lkq.services.docker.daemon.health.HealthCheckHandler;
 import com.lkq.services.docker.daemon.routes.v1.Routes;
-import org.eclipse.jetty.client.HttpClient;
+import com.lkq.services.docker.daemon.utils.HttpClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spark.utils.StringUtils;
+
+import static spark.Spark.port;
 
 public class App {
     private static Logger logger = LoggerFactory.getLogger(App.class);
 
-    private final ConsulController consulController;
-    private final SimpleDockerClient dockerClient;
+    private ConsulContext context;
+    private ConsulController consulController;
 
-    public App() {
-
-        dockerClient = SimpleDockerClient.create(DockerClientFactory.get());
-        consulController = new ConsulController(
-                dockerClient,
-                new ConsulHealthChecker());
+    public App(ConsulContext context) {
+        this.context = context;
     }
 
-    public void start(ConsulContext context) {
+    public void start() {
 
-        HttpClient httpClient = new HttpClient();
+        String jarVersion = Environment.get().jarVersion();
+
+        ConsulAPI consulAPI = new ConsulAPI(new HttpClientFactory().create(), new ConsulResponseParser(), Environment.get().consulAPIPort());
+        ConsulHealthChecker consulHealthChecker = new ConsulHealthChecker(consulAPI, context.nodeName(), jarVersion);
+
+        SimpleDockerClient dockerClient = SimpleDockerClient.create(DockerClientFactory.get());
+        consulController = new ConsulController(dockerClient, consulHealthChecker);
+
+        String currentDaemonVersion = consulHealthChecker.getCurrentDaemonVersion();
+        boolean forceRestart = shouldForceRestart(jarVersion, currentDaemonVersion);
+        logger.info("old version: {}, new version: {}, force restart: {}", currentDaemonVersion, jarVersion, forceRestart);
+        consulController.start(context, forceRestart);
+        // TODO: find a better solution to block until consul started
         try {
-            httpClient.start();
-        } catch (Exception e) {
-            logger.error("failed to start http client", e);
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-
-        consulController.start(context);
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> consulController.stop(context.nodeName())));
-
-        new Routes(new HealthCheckHandler(context.nodeName(), httpClient)).ignite();
+        consulHealthChecker.registerDaemonVersion(jarVersion);
+        port(Environment.get().servicePort());
+        new Routes(new HealthCheckHandler(context.nodeName(), new HttpClientFactory().create())).ignite();
 
     }
 
-    public ConsulController getConsulController() {
-        return consulController;
+    private boolean shouldForceRestart(String jarVersion, String currentDaemonVersion) {
+        Boolean forceRestart = Environment.get().forceRestart();
+        if (forceRestart == null) {
+            if (StringUtils.isNotEmpty(currentDaemonVersion) && currentDaemonVersion.startsWith(jarVersion)) {
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return forceRestart;
+        }
     }
 
-    public SimpleDockerClient getDockerClient() {
-        return dockerClient;
+    public void stop() {
+        consulController.stop(context.nodeName());
     }
+
 }

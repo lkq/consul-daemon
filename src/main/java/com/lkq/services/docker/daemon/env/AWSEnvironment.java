@@ -2,10 +2,14 @@ package com.lkq.services.docker.daemon.env;
 
 import com.lkq.services.docker.daemon.env.aws.AWSClient;
 
-import java.nio.file.Paths;
 import java.util.List;
 
-public class AWSEnvironment implements Environment {
+public class AWSEnvironment extends LinuxEnvironment {
+
+    @Override
+    public String nodeName() {
+        return AWSClient.instance().getTagValue(ENV_NODE_NAME);
+    }
 
     @Override
     public ConsulRole consulRole() {
@@ -21,18 +25,4 @@ public class AWSEnvironment implements Environment {
         return AWSClient.instance().getInstanceIPByTagValue(ENV_CONSUL_ROLE, "server");
     }
 
-    @Override
-    public String getDataPath() {
-        return Paths.get(".").toAbsolutePath().normalize().toString() + "/data";
-    }
-
-    @Override
-    public String getNetwork() {
-        return "host";
-    }
-
-    @Override
-    public String nodeName() {
-        return AWSClient.instance().getTagValue(ENV_NODE_NAME);
-    }
 }

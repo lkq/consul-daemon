@@ -16,6 +16,10 @@
         <appender-ref ref="ConsulLogAppender"/>
     </logger>
 
+    <logger name="com.lkq.services.docker.daemon" level="debug" additivity="false">
+        <appender-ref ref="ApplicationLogAppender"/>
+    </logger>
+
     <root level="info">
         <appender-ref ref="ApplicationLogAppender"/>
     </root>

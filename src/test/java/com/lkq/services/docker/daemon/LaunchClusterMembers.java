@@ -2,9 +2,11 @@ package com.lkq.services.docker.daemon;
 
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.lkq.services.docker.daemon.consul.ConsulController;
+import com.lkq.services.docker.daemon.consul.NoOpHealthChecker;
 import com.lkq.services.docker.daemon.consul.command.AgentCommandBuilder;
 import com.lkq.services.docker.daemon.consul.context.ConsulContext;
 import com.lkq.services.docker.daemon.consul.context.ConsulContextFactory;
+import com.lkq.services.docker.daemon.container.DockerClientFactory;
 import com.lkq.services.docker.daemon.container.SimpleDockerClient;
 import com.lkq.services.docker.daemon.env.EnvironmentProvider;
 import com.lkq.services.docker.daemon.exception.ConsulDaemonException;
@@ -26,13 +28,12 @@ public class LaunchClusterMembers {
 
         logger = LoggerFactory.getLogger(LaunchClusterMembers.class);
 
-        EnvironmentProvider.set(new LocalEnvironment());
-        App app = new App();
+        EnvironmentProvider.set(new MacEnvironment());
+
+        SimpleDockerClient dockerClient = SimpleDockerClient.create(DockerClientFactory.get());
+        ConsulController consulController = new ConsulController(dockerClient, new NoOpHealthChecker());
 
         ConsulContextFactory contextFactory = new ConsulContextFactory();
-        SimpleDockerClient dockerClient = app.getDockerClient();
-        ConsulController consulController = app.getConsulController();
-
         new LaunchClusterMembers().joinCluster(consulController, dockerClient, contextFactory);
 
         try {
@@ -78,7 +79,7 @@ public class LaunchClusterMembers {
             if (nodeIndex == 0) {
                 context.portBinders(new ConsulPorts().getPortBinders());
             }
-            consulController.start(context);
+            consulController.start(context, true);
             Runtime.getRuntime().addShutdownHook(new Thread(() -> consulController.stop(context.nodeName())));
         }
     }
