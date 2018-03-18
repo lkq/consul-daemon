@@ -3,7 +3,6 @@ package com.lkq.services.docker.daemon.consul;
 import com.lkq.services.docker.daemon.consul.context.ConsulContext;
 import com.lkq.services.docker.daemon.container.ContainerLogger;
 import com.lkq.services.docker.daemon.container.SimpleDockerClient;
-import com.lkq.services.docker.daemon.health.ConsulHealthChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,22 +13,9 @@ public class ConsulController {
     private static Logger logger = LoggerFactory.getLogger(ConsulController.class);
 
     private SimpleDockerClient dockerClient;
-    private ConsulHealthChecker consulHealthChecker;
 
-    public ConsulController(SimpleDockerClient dockerClient,
-                            ConsulHealthChecker consulHealthChecker) {
+    public ConsulController(SimpleDockerClient dockerClient) {
         this.dockerClient = dockerClient;
-        this.consulHealthChecker = consulHealthChecker;
-    }
-
-    public void start(ConsulContext context, boolean forceRestart) {
-        if (forceRestart) {
-            stopAndRemoveExistingInstance(context.nodeName());
-            startNewInstance(context);
-        } else if (!consulHealthChecker.isHealthy()) {
-            startNewInstance(context);
-        }
-        attachLogging(context.nodeName());
     }
 
     public void startNewInstance(ConsulContext context) {

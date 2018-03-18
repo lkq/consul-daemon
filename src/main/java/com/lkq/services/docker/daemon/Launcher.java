@@ -26,7 +26,7 @@ public class Launcher {
 
         String appVersion = Environment.get().appVersion();
         ConsulHealthChecker consulHealthChecker = new ConsulHealthChecker(consulAPI, context.nodeName(), appVersion);
-        ConsulController consulController = new ConsulController(dockerClient, consulHealthChecker);
+        ConsulController consulController = new ConsulController(dockerClient);
         WebServer webServer = new WebServer(new Routes(consulHealthChecker), Environment.get().servicePort());
 
         App app = new App(context,

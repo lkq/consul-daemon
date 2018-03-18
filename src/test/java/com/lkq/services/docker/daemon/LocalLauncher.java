@@ -7,6 +7,7 @@ import com.lkq.services.docker.daemon.consul.command.AgentCommandBuilder;
 import com.lkq.services.docker.daemon.consul.context.ConsulContext;
 import com.lkq.services.docker.daemon.consul.context.ConsulContextFactory;
 import com.lkq.services.docker.daemon.container.DockerClientFactory;
+import com.lkq.services.docker.daemon.container.PortBinder;
 import com.lkq.services.docker.daemon.container.SimpleDockerClient;
 import com.lkq.services.docker.daemon.env.Environment;
 import com.lkq.services.docker.daemon.env.EnvironmentProvider;
@@ -15,14 +16,16 @@ import com.lkq.services.docker.daemon.logging.JulToSlf4jBridge;
 import com.lkq.services.docker.daemon.routes.v1.Routes;
 import com.lkq.services.docker.daemon.utils.HttpClientFactory;
 
+import java.util.List;
+
 public class LocalLauncher {
     public static void main(String[] args) {
         JulToSlf4jBridge.setup();
-        new LocalLauncher().launch();
+        new LocalLauncher().launch(new MacEnvironment(), new ConsulPorts().defaultPortBindings());
     }
 
-    private void launch() {
-        EnvironmentProvider.set(new MacEnvironment());
+    private void launch(Environment env, List<PortBinder> portBinders) {
+        EnvironmentProvider.set(env);
 
         AgentCommandBuilder builder = new AgentCommandBuilder()
                 .server(true)
@@ -31,14 +34,14 @@ public class LocalLauncher {
                 .bootstrap(true);
         ConsulContext context = new ConsulContextFactory()
                 .createDefaultContext(Environment.get().nodeName())
-                .portBinders(new ConsulPorts().getPortBinders())
+                .portBinders(portBinders)
                 .commandBuilder(builder);
 
         ConsulAPI consulAPI = new ConsulAPI(new HttpClientFactory().create(), new ConsulResponseParser(), Environment.get().consulAPIPort());
         SimpleDockerClient dockerClient = SimpleDockerClient.create(DockerClientFactory.get());
 
         ConsulHealthChecker consulHealthChecker = new ConsulHealthChecker(consulAPI, context.nodeName(), Environment.get().appVersion());
-        ConsulController consulController = new ConsulController(dockerClient, consulHealthChecker);
+        ConsulController consulController = new ConsulController(dockerClient);
         WebServer webServer = new WebServer(new Routes(consulHealthChecker), 0);
 
         App app = new App(context,

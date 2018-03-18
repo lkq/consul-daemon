@@ -12,9 +12,21 @@ import java.util.jar.JarFile;
 
 public class LinuxEnvironment implements Environment {
 
+    private String getEnv(String key, String defaultValue) {
+        String value = System.getenv(key);
+        if (StringUtils.isEmpty(value)) {
+            value = System.getProperty(key, defaultValue);
+        }
+        return value;
+    }
+
     @Override
     public String nodeName() {
-        return getEnv(Environment.ENV_NODE_NAME, "consul-node-" + System.currentTimeMillis());
+        String nodeName = getEnv(Environment.ENV_NODE_NAME, "");
+        if (StringUtils.isEmpty(nodeName)) {
+            throw new ConsulDaemonException("please provide node name by export consul.nodeName=<name> or -Dconsul.nodeName=<name>");
+        }
+        return nodeName;
     }
 
     @Override
@@ -47,14 +59,6 @@ public class LinuxEnvironment implements Environment {
     @Override
     public String network() {
         return "host";
-    }
-
-    private String getEnv(String key, String defaultValue) {
-        String value = System.getenv(key);
-        if (StringUtils.isEmpty(value)) {
-            value = System.getProperty(key, defaultValue);
-        }
-        return value;
     }
 
     @Override

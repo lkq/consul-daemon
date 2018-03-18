@@ -10,11 +10,11 @@ import spark.utils.StringUtils;
 public class App {
     private static Logger logger = LoggerFactory.getLogger(App.class);
 
-    private ConsulContext context;
+    private final ConsulContext context;
     private final String appVersion;
-    private ConsulController consulController;
-    private ConsulHealthChecker consulHealthChecker;
-    private WebServer webServer;
+    private final ConsulController consulController;
+    private final ConsulHealthChecker consulHealthChecker;
+    private final WebServer webServer;
 
     /**
      * application entry point, a place to put together different pieces and make it run
@@ -37,7 +37,7 @@ public class App {
      * start the application
      *
      * @param cleanStart weather should do a clean start or not,
-     *                   if not specified, will determined by the registered consul daemon version and current appVersion.
+     *                   if not specified, will clean start if the registered consul daemon version does not match with current package version.
      */
     public void start(Boolean cleanStart) {
 
