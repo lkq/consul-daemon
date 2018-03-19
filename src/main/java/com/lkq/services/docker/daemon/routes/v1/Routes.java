@@ -12,6 +12,6 @@ public class Routes {
     }
 
     public void ignite(Service service) {
-        service.get("/consul-daemon/health", consulHealthChecker::getNodeHealth);
+        service.get("/consul-daemon/v1/health", consulHealthChecker::getNodeHealth);
     }
 }

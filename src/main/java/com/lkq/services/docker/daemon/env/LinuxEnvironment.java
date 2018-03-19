@@ -12,7 +12,7 @@ import java.util.jar.JarFile;
 
 public class LinuxEnvironment implements Environment {
 
-    private String getEnv(String key, String defaultValue) {
+    protected String getEnv(String key, String defaultValue) {
         String value = System.getenv(key);
         if (StringUtils.isEmpty(value)) {
             value = System.getProperty(key, defaultValue);

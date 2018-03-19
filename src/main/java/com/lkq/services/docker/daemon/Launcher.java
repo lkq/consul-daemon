@@ -20,10 +20,10 @@ public class Launcher {
     }
 
     private void start() {
-        ConsulContext context = new ConsulContextFactory().createClusterNodeContext();
         ConsulAPI consulAPI = new ConsulAPI(new HttpClientFactory().create(), new ConsulResponseParser(), Environment.get().consulAPIPort());
         SimpleDockerClient dockerClient = SimpleDockerClient.create(DockerClientFactory.get());
 
+        ConsulContext context = new ConsulContextFactory().createClusterNodeContext();
         String appVersion = Environment.get().appVersion();
         ConsulHealthChecker consulHealthChecker = new ConsulHealthChecker(consulAPI, context.nodeName(), appVersion);
         ConsulController consulController = new ConsulController(dockerClient);
