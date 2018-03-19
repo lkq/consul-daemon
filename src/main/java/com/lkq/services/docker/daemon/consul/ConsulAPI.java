@@ -7,7 +7,9 @@ import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spark.utils.StringUtils;
 
+import java.util.Base64;
 import java.util.Map;
 
 public class ConsulAPI {
@@ -27,7 +29,7 @@ public class ConsulAPI {
         this.responseParser = responseParser;
         this.API_V1 = API_HOST + ":" + port + "/v1/";
         this.API_V1_KV = API_V1 + "kv/";
-        this.API_V1_HEALTH_NODE = API_V1 + "/health/node/";
+        this.API_V1_HEALTH_NODE = API_V1 + "health/node/";
     }
 
     public Map<String, String> getNodeHealth(String nodeName) {
@@ -48,6 +50,7 @@ public class ConsulAPI {
                     .method(HttpMethod.PUT)
                     .content(new StringContentProvider(value))
                     .send();
+            logger.info("put key response: {}", response.getContentAsString());
             if (response.getStatus() == 200) {
                 return Boolean.valueOf(response.getContentAsString());
             }
@@ -64,7 +67,12 @@ public class ConsulAPI {
             ContentResponse response = httpClient.GET(uri);
             if (response.getStatus() == 200) {
                 Map<String, String> kvMap = responseParser.parse(response.getContentAsString());
-                return kvMap.get("Value");
+                String encodedValue = kvMap.get("Value");
+                if (StringUtils.isNotEmpty(encodedValue)) {
+                    return new String(Base64.getDecoder().decode(encodedValue.getBytes()));
+                } else {
+                    return null;
+                }
             }
         } catch (Exception e) {
             logger.error("failed to get kv: {}, cause: {}", key, e.getMessage());

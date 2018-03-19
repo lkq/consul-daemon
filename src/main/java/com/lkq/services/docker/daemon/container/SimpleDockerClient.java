@@ -47,7 +47,7 @@ public class SimpleDockerClient {
             client.removeContainerCmd(containerId).withForce(true).exec();
             return true;
         } catch (Exception e) {
-            logger.info("failed to remove container: " + containerId, e);
+            logger.warn("failed to remove container: {}, cause: {}", containerId, e.getMessage());
         }
         return false;
     }
@@ -64,7 +64,7 @@ public class SimpleDockerClient {
             InspectContainerResponse inspectResponse = client.inspectContainerCmd(containerID).exec();
             return inspectResponse.getState().getRunning();
         } catch (Exception e) {
-            logger.info("failed to start container: {}", containerID);
+            logger.warn("failed to start container: {}", containerID);
         }
         return false;
     }
@@ -76,9 +76,9 @@ public class SimpleDockerClient {
             logger.info("stopped container: {}", containerId);
             return true;
         } catch (NotModifiedException e) {
-            logger.info("container is not running: {}", containerId);
+            logger.warn("container is not running: {}", containerId);
         } catch (Exception e) {
-            logger.info("failed to stop container: " + containerId, e);
+            logger.warn("failed to stop container: {}, cause: {}", containerId, e.getMessage());
         }
         return false;
     }
@@ -89,7 +89,7 @@ public class SimpleDockerClient {
             client.renameContainerCmd(containerName).withName(newName).exec();
             return true;
         } catch (Exception e) {
-            logger.info("failed to rename container from [" + containerName + "] to [" + newName + "]", e);
+            logger.warn("failed to rename container from {} to {}, cause: {}", containerName, newName, e.getMessage());
         }
         return false;
     }
@@ -99,7 +99,7 @@ public class SimpleDockerClient {
             InspectImageResponse inspectResponse = client.inspectImageCmd(imageName).exec();
             return StringUtils.isNotEmpty(inspectResponse.getId());
         } catch (Exception e) {
-            logger.info("failed to inspect image: " + imageName, e);
+            logger.warn("failed to inspect image: {}, cause: {}", imageName, e.getMessage());
         }
         return false;
     }
@@ -112,7 +112,7 @@ public class SimpleDockerClient {
             }
             return true;
         } catch (Exception e) {
-            logger.info("failed to pull image: {}, reason: {}", image, e.getMessage());
+            logger.warn("failed to pull image: {}, reason: {}", image, e.getMessage());
         }
         return false;
     }
@@ -122,7 +122,7 @@ public class SimpleDockerClient {
         try {
             return client.inspectContainerCmd(containerName).exec();
         } catch (Exception e) {
-            logger.info("failed to inspect container: {}, reason: {}", containerName, e.getMessage());
+            logger.warn("failed to inspect container: {}, reason: {}", containerName, e.getMessage());
         }
         return null;
     }
@@ -141,9 +141,9 @@ public class SimpleDockerClient {
             ExecStartResultCallback resultCallback = client.execStartCmd(response.getId())
                     .exec(new ExecStartResultCallback(stdout, stderr));
             resultCallback.awaitCompletion();
-            logger.info("execute result: stdout={}, stderr={}", stdout.toString(), stderr.toString());
+            logger.info("execute result: stdout: {}, stderr: {}", stdout.toString(), stderr.toString());
         } catch (Exception e) {
-            logger.info("failed to execute commands, container: " + containerName + ", command: " + Arrays.toString(command), e);
+            logger.warn("failed to execute commands, container: {}, command: {}, cause: {}", containerName, Arrays.toString(command), e.getMessage());
         }
     }
 
@@ -168,7 +168,8 @@ public class SimpleDockerClient {
         try {
             InspectContainerResponse container = client.inspectContainerCmd(containerId).exec();
             return StringUtils.isNotEmpty(container.getId());
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            logger.warn("failed to check if container exists, containerID: {}, cause: {}", containerId, e.getMessage());
         }
         return false;
     }
@@ -182,7 +183,8 @@ public class SimpleDockerClient {
             } else {
                 return state.getRunning();
             }
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            logger.warn("failed to check if container running, containerID: {}, cause: {}", containerName, e.getMessage());
         }
         return false;
     }

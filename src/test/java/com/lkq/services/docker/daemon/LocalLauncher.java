@@ -24,7 +24,7 @@ public class LocalLauncher {
         new LocalLauncher().launch(new MacEnvironment(), new ConsulPorts().defaultPortBindings());
     }
 
-    private void launch(Environment env, List<PortBinder> portBinders) {
+    public void launch(Environment env, List<PortBinder> portBinders) {
         EnvironmentProvider.set(env);
 
         AgentCommandBuilder builder = new AgentCommandBuilder()
