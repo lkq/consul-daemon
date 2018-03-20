@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -35,6 +36,7 @@ class AppTest {
     @Test
     void willCleanStartConsulIfItsNotAlreadyRunning() {
         given(consulHealthChecker.registeredConsulDaemonVersion()).willReturn(null);
+        given(consulController.startNewInstance(any(ConsulContext.class))).willReturn(true);
         given(context.nodeName()).willReturn(TEST_NODE_NAME);
 
         app.start(null);
@@ -49,6 +51,7 @@ class AppTest {
     @Test
     void willCleanStartConsulIfDaemonVersionNotMatch() {
         given(consulHealthChecker.registeredConsulDaemonVersion()).willReturn(APP_VERSION + ".test");
+        given(consulController.startNewInstance(any(ConsulContext.class))).willReturn(true);
         given(context.nodeName()).willReturn(TEST_NODE_NAME);
 
         app.start(null);
@@ -63,6 +66,7 @@ class AppTest {
     @Test
     void willAttachConsulLogIfDaemonVersionMatch() {
         given(consulHealthChecker.registeredConsulDaemonVersion()).willReturn(APP_VERSION);
+        given(consulController.startNewInstance(any(ConsulContext.class))).willReturn(true);
         given(context.nodeName()).willReturn(TEST_NODE_NAME);
 
         app.start(null);
@@ -77,6 +81,7 @@ class AppTest {
     @Test
     void willCleanStartConsulIfToldTo() {
         given(consulHealthChecker.registeredConsulDaemonVersion()).willReturn(APP_VERSION);
+        given(consulController.startNewInstance(any(ConsulContext.class))).willReturn(true);
         given(context.nodeName()).willReturn(TEST_NODE_NAME);
 
         app.start(true);
@@ -91,6 +96,7 @@ class AppTest {
     @Test
     void willNotCleanStartConsulIfToldNotTo() {
         given(consulHealthChecker.registeredConsulDaemonVersion()).willReturn(APP_VERSION + ".test");
+        given(consulController.startNewInstance(any(ConsulContext.class))).willReturn(true);
         given(context.nodeName()).willReturn(TEST_NODE_NAME);
 
         app.start(false);

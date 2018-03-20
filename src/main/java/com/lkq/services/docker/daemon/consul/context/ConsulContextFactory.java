@@ -15,10 +15,15 @@ public class ConsulContextFactory {
     public ConsulContext createClusterNodeContext() {
 
         List<String> retryJoin = Environment.get().clusterMembers();
+        boolean isServer = Environment.get().isServer();
+
         AgentCommandBuilder commandBuilder = new AgentCommandBuilder()
-                .server(true)
-                .bootstrapExpect(retryJoin.size())
+                .server(isServer)
                 .retryJoin(retryJoin);
+
+        if (isServer) {
+            commandBuilder.bootstrapExpect(retryJoin.size());
+        }
 
         return createDefaultContext(Environment.get().nodeName()).commandBuilder(commandBuilder);
     }

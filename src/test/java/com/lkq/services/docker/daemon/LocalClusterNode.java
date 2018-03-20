@@ -8,11 +8,11 @@ import com.lkq.services.docker.daemon.consul.context.ConsulContextFactory;
 import com.lkq.services.docker.daemon.container.DockerClientFactory;
 import com.lkq.services.docker.daemon.container.SimpleDockerClient;
 import com.lkq.services.docker.daemon.env.EnvironmentProvider;
-import com.lkq.services.docker.daemon.exception.ConsulDaemonException;
 import com.lkq.services.docker.daemon.health.ConsulHealthChecker;
 import com.lkq.services.docker.daemon.logging.JulToSlf4jBridge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spark.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,10 +20,13 @@ import java.util.List;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
+/**
+ * start server nodes and form a cluster when provided -Dnode-index=
+ * otherwise start as client node
+ */
 public class LocalClusterNode {
+    public static final int MIN_CLUSTER_SIZE = 3;
     private static Logger logger;
-
-    private static String[] NODE_NAMES = {"consul-node0", "consul-node1", "consul-node2"};
 
     public static void main(String[] args) {
         JulToSlf4jBridge.setup();
@@ -54,21 +57,35 @@ public class LocalClusterNode {
         ConsulContextFactory contextFactory = new ConsulContextFactory();
 
         int nodeIndex = nodeIndex();
-        String nodeName = NODE_NAMES[nodeIndex];
+
+        boolean isServer = nodeIndex >= 0;
+        String nodeName = nodeName(nodeIndex);
         AgentCommandBuilder builder = new AgentCommandBuilder()
-                .server(true)
+                .server(isServer)
                 .ui(true)
-                .bootstrapExpect(3)
                 .clientIP(ConsulContextFactory.BIND_CLIENT_IP)
                 .retryJoin(runningNodeIPs(dockerClient));
+        if (isServer) {
+            builder.bootstrapExpect(MIN_CLUSTER_SIZE);
+        }
         ConsulContext context = contextFactory.createDefaultContext(nodeName).commandBuilder(builder);
         if (nodeIndex == 0) {
-            context.portBinders(new ConsulPorts().integrationTestPortBindings());
+            context.portBinders(new ConsulPorts().localServerPortBindings());
+        } else if (nodeIndex == -1) {
+            context.portBinders(new ConsulPorts().localClientPortBindings());
         }
         App app = new App(context, consulController, healthChecker, webServer, "1.2.3");
         app.start(!nodeRunning(dockerClient, nodeName));
 
         Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
+    }
+
+    private String nodeName(int nodeIndex) {
+        if (nodeIndex >= 0) {
+            return "consul-server-" + nodeIndex;
+        } else {
+            return "consul-client-" + System.currentTimeMillis();
+        }
     }
 
     private boolean nodeRunning(SimpleDockerClient dockerClient, String nodeName) {
@@ -79,16 +96,18 @@ public class LocalClusterNode {
     }
 
     private int nodeIndex() {
-        int nodeIndex = Integer.valueOf(System.getProperty("node-index", "-1"));
-        if (nodeIndex < 0) {
-            throw new ConsulDaemonException("please provide node-name by -Dnode-index=[0, 1, 2]");
+        String index = System.getProperty("node-index", "");
+        if (StringUtils.isNotEmpty(index)) {
+            return Integer.valueOf(index);
+        } else {
+            return -1;
         }
-        return nodeIndex;
     }
 
     private List<String> runningNodeIPs(SimpleDockerClient dockerClient) {
         List<String> runningNodeIPs = new ArrayList<>();
-        for (String nodeName : NODE_NAMES) {
+        for (int nodeIndex = 0; nodeIndex < MIN_CLUSTER_SIZE; nodeIndex++) {
+            String nodeName = "consul-server-" + nodeIndex;
             InspectContainerResponse memberNode = dockerClient.inspectContainer(nodeName);
             if (memberNode != null && memberNode.getState().getRunning() != null && memberNode.getState().getRunning()) {
                 // collect cluster member ips

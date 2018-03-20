@@ -2,6 +2,7 @@ package com.lkq.services.docker.daemon;
 
 import com.lkq.services.docker.daemon.consul.ConsulController;
 import com.lkq.services.docker.daemon.consul.context.ConsulContext;
+import com.lkq.services.docker.daemon.exception.ConsulDaemonException;
 import com.lkq.services.docker.daemon.health.ConsulHealthChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,9 +48,14 @@ public class App {
         logger.info("old version: {}, new version: {}, force restart: {}", registeredVersion, appVersion, cleanStart);
         if (cleanStart) {
             consulController.stopAndRemoveExistingInstance(context.nodeName());
-            consulController.startNewInstance(context);
+            if (consulController.startNewInstance(context)) {
+                consulController.attachLogging(context.nodeName());
+            } else {
+                throw new ConsulDaemonException("failed to start consul instance, context: " + context);
+            }
+        } else {
+            consulController.attachLogging(context.nodeName());
         }
-        consulController.attachLogging(context.nodeName());
         // TODO: find a better solution to block until consul started
         try {
             Thread.sleep(5000);

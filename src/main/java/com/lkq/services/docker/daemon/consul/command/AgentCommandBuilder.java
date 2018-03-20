@@ -57,4 +57,16 @@ public class AgentCommandBuilder implements CommandBuilder {
         this.clientIP = client;
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "AgentCommandBuilder{" +
+                "server=" + server +
+                ", ui=" + ui +
+                ", bootstrap=" + bootstrap +
+                ", bootstrapExpect=" + bootstrapExpect +
+                ", retryJoin=" + retryJoin +
+                ", clientIP='" + clientIP + '\'' +
+                '}';
+    }
 }

@@ -19,7 +19,7 @@ public interface Environment {
     }
 
     String nodeName();
-    ConsulRole consulRole();
+    boolean isServer();
     List<String> clusterMembers();
     String dataPath();
     String network();

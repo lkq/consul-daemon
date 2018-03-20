@@ -87,4 +87,18 @@ public class ConsulContext {
         this.commands = commandBuilder;
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "ConsulContext{" +
+                "imageName='" + imageName + '\'' +
+                ", nodeName='" + nodeName + '\'' +
+                ", hostName='" + hostName + '\'' +
+                ", network='" + network + '\'' +
+                ", environmentVariables=" + environmentVariables +
+                ", portBinders=" + portBinders +
+                ", dataPath='" + dataPath + '\'' +
+                ", commands=" + commands +
+                '}';
+    }
 }

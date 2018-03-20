@@ -18,7 +18,7 @@ public class ConsulController {
         this.dockerClient = dockerClient;
     }
 
-    public void startNewInstance(ConsulContext context) {
+    public Boolean startNewInstance(ConsulContext context) {
         logger.info("going to start new consul container");
         String containerID = dockerClient.createContainer(context.imageName(), context.nodeName())
                 .withDataVolume(context.dataPath())
@@ -29,7 +29,7 @@ public class ConsulController {
                 .withCommand(context.commandBuilder().commands())
                 .build();
 
-        dockerClient.startContainer(containerID);
+        return dockerClient.startContainer(containerID);
     }
 
     public void stopAndRemoveExistingInstance(String nodeName) {

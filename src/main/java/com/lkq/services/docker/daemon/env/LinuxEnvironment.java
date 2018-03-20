@@ -30,12 +30,12 @@ public class LinuxEnvironment implements Environment {
     }
 
     @Override
-    public Environment.ConsulRole consulRole() {
+    public boolean isServer() {
         String tagValue = getEnv(ENV_CONSUL_ROLE, "");
         if ("server".equals(tagValue)) {
-            return Environment.ConsulRole.SERVER;
+            return true;
         }
-        return Environment.ConsulRole.CLIENT;
+        return false;
     }
 
     @Override

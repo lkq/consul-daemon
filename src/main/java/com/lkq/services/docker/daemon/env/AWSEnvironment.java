@@ -12,12 +12,12 @@ public class AWSEnvironment extends LinuxEnvironment {
     }
 
     @Override
-    public ConsulRole consulRole() {
+    public boolean isServer() {
         String tagValue = AWSClient.instance().getTagValue(ENV_CONSUL_ROLE, "");
         if ("server".equals(tagValue)) {
-            return ConsulRole.SERVER;
+            return true;
         }
-        return ConsulRole.CLIENT;
+        return false;
     }
 
     @Override

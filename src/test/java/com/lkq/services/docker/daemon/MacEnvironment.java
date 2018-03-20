@@ -12,8 +12,8 @@ public class MacEnvironment extends LinuxEnvironment {
     }
 
     @Override
-    public ConsulRole consulRole() {
-        return ConsulRole.SERVER;
+    public boolean isServer() {
+        return true;
     }
 
     @Override
