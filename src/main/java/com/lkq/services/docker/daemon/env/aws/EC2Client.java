@@ -13,32 +13,32 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class AWSClient {
+public class EC2Client {
 
-    private static Logger logger = LoggerFactory.getLogger(AWSClient.class);
+    private static Logger logger = LoggerFactory.getLogger(EC2Client.class);
 
-    private static AWSClient instance = new AWSClient();
+    private static EC2Client instance = new EC2Client();
 
-    private Boolean isAws;
+    private Boolean isEc2;
     private final AmazonEC2 amazonEC2;
 
-    private AWSClient() {
+    private EC2Client() {
         amazonEC2 = AmazonEC2ClientBuilder.defaultClient();
     }
 
-    public static AWSClient instance() {
+    public static EC2Client instance() {
         return instance;
     }
 
-    public boolean isAws() {
-        if (isAws == null) {
+    public boolean isEc2() {
+        if (isEc2 == null) {
             try {
-                isAws = StringUtils.isNotEmpty(EC2MetadataUtils.getInstanceId());
+                isEc2 = StringUtils.isNotEmpty(EC2MetadataUtils.getInstanceId());
             } catch (Exception ignored) {
-                isAws = false;
+                isEc2 = false;
             }
         }
-        return isAws;
+        return isEc2;
     }
 
     public String getPrivateIP() {

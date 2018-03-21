@@ -11,7 +11,7 @@ public class EnvironmentProvider {
     public synchronized static Environment get() {
         if (env == null) {
             if (StringUtils.isNotEmpty(EC2MetadataUtils.getInstanceId())) {
-                env = new AWSEnvironment();
+                env = new EC2Environment();
             } else {
                 env = new LinuxEnvironment();
             }
