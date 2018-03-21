@@ -8,8 +8,6 @@ import org.slf4j.LoggerFactory;
 
 public class ConsulController {
 
-    public static final String CONSUL_CONTAINER_NAME = "consul";
-    public static final String CONSUL_IMAGE = "consul:1.0.6";
     private static Logger logger = LoggerFactory.getLogger(ConsulController.class);
 
     private SimpleDockerClient dockerClient;
@@ -20,6 +18,8 @@ public class ConsulController {
 
     public Boolean startNewInstance(ConsulContext context) {
         logger.info("going to start new consul container");
+        dockerClient.pullImage(context.imageName());
+
         String containerID = dockerClient.createContainer(context.imageName(), context.nodeName())
                 .withDataVolume(context.dataPath())
                 .withEnvironmentVariable(context.environmentVariables())
