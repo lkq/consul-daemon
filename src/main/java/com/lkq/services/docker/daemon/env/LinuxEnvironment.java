@@ -4,7 +4,6 @@ import com.lkq.services.docker.daemon.exception.ConsulDaemonException;
 import spark.utils.StringUtils;
 
 import java.io.IOException;
-import java.net.ServerSocket;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -83,11 +82,7 @@ public class LinuxEnvironment implements Environment {
 
     @Override
     public int servicePort() {
-        try (ServerSocket serverSocket = new ServerSocket(0)) {
-            return serverSocket.getLocalPort();
-        } catch (IOException e) {
-            throw new ConsulDaemonException("failed to get available port", e);
-        }
+        return 1026;
     }
 
     @Override
