@@ -46,11 +46,12 @@ public class ConsulAPI {
 
     public boolean putKeyValue(String key, String value) {
         try {
-            ContentResponse response = httpClient.newRequest(API_V1_KV + key)
+            String uri = API_V1_KV + key;
+            ContentResponse response = httpClient.newRequest(uri)
                     .method(HttpMethod.PUT)
                     .content(new StringContentProvider(value))
                     .send();
-            logger.info("put key response: {}", response.getContentAsString());
+            logger.debug("put kv result: [{}], url: {}", response.getContentAsString(), uri);
             if (response.getStatus() == 200) {
                 return Boolean.valueOf(response.getContentAsString());
             }
@@ -62,18 +63,18 @@ public class ConsulAPI {
 
     public String getKeyValue(String key) {
         try {
+            String value = "";
             String uri = API_V1_KV + key;
-            logger.debug("getting key value from: {}", uri);
             ContentResponse response = httpClient.GET(uri);
             if (response.getStatus() == 200) {
                 Map<String, String> kvMap = responseParser.parse(response.getContentAsString());
                 String encodedValue = kvMap.get("Value");
                 if (StringUtils.isNotEmpty(encodedValue)) {
-                    return new String(Base64.getDecoder().decode(encodedValue.getBytes()));
-                } else {
-                    return null;
+                    value = new String(Base64.getDecoder().decode(encodedValue.getBytes()));
                 }
             }
+            logger.debug("get kv result: [{}], url: {}", value, uri);
+            return value;
         } catch (Exception e) {
             logger.error("failed to get kv: {}, cause: {}", key, e.getMessage());
         }

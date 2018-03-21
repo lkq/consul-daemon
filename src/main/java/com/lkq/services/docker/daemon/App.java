@@ -56,13 +56,10 @@ public class App {
         } else {
             consulController.attachLogging(context.nodeName());
         }
-        // TODO: find a better solution to block until consul started
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+
+        if (!consulHealthChecker.registerConsulDaemonVersion(appVersion, 10)) {
+            throw new ConsulDaemonException("failed to register consul daemon version: " + appVersion);
         }
-        consulHealthChecker.registerConsulDaemonVersion(appVersion);
 
         webServer.start();
 

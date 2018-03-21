@@ -15,13 +15,22 @@ import com.lkq.services.docker.daemon.health.ConsulHealthChecker;
 import com.lkq.services.docker.daemon.logging.JulToSlf4jBridge;
 import com.lkq.services.docker.daemon.routes.v1.Routes;
 import com.lkq.services.docker.daemon.utils.HttpClientFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 public class LocalLauncher {
+    private static Logger logger;
     public static void main(String[] args) {
         JulToSlf4jBridge.setup();
-        new LocalLauncher().launch(new MacEnvironment(), new ConsulPorts().defaultPortBindings());
+        logger = LoggerFactory.getLogger(LocalLauncher.class);
+        try {
+            new LocalLauncher().launch(new MacEnvironment(), new ConsulPorts().defaultPortBindings());
+        } catch (Exception e) {
+            logger.error("failed to start application", e);
+            System.exit(1);
+        }
     }
 
     public void launch(Environment env, List<PortBinder> portBinders) {

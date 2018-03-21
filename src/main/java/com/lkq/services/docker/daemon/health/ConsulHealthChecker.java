@@ -3,6 +3,7 @@ package com.lkq.services.docker.daemon.health;
 import com.lkq.services.docker.daemon.consul.ConsulAPI;
 import spark.Request;
 import spark.Response;
+import spark.utils.StringUtils;
 
 import java.util.Map;
 
@@ -44,8 +45,23 @@ public class ConsulHealthChecker {
         return consulAPI.getKeyValue(daemonVersionKey);
     }
 
-    public void registerConsulDaemonVersion(String appVersion) {
-        consulAPI.putKeyValue(daemonVersionKey, createVersionTimestamp(appVersion));
+    public boolean registerConsulDaemonVersion(String appVersion, int timeoutInSeconds) {
+        boolean success = false;
+        do {
+            try {
+                consulAPI.putKeyValue(daemonVersionKey, createVersionTimestamp(appVersion));
+                String version = registeredConsulDaemonVersion();
+                if (StringUtils.isNotEmpty(version)) {
+                    success = appVersion.equals(version.split("@")[0]);
+                }
+                if (!success && timeoutInSeconds > 0) {
+                    timeoutInSeconds -= 1;
+                    Thread.sleep(1000);
+                }
+            } catch (Exception ignored) {
+            }
+        } while (!success && timeoutInSeconds > 0);
+        return success;
     }
 
     private String createVersionTimestamp(String jarVersion) {
