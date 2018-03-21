@@ -28,6 +28,7 @@ class ConsulAPITest {
     @BeforeAll
     static void startTestServer() {
 
+        apiPort = randomPort();
         MacEnvironment env = new MacEnvironment() {
             @Override
             public String nodeName() {
@@ -38,8 +39,12 @@ class ConsulAPITest {
             public Boolean forceRestart() {
                 return true;
             }
+
+            @Override
+            public int consulAPIPort() {
+                return apiPort;
+            }
         };
-        apiPort = randomPort();
         new LocalLauncher().launch(env, Arrays.asList(new PortBinder(apiPort, 8500, PortBinder.Protocol.TCP)));
     }
 
