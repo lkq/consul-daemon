@@ -1,1 +1,3 @@
-can start in client mode
+    the consul daemon can act as a service register, micro services establish a websocket connection with the local daemon
+the local daemon talks to consul agent to register the micro services,
+once the connection disconnected, the daemon will automatically un-register the microservice
