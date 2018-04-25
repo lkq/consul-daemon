@@ -1,6 +1,6 @@
 
 .idea/
-consul-daemon.iml
+*.iml
 target/
 .DS_Store
 data/

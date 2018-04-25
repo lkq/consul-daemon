@@ -1,7 +1,10 @@
-# Consul Daemon
+# Smash
+
+a service mesh implementation using linkerd and consul
+
+## Consul Daemon
 
 A daemon process to manage consul docker container lifecycle and clustering
-
 in order to achieve the target, it uses:
 - [docker-java](https://github.com/docker-java/docker-java) - a java library to manipulate docker container lifecycle
 - [aws-java-sdk-ec2](https://github.com/aws/aws-sdk-java) - AWS EC2 java SDK
