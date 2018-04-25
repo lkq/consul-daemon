@@ -10,8 +10,9 @@
 
 
     <modules>
-        <module>docker-controller</module>
+        <module>smesh-common</module>
         <module>smesh-consul</module>
+        <module>smesh-linkerd</module>
     </modules>
 
 </project>

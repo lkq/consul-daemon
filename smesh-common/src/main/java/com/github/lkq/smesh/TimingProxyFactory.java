@@ -1,4 +1,4 @@
-package com.github.lkq.smesh.docker;
+package com.github.lkq.smesh;
 
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;

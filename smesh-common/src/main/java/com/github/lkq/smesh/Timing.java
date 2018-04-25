@@ -1,4 +1,4 @@
-package com.github.lkq.smesh.docker;
+package com.github.lkq.smesh;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

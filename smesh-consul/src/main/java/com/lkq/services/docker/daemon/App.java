@@ -2,7 +2,7 @@ package com.lkq.services.docker.daemon;
 
 import com.lkq.services.docker.daemon.consul.ConsulController;
 import com.lkq.services.docker.daemon.consul.context.ConsulContext;
-import com.lkq.services.docker.daemon.exception.ConsulDaemonException;
+import com.github.lkq.smesh.exception.ConsulDaemonException;
 import com.lkq.services.docker.daemon.health.ConsulHealthChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

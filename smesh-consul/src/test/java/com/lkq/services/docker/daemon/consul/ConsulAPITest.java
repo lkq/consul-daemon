@@ -1,10 +1,10 @@
 package com.lkq.services.docker.daemon.consul;
 
-import com.lkq.services.docker.daemon.IntegrationTest;
+import com.github.lkq.smesh.IntegrationTest;
 import com.lkq.services.docker.daemon.LocalLauncher;
 import com.lkq.services.docker.daemon.MacEnvironment;
 import com.github.lkq.smesh.docker.PortBinder;
-import com.lkq.services.docker.daemon.exception.ConsulDaemonException;
+import com.github.lkq.smesh.exception.ConsulDaemonException;
 import org.eclipse.jetty.client.HttpClient;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;

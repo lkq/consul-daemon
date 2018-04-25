@@ -1,4 +1,4 @@
-package com.github.lkq.smesh.docker;
+package com.github.lkq.smesh;
 
 public class StringUtils {
     public static boolean isNotEmpty(String value) {

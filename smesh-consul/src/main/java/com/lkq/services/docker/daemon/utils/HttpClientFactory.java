@@ -1,6 +1,6 @@
 package com.lkq.services.docker.daemon.utils;
 
-import com.lkq.services.docker.daemon.exception.ConsulDaemonException;
+import com.github.lkq.smesh.exception.ConsulDaemonException;
 import org.eclipse.jetty.client.HttpClient;
 
 public class HttpClientFactory {

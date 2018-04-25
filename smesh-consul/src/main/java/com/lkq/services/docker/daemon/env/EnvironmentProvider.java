@@ -1,7 +1,7 @@
 package com.lkq.services.docker.daemon.env;
 
 import com.amazonaws.util.EC2MetadataUtils;
-import com.lkq.services.docker.daemon.exception.ConsulDaemonException;
+import com.github.lkq.smesh.exception.ConsulDaemonException;
 import spark.utils.StringUtils;
 
 public class EnvironmentProvider {

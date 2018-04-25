@@ -6,9 +6,9 @@ import com.github.dockerjava.api.model.Bind;
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.Ports;
 import com.github.dockerjava.api.model.Volume;
+import com.github.lkq.smesh.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spark.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;

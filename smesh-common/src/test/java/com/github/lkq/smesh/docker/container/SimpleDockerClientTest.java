@@ -4,26 +4,27 @@ import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.command.StartContainerCmd;
 import com.github.dockerjava.api.model.Frame;
+import com.github.lkq.smesh.StringUtils;
 import com.github.lkq.smesh.docker.ContainerLogger;
 import com.github.lkq.smesh.docker.DockerClientFactory;
 import com.github.lkq.smesh.docker.SimpleDockerClient;
-import com.lkq.services.docker.daemon.IntegrationTest;
-import com.lkq.services.docker.daemon.exception.ConsulDaemonException;
+import com.github.lkq.smesh.exception.ConsulDaemonException;
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
+import org.mockito.Matchers;
 import org.mockito.Mock;
-import spark.utils.StringUtils;
+import org.mockito.Mockito;
 
 import java.io.IOException;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 class SimpleDockerClientTest {
@@ -45,15 +46,15 @@ class SimpleDockerClientTest {
 
     @Test
     void canStartContainer() {
-        StartContainerCmd startContainerCmd = mock(StartContainerCmd.class);
+        StartContainerCmd startContainerCmd = Mockito.mock(StartContainerCmd.class);
         given(dockerClient.startContainerCmd(anyString())).willReturn(startContainerCmd);
         given(dockerClient.inspectContainerCmd(anyString()).exec()).willReturn(inspectResponse);
         given(inspectResponse.getState().getRunning()).willReturn(true);
 
         Boolean started = simpleDockerClient.startContainer("dummy-container");
 
-        assertThat(started, is(true));
-        verify(startContainerCmd, times(1)).exec();
+        MatcherAssert.assertThat(started, CoreMatchers.is(true));
+        verify(startContainerCmd, Mockito.times(1)).exec();
     }
 
     @Test
@@ -68,7 +69,7 @@ class SimpleDockerClientTest {
         given(dockerClient.renameContainerCmd(anyString())).willThrow(new ConsulDaemonException("mock exception"));
         boolean renamed = simpleDockerClient.renameContainer("dummy-container", "new-name");
 
-        assertFalse(renamed);
+        Assertions.assertFalse(renamed);
     }
 
     @IntegrationTest
@@ -97,7 +98,7 @@ class SimpleDockerClientTest {
         String currentName = "dummy-container-" + System.currentTimeMillis();
         SimpleDockerClient client = SimpleDockerClient.create(DockerClientFactory.get());
         boolean renamed = client.renameContainer(currentName, "dummy-container");
-        assertThat(renamed, is(false));
+        MatcherAssert.assertThat(renamed, CoreMatchers.is(false));
     }
 
     @IntegrationTest
@@ -112,10 +113,10 @@ class SimpleDockerClientTest {
             containerID = client.createContainer(helloWorldImage, oldContainerName).build();
             boolean renamed = client.renameContainer(oldContainerName, newContainerName);
 
-            assertThat(renamed, is(true));
+            MatcherAssert.assertThat(renamed, CoreMatchers.is(true));
 
             InspectContainerResponse inspectResponse = client.get().inspectContainerCmd(containerID).exec();
-            assertThat(inspectResponse.getName(), is("/" + newContainerName));
+            MatcherAssert.assertThat(inspectResponse.getName(), CoreMatchers.is("/" + newContainerName));
 
         } finally {
             if (StringUtils.isNotEmpty(containerID)) {
@@ -134,7 +135,7 @@ class SimpleDockerClientTest {
         String containerID = null;
         try {
             containerID = client.createContainer(helloWorldImage, containerName).build();
-            ContainerLogger containerLogger = mock(ContainerLogger.class);
+            ContainerLogger containerLogger = Mockito.mock(ContainerLogger.class);
             String finalContainerID = containerID;
             new Thread(() -> client.startContainer(finalContainerID)).run();
             client.attachLogging(containerID, containerLogger);
@@ -144,7 +145,7 @@ class SimpleDockerClientTest {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            verify(containerLogger, atLeast(1)).onNext(any(Frame.class));
+            verify(containerLogger, Mockito.atLeast(1)).onNext(Matchers.any(Frame.class));
         }finally {
             if (StringUtils.isNotEmpty(containerID)) {
                 client.removeContainer(containerID);

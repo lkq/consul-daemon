@@ -1,4 +1,4 @@
-package com.lkq.services.docker.daemon.exception;
+package com.github.lkq.smesh.exception;
 
 public class ConsulDaemonException extends RuntimeException {
     public ConsulDaemonException(String message) {

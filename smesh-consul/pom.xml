@@ -10,7 +10,7 @@
     <dependencies>
         <dependency>
             <groupId>com.github.lkq</groupId>
-            <artifactId>docker-controller</artifactId>
+            <artifactId>smesh-common</artifactId>
             <version>0.1.0-SNAPSHOT</version>
         </dependency>
 
@@ -19,11 +19,6 @@
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-client</artifactId>
             <version>9.3.6.v20151106</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.docker-java</groupId>
-            <artifactId>docker-java</artifactId>
-            <version>3.0.10</version>
         </dependency>
 
         <dependency>
@@ -41,22 +36,12 @@
             <artifactId>gson</artifactId>
             <version>2.8.0</version>
         </dependency>
-        <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib</artifactId>
-            <version>3.2.6</version>
-        </dependency>
 
         <!--logging dependency begin-->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jul-to-slf4j</artifactId>
             <version>1.7.21</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.1.7</version>
         </dependency>
 
         <!--testing depencency-->
