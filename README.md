@@ -51,7 +51,7 @@ or environment variable:
 
 ### Health Check
 exposed a simple health check end point:
-http://localhost:1026/consul-daemon/v1/health
+http://localhost:1026/smesh-consul/v1/health
 
 ### Testing
 

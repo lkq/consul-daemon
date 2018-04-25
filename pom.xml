@@ -11,7 +11,7 @@
 
     <modules>
         <module>docker-controller</module>
-        <module>consul-daemon</module>
+        <module>smesh-consul</module>
     </modules>
 
 </project>
