@@ -1,7 +1,7 @@
 package com.lkq.services.docker.daemon.consul.context;
 
-import com.lkq.services.docker.daemon.consul.command.CommandBuilder;
-import com.lkq.services.docker.daemon.container.PortBinder;
+import com.github.lkq.smesh.docker.CommandBuilder;
+import com.github.lkq.smesh.docker.PortBinder;
 
 import java.util.List;
 

@@ -1,8 +1,8 @@
 package com.lkq.services.docker.daemon.consul;
 
 import com.lkq.services.docker.daemon.consul.context.ConsulContext;
-import com.lkq.services.docker.daemon.container.ContainerLogger;
-import com.lkq.services.docker.daemon.container.SimpleDockerClient;
+import com.github.lkq.smesh.docker.ContainerLogger;
+import com.github.lkq.smesh.docker.SimpleDockerClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
