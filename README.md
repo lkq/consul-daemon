@@ -1,4 +1,4 @@
-# Smash
+# Smesh
 
 a service mesh implementation using linkerd and consul
 
