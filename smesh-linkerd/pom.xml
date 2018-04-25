@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.lkq</groupId>
-    <artifactId>linkerd-daemon</artifactId>
+    <artifactId>smesh-linkerd</artifactId>
     <version>0.1.0-SNAPSHOT</version>
 
 
