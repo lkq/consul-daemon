@@ -1,4 +1,4 @@
-package com.lkq.services.docker.daemon.logging;
+package com.github.lkq.smesh.logging;
 
 import org.slf4j.bridge.SLF4JBridgeHandler;
 

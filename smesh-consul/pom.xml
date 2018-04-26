@@ -37,13 +37,6 @@
             <version>2.8.0</version>
         </dependency>
 
-        <!--logging dependency begin-->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jul-to-slf4j</artifactId>
-            <version>1.7.21</version>
-        </dependency>
-
         <!--testing depencency-->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

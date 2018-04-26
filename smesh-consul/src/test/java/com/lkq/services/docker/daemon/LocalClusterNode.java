@@ -9,7 +9,7 @@ import com.github.lkq.smesh.docker.DockerClientFactory;
 import com.github.lkq.smesh.docker.SimpleDockerClient;
 import com.lkq.services.docker.daemon.env.EnvironmentProvider;
 import com.lkq.services.docker.daemon.health.ConsulHealthChecker;
-import com.lkq.services.docker.daemon.logging.JulToSlf4jBridge;
+import com.github.lkq.smesh.logging.JulToSlf4jBridge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.utils.StringUtils;
