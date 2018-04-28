@@ -13,16 +13,22 @@ import com.github.lkq.smesh.context.ContainerContext;
 import com.github.lkq.smesh.docker.DockerClientFactory;
 import com.github.lkq.smesh.docker.SimpleDockerClient;
 import com.github.lkq.smesh.logging.JulToSlf4jBridge;
+import com.github.lkq.timeron.Timer;
 
 public class Launcher {
+
+    private static final Timer timer = new Timer();
+
     public static void main(String[] args) {
         JulToSlf4jBridge.setup();
+        setupTimers();
         new Launcher().start();
     }
 
     private void start() {
         ConsulAPI consulAPI = new ConsulAPI(new HttpClientFactory().create(), new ConsulResponseParser(), Environment.get().consulAPIPort());
-        SimpleDockerClient dockerClient = SimpleDockerClient.create(DockerClientFactory.get());
+
+        SimpleDockerClient dockerClient = timer.on(SimpleDockerClient.create(DockerClientFactory.get()));
 
         ContainerContext context = new ConsulContextFactory().createClusterNodeContext();
         String appVersion = Environment.get().appVersion();
@@ -40,6 +46,15 @@ public class Launcher {
         Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
 
         app.start(Environment.get().forceRestart());
+    }
+
+    private static void setupTimers() {
+        SimpleDockerClient interceptor = timer.interceptor(SimpleDockerClient.class);
+        timer.measure(() -> interceptor.createContainer("", ""));
+        timer.measure(() -> interceptor.pullImage(""));
+        timer.measure(() -> interceptor.startContainer(""));
+        timer.measure(() -> interceptor.stopContainer(""));
+        timer.measure(() -> interceptor.execute("", null));
     }
 
 }

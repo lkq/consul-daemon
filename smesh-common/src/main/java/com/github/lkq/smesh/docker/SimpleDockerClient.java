@@ -8,7 +8,6 @@ import com.github.dockerjava.api.exception.NotModifiedException;
 import com.github.dockerjava.core.command.ExecStartResultCallback;
 import com.github.dockerjava.core.command.PullImageResultCallback;
 import com.github.lkq.smesh.StringUtils;
-import com.github.lkq.smesh.Timing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +32,6 @@ public class SimpleDockerClient {
         return client;
     }
 
-    @Timing
     public boolean removeContainer(String containerId) {
         try {
             client.removeContainerCmd(containerId).withForce(true).exec();
@@ -44,12 +42,10 @@ public class SimpleDockerClient {
         return false;
     }
 
-    @Timing
     public ContainerBuilder createContainer(String imageName, String containerName) {
         return new ContainerBuilder(client, imageName, containerName);
     }
 
-    @Timing
     public Boolean startContainer(String containerID) {
         try {
             client.startContainerCmd(containerID).exec();
@@ -61,7 +57,6 @@ public class SimpleDockerClient {
         return false;
     }
 
-    @Timing
     public boolean stopContainer(String containerId) {
         try {
             client.stopContainerCmd(containerId).withTimeout(30000).exec();
@@ -75,7 +70,6 @@ public class SimpleDockerClient {
         return false;
     }
 
-    @Timing
     public boolean renameContainer(String containerName, String newName) {
         try {
             client.renameContainerCmd(containerName).withName(newName).exec();
@@ -96,7 +90,6 @@ public class SimpleDockerClient {
         return false;
     }
 
-    @Timing
     public boolean pullImage(String image) {
         try {
             if (!imageExists(image)) {
@@ -109,7 +102,6 @@ public class SimpleDockerClient {
         return false;
     }
 
-    @Timing
     public InspectContainerResponse inspectContainer(String containerName) {
         try {
             return client.inspectContainerCmd(containerName).exec();
@@ -119,7 +111,6 @@ public class SimpleDockerClient {
         return null;
     }
 
-    @Timing
     public void execute(String containerName, String[] command) {
         try {
             logger.info("executing command, container: {}, command: {}", containerName, command);
