@@ -1,28 +1,21 @@
 package com.github.lkq.smesh.linkerd.context;
 
 import com.github.lkq.smesh.context.ContainerContext;
+import com.github.lkq.smesh.docker.PortBinder;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 public class LinkerdContextFactory {
     private static final String NET_EASY_HUB = "http://hub-mirror.c.163.com";
 
-    public static final String CONSUL_IMAGE = "consul:1.0.6";
-    public static final String BIND_CLIENT_IP = "0.0.0.0";
+    public static final String IMAGE_NAME = "buoyantio/linkerd:1.3.7";
 
-    public ContainerContext createDefaultContext(String nodeName) {
+    public ContainerContext createDefaultContext() {
         return new ContainerContext()
-                .imageName(CONSUL_IMAGE)
-                .nodeName(nodeName)
-                .hostName(nodeName)
-                .environmentVariables(getEnvironmentVariables());
+                .imageName(IMAGE_NAME)
+                .nodeName("linkerd")
+                .dataPath("/Users/kingson/Sandbox/smesh/smesh-linkerd/src/main/resources")
+                .portBinders(Arrays.asList(new PortBinder(9990, 9990, PortBinder.Protocol.TCP)));
     }
 
-
-    public List<String> getEnvironmentVariables() {
-        List<String> env = new ArrayList<>();
-        env.add("CONSUL_BIND_INTERFACE=eth0");
-        return env;
-    }
 }

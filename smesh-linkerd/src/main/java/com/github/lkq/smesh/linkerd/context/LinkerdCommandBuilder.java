@@ -8,7 +8,7 @@ public class LinkerdCommandBuilder implements CommandBuilder {
     @Override
     public String[] commands() {
         ArrayList<String> commands = new ArrayList<>();
-        commands.add("/config.yaml");
+        commands.add("/consul/data/config.yaml");
         return commands.toArray(new String[]{});
     }
 }

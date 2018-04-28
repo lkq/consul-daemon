@@ -1,6 +1,7 @@
 package com.github.lkq.smesh.consul;
 
 import com.github.dockerjava.api.command.InspectContainerResponse;
+import com.github.lkq.smesh.server.WebServer;
 import com.github.lkq.smesh.consul.api.ConsulController;
 import com.github.lkq.smesh.consul.command.AgentCommandBuilder;
 import com.github.lkq.smesh.consul.context.ConsulContextFactory;

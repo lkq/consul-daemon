@@ -1,6 +1,5 @@
-package com.github.lkq.smesh.consul;
+package com.github.lkq.smesh.server;
 
-import com.github.lkq.smesh.consul.routes.v1.Routes;
 import spark.Service;
 
 public class WebServer {
