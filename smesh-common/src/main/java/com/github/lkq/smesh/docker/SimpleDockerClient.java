@@ -9,7 +9,6 @@ import com.github.dockerjava.core.command.ExecStartResultCallback;
 import com.github.dockerjava.core.command.PullImageResultCallback;
 import com.github.lkq.smesh.StringUtils;
 import com.github.lkq.smesh.Timing;
-import com.github.lkq.smesh.TimingProxyFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,14 +22,7 @@ public class SimpleDockerClient {
     private DockerClient client;
 
     public static SimpleDockerClient create(DockerClient client) {
-        return TimingProxyFactory.create(new SimpleDockerClient(client));
-    }
-
-    /**
-     * default constructor required for CGLib proxy
-     */
-    public SimpleDockerClient() {
-
+        return new SimpleDockerClient(client);
     }
 
     private SimpleDockerClient(DockerClient client) {
