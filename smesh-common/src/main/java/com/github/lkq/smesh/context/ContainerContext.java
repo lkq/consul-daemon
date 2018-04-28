@@ -1,11 +1,11 @@
-package com.github.lkq.smesh.consul.context;
+package com.github.lkq.smesh.context;
 
 import com.github.lkq.smesh.docker.CommandBuilder;
 import com.github.lkq.smesh.docker.PortBinder;
 
 import java.util.List;
 
-public class ConsulContext {
+public class ContainerContext {
 
     private String imageName;
     private String nodeName;
@@ -20,7 +20,7 @@ public class ConsulContext {
         return imageName;
     }
 
-    public ConsulContext imageName(String imageName) {
+    public ContainerContext imageName(String imageName) {
         this.imageName = imageName;
         return this;
     }
@@ -29,7 +29,7 @@ public class ConsulContext {
         return nodeName;
     }
 
-    public ConsulContext nodeName(String nodeName) {
+    public ContainerContext nodeName(String nodeName) {
         this.nodeName = nodeName;
         return this;
     }
@@ -38,7 +38,7 @@ public class ConsulContext {
         return network;
     }
 
-    public ConsulContext network(String network) {
+    public ContainerContext network(String network) {
         this.network = network;
         return this;
     }
@@ -47,7 +47,7 @@ public class ConsulContext {
         return environmentVariables;
     }
 
-    public ConsulContext environmentVariables(List<String> environmentVariables) {
+    public ContainerContext environmentVariables(List<String> environmentVariables) {
         this.environmentVariables = environmentVariables;
         return this;
     }
@@ -56,7 +56,7 @@ public class ConsulContext {
         return portBinders;
     }
 
-    public ConsulContext portBinders(List<PortBinder> portBinders) {
+    public ContainerContext portBinders(List<PortBinder> portBinders) {
         this.portBinders = portBinders;
         return this;
     }
@@ -65,7 +65,7 @@ public class ConsulContext {
         return dataPath;
     }
 
-    public ConsulContext dataPath(String dataPath) {
+    public ContainerContext dataPath(String dataPath) {
         this.dataPath = dataPath;
         return this;
     }
@@ -74,7 +74,7 @@ public class ConsulContext {
         return hostName;
     }
 
-    public ConsulContext hostName(String hostName) {
+    public ContainerContext hostName(String hostName) {
         this.hostName = hostName;
         return this;
     }
@@ -83,14 +83,14 @@ public class ConsulContext {
         return commands;
     }
 
-    public ConsulContext commandBuilder(CommandBuilder commandBuilder) {
+    public ContainerContext commandBuilder(CommandBuilder commandBuilder) {
         this.commands = commandBuilder;
         return this;
     }
 
     @Override
     public String toString() {
-        return "ConsulContext{" +
+        return "ContainerContext{" +
                 "imageName='" + imageName + '\'' +
                 ", nodeName='" + nodeName + '\'' +
                 ", hostName='" + hostName + '\'' +

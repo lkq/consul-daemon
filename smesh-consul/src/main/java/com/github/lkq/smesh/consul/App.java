@@ -1,6 +1,6 @@
 package com.github.lkq.smesh.consul;
 
-import com.github.lkq.smesh.consul.context.ConsulContext;
+import com.github.lkq.smesh.context.ContainerContext;
 import com.github.lkq.smesh.consul.health.ConsulHealthChecker;
 import com.github.lkq.smesh.consul.api.ConsulController;
 import com.github.lkq.smesh.exception.ConsulDaemonException;
@@ -11,7 +11,7 @@ import spark.utils.StringUtils;
 public class App {
     private static Logger logger = LoggerFactory.getLogger(App.class);
 
-    private final ConsulContext context;
+    private final ContainerContext context;
     private final String appVersion;
     private final ConsulController consulController;
     private final ConsulHealthChecker consulHealthChecker;
@@ -26,7 +26,7 @@ public class App {
      * @param webServer
      * @param appVersion
      */
-    public App(ConsulContext context, ConsulController consulController, ConsulHealthChecker consulHealthChecker, WebServer webServer, String appVersion) {
+    public App(ContainerContext context, ConsulController consulController, ConsulHealthChecker consulHealthChecker, WebServer webServer, String appVersion) {
         this.context = context;
         this.appVersion = appVersion;
         this.consulHealthChecker = consulHealthChecker;

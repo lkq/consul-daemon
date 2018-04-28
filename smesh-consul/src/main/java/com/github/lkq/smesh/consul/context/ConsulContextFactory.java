@@ -2,6 +2,7 @@ package com.github.lkq.smesh.consul.context;
 
 import com.github.lkq.smesh.consul.command.AgentCommandBuilder;
 import com.github.lkq.smesh.consul.env.Environment;
+import com.github.lkq.smesh.context.ContainerContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +13,7 @@ public class ConsulContextFactory {
     public static final String CONSUL_IMAGE = "consul:1.0.6";
     public static final String BIND_CLIENT_IP = "0.0.0.0";
 
-    public ConsulContext createClusterNodeContext() {
+    public ContainerContext createClusterNodeContext() {
 
         List<String> retryJoin = Environment.get().clusterMembers();
         boolean isServer = Environment.get().isServer();
@@ -28,8 +29,8 @@ public class ConsulContextFactory {
         return createDefaultContext(Environment.get().nodeName()).commandBuilder(commandBuilder);
     }
 
-    public ConsulContext createDefaultContext(String nodeName) {
-        return new ConsulContext()
+    public ContainerContext createDefaultContext(String nodeName) {
+        return new ContainerContext()
                 .imageName(CONSUL_IMAGE)
                 .nodeName(nodeName)
                 .hostName(nodeName)

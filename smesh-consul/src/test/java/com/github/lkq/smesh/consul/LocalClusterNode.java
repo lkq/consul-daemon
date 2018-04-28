@@ -1,12 +1,12 @@
 package com.github.lkq.smesh.consul;
 
 import com.github.dockerjava.api.command.InspectContainerResponse;
+import com.github.lkq.smesh.consul.api.ConsulController;
 import com.github.lkq.smesh.consul.command.AgentCommandBuilder;
-import com.github.lkq.smesh.consul.context.ConsulContext;
 import com.github.lkq.smesh.consul.context.ConsulContextFactory;
 import com.github.lkq.smesh.consul.env.EnvironmentProvider;
 import com.github.lkq.smesh.consul.health.ConsulHealthChecker;
-import com.github.lkq.smesh.consul.api.ConsulController;
+import com.github.lkq.smesh.context.ContainerContext;
 import com.github.lkq.smesh.docker.DockerClientFactory;
 import com.github.lkq.smesh.docker.SimpleDockerClient;
 import com.github.lkq.smesh.logging.JulToSlf4jBridge;
@@ -68,7 +68,7 @@ public class LocalClusterNode {
         if (isServer) {
             builder.bootstrapExpect(MIN_CLUSTER_SIZE);
         }
-        ConsulContext context = contextFactory.createDefaultContext(nodeName).commandBuilder(builder);
+        ContainerContext context = contextFactory.createDefaultContext(nodeName).commandBuilder(builder);
         if (nodeIndex == 0) {
             context.portBinders(new ConsulPorts().localServerPortBindings());
         } else if (nodeIndex == -1) {

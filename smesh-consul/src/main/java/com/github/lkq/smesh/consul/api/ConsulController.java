@@ -1,6 +1,6 @@
 package com.github.lkq.smesh.consul.api;
 
-import com.github.lkq.smesh.consul.context.ConsulContext;
+import com.github.lkq.smesh.context.ContainerContext;
 import com.github.lkq.smesh.docker.ContainerLogger;
 import com.github.lkq.smesh.docker.SimpleDockerClient;
 import org.slf4j.Logger;
@@ -16,8 +16,8 @@ public class ConsulController {
         this.dockerClient = dockerClient;
     }
 
-    public Boolean startNewInstance(ConsulContext context) {
-        logger.info("going to start new consul container");
+    public Boolean startNewInstance(ContainerContext context) {
+        logger.info("going to start new container from {}", context.imageName());
         dockerClient.pullImage(context.imageName());
 
         String containerID = dockerClient.createContainer(context.imageName(), context.nodeName())
@@ -34,7 +34,7 @@ public class ConsulController {
 
     public void stopAndRemoveExistingInstance(String nodeName) {
         if (dockerClient.containerExists(nodeName)) {
-            logger.info("removing existing consul container: {}", nodeName);
+            logger.info("removing existing container: {}", nodeName);
             dockerClient.stopContainer(nodeName);
             String tempContainerName = nodeName + "-remove-" + System.currentTimeMillis();
             dockerClient.renameContainer(nodeName, tempContainerName);

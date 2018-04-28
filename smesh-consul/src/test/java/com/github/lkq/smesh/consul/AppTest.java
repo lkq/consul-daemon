@@ -1,7 +1,7 @@
 package com.github.lkq.smesh.consul;
 
 import com.github.lkq.smesh.consul.api.ConsulController;
-import com.github.lkq.smesh.consul.context.ConsulContext;
+import com.github.lkq.smesh.context.ContainerContext;
 import com.github.lkq.smesh.exception.ConsulDaemonException;
 import com.github.lkq.smesh.consul.health.ConsulHealthChecker;
 import org.junit.jupiter.api.Assertions;
@@ -22,7 +22,7 @@ class AppTest {
     private static final String TEST_NODE_NAME = "test-node";
     private static final String APP_VERSION = "1.2.3";
     @Mock
-    private ConsulContext context;
+    private ContainerContext context;
     @Mock
     private ConsulController consulController;
     @Mock
@@ -41,7 +41,7 @@ class AppTest {
     void willCleanStartConsulIfItsNotAlreadyRunning() {
         given(consulHealthChecker.registeredConsulDaemonVersion()).willReturn(null);
         given(consulHealthChecker.registerConsulDaemonVersion(anyString(), anyInt())).willReturn(true);
-        given(consulController.startNewInstance(any(ConsulContext.class))).willReturn(true);
+        given(consulController.startNewInstance(any(ContainerContext.class))).willReturn(true);
         given(context.nodeName()).willReturn(TEST_NODE_NAME);
 
         app.start(null);
@@ -57,7 +57,7 @@ class AppTest {
     void willCleanStartConsulIfDaemonVersionNotMatch() {
         given(consulHealthChecker.registeredConsulDaemonVersion()).willReturn(APP_VERSION + ".test");
         given(consulHealthChecker.registerConsulDaemonVersion(anyString(), anyInt())).willReturn(true);
-        given(consulController.startNewInstance(any(ConsulContext.class))).willReturn(true);
+        given(consulController.startNewInstance(any(ContainerContext.class))).willReturn(true);
         given(context.nodeName()).willReturn(TEST_NODE_NAME);
 
         app.start(null);
@@ -72,7 +72,7 @@ class AppTest {
     @Test
     void willAttachConsulLogIfDaemonVersionMatch() {
         given(consulHealthChecker.registeredConsulDaemonVersion()).willReturn(APP_VERSION);
-        given(consulController.startNewInstance(any(ConsulContext.class))).willReturn(true);
+        given(consulController.startNewInstance(any(ContainerContext.class))).willReturn(true);
         given(consulHealthChecker.registerConsulDaemonVersion(anyString(), anyInt())).willReturn(true);
         given(context.nodeName()).willReturn(TEST_NODE_NAME);
 
@@ -88,7 +88,7 @@ class AppTest {
     @Test
     void willCleanStartConsulIfToldTo() {
         given(consulHealthChecker.registeredConsulDaemonVersion()).willReturn(APP_VERSION);
-        given(consulController.startNewInstance(any(ConsulContext.class))).willReturn(true);
+        given(consulController.startNewInstance(any(ContainerContext.class))).willReturn(true);
         given(consulHealthChecker.registerConsulDaemonVersion(anyString(), anyInt())).willReturn(true);
         given(context.nodeName()).willReturn(TEST_NODE_NAME);
 
@@ -104,7 +104,7 @@ class AppTest {
     @Test
     void willNotCleanStartConsulIfToldNotTo() {
         given(consulHealthChecker.registeredConsulDaemonVersion()).willReturn(APP_VERSION + ".test");
-        given(consulController.startNewInstance(any(ConsulContext.class))).willReturn(true);
+        given(consulController.startNewInstance(any(ContainerContext.class))).willReturn(true);
         given(consulHealthChecker.registerConsulDaemonVersion(anyString(), anyInt())).willReturn(true);
         given(context.nodeName()).willReturn(TEST_NODE_NAME);
 
@@ -121,7 +121,7 @@ class AppTest {
     void willThrowExceptionIfCanNotRegisterNewConsulDaemonVersion() {
         given(consulHealthChecker.registeredConsulDaemonVersion()).willReturn(APP_VERSION + ".test");
         given(consulHealthChecker.registerConsulDaemonVersion(anyString(), anyInt())).willReturn(false);
-        given(consulController.startNewInstance(any(ConsulContext.class))).willReturn(true);
+        given(consulController.startNewInstance(any(ContainerContext.class))).willReturn(true);
         given(context.nodeName()).willReturn(TEST_NODE_NAME);
 
         Assertions.assertThrows(ConsulDaemonException.class, () -> app.start(false), "expect failed to register new daemon version");

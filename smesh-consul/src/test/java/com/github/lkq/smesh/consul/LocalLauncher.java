@@ -1,16 +1,16 @@
 package com.github.lkq.smesh.consul;
 
 import com.github.lkq.smesh.consul.api.ConsulAPI;
+import com.github.lkq.smesh.consul.api.ConsulController;
+import com.github.lkq.smesh.consul.api.ConsulResponseParser;
 import com.github.lkq.smesh.consul.command.AgentCommandBuilder;
-import com.github.lkq.smesh.consul.context.ConsulContext;
 import com.github.lkq.smesh.consul.context.ConsulContextFactory;
 import com.github.lkq.smesh.consul.env.Environment;
 import com.github.lkq.smesh.consul.env.EnvironmentProvider;
 import com.github.lkq.smesh.consul.health.ConsulHealthChecker;
 import com.github.lkq.smesh.consul.routes.v1.Routes;
 import com.github.lkq.smesh.consul.utils.HttpClientFactory;
-import com.github.lkq.smesh.consul.api.ConsulController;
-import com.github.lkq.smesh.consul.api.ConsulResponseParser;
+import com.github.lkq.smesh.context.ContainerContext;
 import com.github.lkq.smesh.docker.DockerClientFactory;
 import com.github.lkq.smesh.docker.PortBinder;
 import com.github.lkq.smesh.docker.SimpleDockerClient;
@@ -41,7 +41,7 @@ public class LocalLauncher {
                 .ui(true)
                 .clientIP("0.0.0.0")
                 .bootstrap(true);
-        ConsulContext context = new ConsulContextFactory()
+        ContainerContext context = new ConsulContextFactory()
                 .createDefaultContext(Environment.get().nodeName())
                 .portBinders(portBinders)
                 .commandBuilder(builder);
