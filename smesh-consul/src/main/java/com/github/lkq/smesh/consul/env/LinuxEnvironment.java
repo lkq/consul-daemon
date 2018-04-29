@@ -51,7 +51,7 @@ public class LinuxEnvironment implements Environment {
     }
 
     @Override
-    public String dataPath() {
+    public String consulDataPath() {
         return Paths.get(".").toAbsolutePath().normalize().toString() + "/data";
     }
 

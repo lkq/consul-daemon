@@ -2,6 +2,7 @@ package com.github.lkq.smesh.context;
 
 import com.github.lkq.smesh.docker.CommandBuilder;
 import com.github.lkq.smesh.docker.PortBinder;
+import com.github.lkq.smesh.docker.VolumeBinder;
 
 import java.util.List;
 
@@ -13,7 +14,7 @@ public class ContainerContext {
     private String network;
     private List<String> environmentVariables;
     private List<PortBinder> portBinders;
-    private String dataPath;
+    private List<VolumeBinder> volumeBinders;
     private CommandBuilder commands;
 
     public String imageName() {
@@ -61,12 +62,12 @@ public class ContainerContext {
         return this;
     }
 
-    public String dataPath() {
-        return dataPath;
+    public List<VolumeBinder> volumeBinders() {
+        return volumeBinders;
     }
 
-    public ContainerContext dataPath(String dataPath) {
-        this.dataPath = dataPath;
+    public ContainerContext volumeBinders(List<VolumeBinder> volumeBinders) {
+        this.volumeBinders = volumeBinders;
         return this;
     }
 
@@ -97,7 +98,7 @@ public class ContainerContext {
                 ", network='" + network + '\'' +
                 ", environmentVariables=" + environmentVariables +
                 ", portBinders=" + portBinders +
-                ", dataPath='" + dataPath + '\'' +
+                ", volumeBinders=" + volumeBinders +
                 ", commands=" + commands +
                 '}';
     }

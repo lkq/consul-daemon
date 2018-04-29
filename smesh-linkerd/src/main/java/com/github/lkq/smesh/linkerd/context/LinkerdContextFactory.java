@@ -2,6 +2,7 @@ package com.github.lkq.smesh.linkerd.context;
 
 import com.github.lkq.smesh.context.ContainerContext;
 import com.github.lkq.smesh.docker.PortBinder;
+import com.github.lkq.smesh.docker.VolumeBinder;
 
 import java.util.Arrays;
 
@@ -14,7 +15,7 @@ public class LinkerdContextFactory {
         return new ContainerContext()
                 .imageName(IMAGE_NAME)
                 .nodeName("linkerd")
-                .dataPath("/Users/kingson/Sandbox/smesh/smesh-linkerd/src/main/resources")
+                .volumeBinders(Arrays.asList(new VolumeBinder("/Users/kingson/Sandbox/smesh/smesh-linkerd/src/main/resources", "/config")))
                 .portBinders(Arrays.asList(new PortBinder(9990, 9990, PortBinder.Protocol.TCP)));
     }
 

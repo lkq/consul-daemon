@@ -3,8 +3,10 @@ package com.github.lkq.smesh.consul.context;
 import com.github.lkq.smesh.consul.command.AgentCommandBuilder;
 import com.github.lkq.smesh.consul.env.Environment;
 import com.github.lkq.smesh.context.ContainerContext;
+import com.github.lkq.smesh.docker.VolumeBinder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ConsulContextFactory {
@@ -35,7 +37,7 @@ public class ConsulContextFactory {
                 .nodeName(nodeName)
                 .hostName(nodeName)
                 .network(Environment.get().network())
-                .dataPath(Environment.get().dataPath())
+                .volumeBinders(Arrays.asList(new VolumeBinder(Environment.get().consulDataPath(), "/consul/data")))
                 .environmentVariables(getEnvironmentVariables());
     }
 

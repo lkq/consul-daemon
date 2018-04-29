@@ -8,12 +8,6 @@ public interface Environment {
     String ENV_CONSUL_CLUSTER_MEMBER = "consul.cluster.member";
     String ENV_NODE_NAME = "consul.nodeName";
 
-    enum ConsulRole {
-        CLIENT,
-        SERVER
-
-    }
-
     static Environment get() {
         return EnvironmentProvider.get();
     }
@@ -21,7 +15,7 @@ public interface Environment {
     String nodeName();
     boolean isServer();
     List<String> clusterMembers();
-    String dataPath();
+    String consulDataPath();
     String network();
     Boolean forceRestart();
     String appVersion();

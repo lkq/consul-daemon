@@ -22,7 +22,7 @@ public class MacEnvironment extends LinuxEnvironment {
     }
 
     @Override
-    public String dataPath() {
+    public String consulDataPath() {
         return "";
     }
 

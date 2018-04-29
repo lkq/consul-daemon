@@ -16,4 +16,12 @@ public class VolumeBinder {
     public String containerPath() {
         return containerPath;
     }
+
+    @Override
+    public String toString() {
+        return "VolumeBinder{" +
+                "hostPath='" + hostPath + '\'' +
+                ", containerPath='" + containerPath + '\'' +
+                '}';
+    }
 }
