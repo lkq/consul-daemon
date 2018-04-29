@@ -4,7 +4,7 @@ import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
 import com.amazonaws.services.ec2.model.*;
 import com.amazonaws.util.EC2MetadataUtils;
-import com.github.lkq.smesh.exception.ConsulDaemonException;
+import com.github.lkq.smesh.exception.SmeshException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.utils.StringUtils;
@@ -64,7 +64,7 @@ public class EC2Client {
         if (tags.size() > 0) {
             return tags.get(0).getValue();
         }
-        throw new ConsulDaemonException("tag not found");
+        throw new SmeshException("tag not found");
     }
 
     public List<String> getInstanceIPByTag(String key) {

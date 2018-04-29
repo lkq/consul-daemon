@@ -1,6 +1,6 @@
 package com.github.lkq.smesh.consul.env;
 
-import com.github.lkq.smesh.exception.ConsulDaemonException;
+import com.github.lkq.smesh.exception.SmeshException;
 import spark.utils.StringUtils;
 
 import java.io.IOException;
@@ -23,7 +23,7 @@ public class LinuxEnvironment implements Environment {
     public String nodeName() {
         String nodeName = getEnv(ENV_NODE_NAME, "");
         if (StringUtils.isEmpty(nodeName)) {
-            throw new ConsulDaemonException("please provide node name by export consul.nodeName=<name> or -Dconsul.nodeName=<name>");
+            throw new SmeshException("please provide node name by export consul.nodeName=<name> or -Dconsul.nodeName=<name>");
         }
         return nodeName;
     }
@@ -76,7 +76,7 @@ public class LinuxEnvironment implements Environment {
             JarFile jarFile = new JarFile(jarPath);
             return (String) jarFile.getManifest().getMainAttributes().get("Bundle-Version");
         } catch (IOException e) {
-            throw new ConsulDaemonException("failed to get jar version", e);
+            throw new SmeshException("failed to get jar version", e);
         }
     }
 

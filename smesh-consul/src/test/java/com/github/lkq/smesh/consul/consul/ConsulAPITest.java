@@ -3,7 +3,7 @@ package com.github.lkq.smesh.consul.consul;
 import com.github.lkq.smesh.consul.api.ConsulAPI;
 import com.github.lkq.smesh.consul.api.ConsulResponseParser;
 import com.github.lkq.smesh.docker.PortBinder;
-import com.github.lkq.smesh.exception.ConsulDaemonException;
+import com.github.lkq.smesh.exception.SmeshException;
 import com.github.lkq.smesh.consul.IntegrationTest;
 import com.github.lkq.smesh.consul.LocalLauncher;
 import com.github.lkq.smesh.consul.MacEnvironment;
@@ -54,7 +54,7 @@ class ConsulAPITest {
         try (ServerSocket s = new ServerSocket(0)) {
             return s.getLocalPort();
         } catch (IOException e) {
-            throw new ConsulDaemonException("no available port", e);
+            throw new SmeshException("no available port", e);
         }
     }
 

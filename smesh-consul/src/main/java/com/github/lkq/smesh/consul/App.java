@@ -4,7 +4,7 @@ import com.github.lkq.smesh.server.WebServer;
 import com.github.lkq.smesh.context.ContainerContext;
 import com.github.lkq.smesh.consul.health.ConsulHealthChecker;
 import com.github.lkq.smesh.consul.api.ConsulController;
-import com.github.lkq.smesh.exception.ConsulDaemonException;
+import com.github.lkq.smesh.exception.SmeshException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.utils.StringUtils;
@@ -52,14 +52,14 @@ public class App {
             if (consulController.startNewInstance(context)) {
                 consulController.attachLogging(context.nodeName());
             } else {
-                throw new ConsulDaemonException("failed to start consul instance, context: " + context);
+                throw new SmeshException("failed to start consul instance, context: " + context);
             }
         } else {
             consulController.attachLogging(context.nodeName());
         }
 
         if (!consulHealthChecker.registerConsulDaemonVersion(appVersion, 10)) {
-            throw new ConsulDaemonException("failed to register consul daemon version: " + appVersion);
+            throw new SmeshException("failed to register consul daemon version: " + appVersion);
         }
 
         webServer.start();

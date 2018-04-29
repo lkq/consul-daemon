@@ -8,7 +8,7 @@ import com.github.lkq.smesh.StringUtils;
 import com.github.lkq.smesh.docker.ContainerLogger;
 import com.github.lkq.smesh.docker.DockerClientFactory;
 import com.github.lkq.smesh.docker.SimpleDockerClient;
-import com.github.lkq.smesh.exception.ConsulDaemonException;
+import com.github.lkq.smesh.exception.SmeshException;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Assertions;
@@ -66,7 +66,7 @@ class SimpleDockerClientTest {
 
     @Test
     void willReturnFalseIfExceptionHappens() {
-        given(dockerClient.renameContainerCmd(anyString())).willThrow(new ConsulDaemonException("mock exception"));
+        given(dockerClient.renameContainerCmd(anyString())).willThrow(new SmeshException("mock exception"));
         boolean renamed = simpleDockerClient.renameContainer("dummy-container", "new-name");
 
         Assertions.assertFalse(renamed);

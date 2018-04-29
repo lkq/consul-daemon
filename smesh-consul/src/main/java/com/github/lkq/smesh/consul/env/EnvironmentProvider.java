@@ -1,7 +1,7 @@
 package com.github.lkq.smesh.consul.env;
 
 import com.amazonaws.util.EC2MetadataUtils;
-import com.github.lkq.smesh.exception.ConsulDaemonException;
+import com.github.lkq.smesh.exception.SmeshException;
 import spark.utils.StringUtils;
 
 public class EnvironmentProvider {
@@ -21,7 +21,7 @@ public class EnvironmentProvider {
 
     public static void set(Environment env) {
         if (EnvironmentProvider.env != null) {
-            throw new ConsulDaemonException("environment already initialized");
+            throw new SmeshException("environment already initialized");
         }
         EnvironmentProvider.env = env;
     }

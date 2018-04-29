@@ -3,7 +3,7 @@ package com.github.lkq.smesh.consul;
 import com.github.lkq.smesh.server.WebServer;
 import com.github.lkq.smesh.consul.api.ConsulController;
 import com.github.lkq.smesh.context.ContainerContext;
-import com.github.lkq.smesh.exception.ConsulDaemonException;
+import com.github.lkq.smesh.exception.SmeshException;
 import com.github.lkq.smesh.consul.health.ConsulHealthChecker;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -125,7 +125,7 @@ class AppTest {
         given(consulController.startNewInstance(any(ContainerContext.class))).willReturn(true);
         given(context.nodeName()).willReturn(TEST_NODE_NAME);
 
-        Assertions.assertThrows(ConsulDaemonException.class, () -> app.start(false), "expect failed to register new daemon version");
+        Assertions.assertThrows(SmeshException.class, () -> app.start(false), "expect failed to register new daemon version");
 
 
         verify(consulController, never()).stopAndRemoveExistingInstance(TEST_NODE_NAME);
