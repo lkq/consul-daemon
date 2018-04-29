@@ -27,16 +27,20 @@ public class ContainerBuilder {
         return createContainerCmd.exec().getId();
     }
 
-    public ContainerBuilder withConfigVolume(String hostPath) {
-        this.createContainerCmd.withBinds(new Bind(hostPath, new Volume("/consul/config")));
+    public ContainerBuilder withVolume(String hostPath, String containerPath) {
+        if (StringUtils.isNotEmpty(hostPath)) {
+            logger.info("data-volume={}", hostPath);
+            this.createContainerCmd.withBinds(new Bind(hostPath, new Volume(containerPath)));
+        }
         return this;
     }
 
-    public ContainerBuilder withDataVolume(String hostPath) {
-        if (StringUtils.isNotEmpty(hostPath)) {
-            logger.info("data-volume={}", hostPath);
-            this.createContainerCmd.withBinds(new Bind(hostPath, new Volume("/consul/data")));
+    public ContainerBuilder withVolume(List<VolumeBinder> volumeBinders) {
+        List<Bind> binds = new ArrayList<>();
+        for (VolumeBinder volumeBinder : volumeBinders) {
+            binds.add(new Bind(volumeBinder.hostPath(), new Volume(volumeBinder.containerPath())));
         }
+        this.createContainerCmd.withBinds(binds);
         return this;
     }
 

@@ -21,7 +21,7 @@ public class ConsulController {
         dockerClient.pullImage(context.imageName());
 
         String containerID = dockerClient.createContainer(context.imageName(), context.nodeName())
-                .withDataVolume(context.dataPath())
+                .withVolume(context.dataPath(), "/consul/data")
                 .withEnvironmentVariable(context.environmentVariables())
                 .withHostName(context.hostName())
                 .withNetwork(context.network())
