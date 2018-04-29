@@ -27,14 +27,6 @@ public class ContainerBuilder {
         return createContainerCmd.exec().getId();
     }
 
-    public ContainerBuilder withVolume(String hostPath, String containerPath) {
-        if (StringUtils.isNotEmpty(hostPath)) {
-            logger.info("data-volume={}", hostPath);
-            this.createContainerCmd.withBinds(new Bind(hostPath, new Volume(containerPath)));
-        }
-        return this;
-    }
-
     public ContainerBuilder withVolume(List<VolumeBinder> volumeBinders) {
         List<Bind> binds = new ArrayList<>();
         for (VolumeBinder volumeBinder : volumeBinders) {
