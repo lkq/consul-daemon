@@ -1,7 +1,7 @@
 package com.github.lkq.smesh.linkerd;
 
 import com.github.lkq.smesh.context.ContainerContext;
-import com.github.lkq.smesh.linkerd.api.LinkerdController;
+import com.github.lkq.smesh.linkerd.container.LinkerdController;
 import com.github.lkq.smesh.server.WebServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

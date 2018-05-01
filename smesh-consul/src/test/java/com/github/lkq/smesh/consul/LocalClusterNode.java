@@ -1,9 +1,9 @@
 package com.github.lkq.smesh.consul;
 
 import com.github.dockerjava.api.command.InspectContainerResponse;
+import com.github.lkq.smesh.consul.command.ConsulCommandBuilder;
 import com.github.lkq.smesh.server.WebServer;
-import com.github.lkq.smesh.consul.api.ConsulController;
-import com.github.lkq.smesh.consul.command.AgentCommandBuilder;
+import com.github.lkq.smesh.consul.container.ConsulController;
 import com.github.lkq.smesh.consul.context.ConsulContextFactory;
 import com.github.lkq.smesh.consul.env.EnvironmentProvider;
 import com.github.lkq.smesh.consul.health.ConsulHealthChecker;
@@ -61,7 +61,7 @@ public class LocalClusterNode {
 
         boolean isServer = nodeIndex >= 0;
         String nodeName = nodeName(nodeIndex);
-        AgentCommandBuilder builder = new AgentCommandBuilder()
+        ConsulCommandBuilder builder = new ConsulCommandBuilder()
                 .server(isServer)
                 .ui(true)
                 .clientIP(ConsulContextFactory.BIND_CLIENT_IP)

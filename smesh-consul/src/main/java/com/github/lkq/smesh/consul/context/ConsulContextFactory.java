@@ -1,6 +1,6 @@
 package com.github.lkq.smesh.consul.context;
 
-import com.github.lkq.smesh.consul.command.AgentCommandBuilder;
+import com.github.lkq.smesh.consul.command.ConsulCommandBuilder;
 import com.github.lkq.smesh.consul.env.Environment;
 import com.github.lkq.smesh.context.ContainerContext;
 import com.github.lkq.smesh.docker.VolumeBinder;
@@ -20,7 +20,7 @@ public class ConsulContextFactory {
         List<String> retryJoin = Environment.get().clusterMembers();
         boolean isServer = Environment.get().isServer();
 
-        AgentCommandBuilder commandBuilder = new AgentCommandBuilder()
+        ConsulCommandBuilder commandBuilder = new ConsulCommandBuilder()
                 .server(isServer)
                 .retryJoin(retryJoin);
 

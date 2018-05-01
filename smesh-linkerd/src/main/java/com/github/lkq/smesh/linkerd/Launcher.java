@@ -4,7 +4,7 @@ import com.github.lkq.smesh.context.ContainerContext;
 import com.github.lkq.smesh.docker.DockerClientFactory;
 import com.github.lkq.smesh.docker.SimpleDockerClient;
 import com.github.lkq.smesh.exception.SmeshException;
-import com.github.lkq.smesh.linkerd.api.LinkerdController;
+import com.github.lkq.smesh.linkerd.container.LinkerdController;
 import com.github.lkq.smesh.linkerd.context.LinkerdCommandBuilder;
 import com.github.lkq.smesh.linkerd.context.LinkerdContextFactory;
 import com.github.lkq.smesh.linkerd.routes.v1.LinkerdRoutes;

@@ -5,10 +5,10 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
-class AgentCommandBuilderTest {
+class ConsulCommandBuilderTest {
     @Test
     void canBuildAgentCommand() {
-        AgentCommandBuilder builder = new AgentCommandBuilder();
+        ConsulCommandBuilder builder = new ConsulCommandBuilder();
         builder.server(true)
                 .ui(true)
                 .bootstrap(true)

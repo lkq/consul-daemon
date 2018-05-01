@@ -1,10 +1,10 @@
 package com.github.lkq.smesh.consul;
 
+import com.github.lkq.smesh.consul.command.ConsulCommandBuilder;
 import com.github.lkq.smesh.server.WebServer;
 import com.github.lkq.smesh.consul.api.ConsulAPI;
-import com.github.lkq.smesh.consul.api.ConsulController;
+import com.github.lkq.smesh.consul.container.ConsulController;
 import com.github.lkq.smesh.consul.api.ConsulResponseParser;
-import com.github.lkq.smesh.consul.command.AgentCommandBuilder;
 import com.github.lkq.smesh.consul.context.ConsulContextFactory;
 import com.github.lkq.smesh.consul.env.Environment;
 import com.github.lkq.smesh.consul.env.EnvironmentProvider;
@@ -37,7 +37,7 @@ public class LocalLauncher {
     public void launch(Environment env, List<PortBinder> portBinders) {
         EnvironmentProvider.set(env);
 
-        AgentCommandBuilder builder = new AgentCommandBuilder()
+        ConsulCommandBuilder builder = new ConsulCommandBuilder()
                 .server(true)
                 .ui(true)
                 .clientIP("0.0.0.0")

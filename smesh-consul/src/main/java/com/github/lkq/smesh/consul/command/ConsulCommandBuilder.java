@@ -1,13 +1,13 @@
 package com.github.lkq.smesh.consul.command;
 
-import com.github.lkq.smesh.docker.CommandBuilder;
+import com.github.lkq.smesh.context.CommandBuilder;
 import spark.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class AgentCommandBuilder implements CommandBuilder {
+public class ConsulCommandBuilder implements CommandBuilder {
 
     private boolean server;
     private boolean ui;
@@ -29,39 +29,39 @@ public class AgentCommandBuilder implements CommandBuilder {
         return commands.toArray(new String[]{});
     }
 
-    public AgentCommandBuilder server(boolean server) {
+    public ConsulCommandBuilder server(boolean server) {
         this.server = server;
         return this;
     }
 
-    public AgentCommandBuilder ui(boolean ui) {
+    public ConsulCommandBuilder ui(boolean ui) {
         this.ui = ui;
         return this;
     }
 
-    public AgentCommandBuilder bootstrap(boolean bootstrap) {
+    public ConsulCommandBuilder bootstrap(boolean bootstrap) {
         this.bootstrap = bootstrap;
         return this;
     }
 
-    public AgentCommandBuilder bootstrapExpect(int bootstrapExpect) {
+    public ConsulCommandBuilder bootstrapExpect(int bootstrapExpect) {
         this.bootstrapExpect = bootstrapExpect;
         return this;
     }
 
-    public AgentCommandBuilder retryJoin(List<String> retryJoin) {
+    public ConsulCommandBuilder retryJoin(List<String> retryJoin) {
         this.retryJoin = retryJoin;
         return this;
     }
 
-    public AgentCommandBuilder clientIP(String client) {
+    public ConsulCommandBuilder clientIP(String client) {
         this.clientIP = client;
         return this;
     }
 
     @Override
     public String toString() {
-        return "AgentCommandBuilder{" +
+        return "ConsulCommandBuilder{" +
                 "server=" + server +
                 ", ui=" + ui +
                 ", bootstrap=" + bootstrap +

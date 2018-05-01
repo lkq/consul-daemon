@@ -1,4 +1,4 @@
-package com.github.lkq.smesh.consul.api;
+package com.github.lkq.smesh.linkerd.container;
 
 import com.github.lkq.smesh.context.ContainerContext;
 import com.github.lkq.smesh.docker.ContainerLogger;
@@ -6,13 +6,16 @@ import com.github.lkq.smesh.docker.SimpleDockerClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ConsulController {
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 
-    private static Logger logger = LoggerFactory.getLogger(ConsulController.class);
+public class LinkerdController {
+    private static Logger logger = LoggerFactory.getLogger(LinkerdController.class);
 
     private SimpleDockerClient dockerClient;
 
-    public ConsulController(SimpleDockerClient dockerClient) {
+    public LinkerdController(SimpleDockerClient dockerClient) {
         this.dockerClient = dockerClient;
     }
 
@@ -22,14 +25,31 @@ public class ConsulController {
 
         String containerID = dockerClient.createContainer(context.imageName(), context.nodeName())
                 .withVolume(context.volumeBinders())
-                .withEnvironmentVariable(context.environmentVariables())
-                .withHostName(context.hostName())
-                .withNetwork(context.network())
                 .withPortBinders(context.portBinders())
                 .withCommand(context.commandBuilder().commands())
+                .withAttachStdIn(context.attachStdIn())
                 .build();
 
-        return dockerClient.startContainer(containerID);
+        Boolean started = dockerClient.startContainer(containerID);
+
+        try {
+            byte[] bytes = ("admin:\n" +
+                    "  port: 9990\n" +
+                    "  ip: 0.0.0.0\n" +
+                    "\n" +
+                    "routers:\n" +
+                    "- protocol: http\n" +
+                    "  dtab: /svc => /$/inet/127.1/9990;\n" +
+                    "  servers:\n" +
+                    "  - port: 8080\n" +
+                    "    ip: 0.0.0.0").getBytes("UTF-8");
+            InputStream stdin = new ByteArrayInputStream(bytes);
+
+            dockerClient.attachStdIn(containerID, stdin);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return started;
     }
 
     public void stopAndRemoveExistingInstance(String nodeName) {
