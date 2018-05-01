@@ -8,7 +8,7 @@
     </appender>
     <appender name="ConsulLogAppender" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>[consul] %msg%n</pattern>
+            <pattern>[linkerd] %msg%n</pattern>
         </encoder>
     </appender>
 

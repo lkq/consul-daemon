@@ -16,6 +16,7 @@ public class ContainerContext {
     private List<PortBinder> portBinders;
     private List<VolumeBinder> volumeBinders;
     private CommandBuilder commands;
+    private boolean attachStdIn;
 
     public String imageName() {
         return imageName;
@@ -86,6 +87,15 @@ public class ContainerContext {
 
     public ContainerContext commandBuilder(CommandBuilder commandBuilder) {
         this.commands = commandBuilder;
+        return this;
+    }
+
+    public boolean attachStdIn() {
+        return attachStdIn;
+    }
+
+    public ContainerContext attachStdIn(boolean attachStdIn) {
+        this.attachStdIn = attachStdIn;
         return this;
     }
 

@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
@@ -127,6 +128,27 @@ public class SimpleDockerClient {
             logger.info("execute result: stdout: {}, stderr: {}", stdout.toString(), stderr.toString());
         } catch (Exception e) {
             logger.warn("failed to execute commands, container: {}, command: {}, cause: {}", containerName, Arrays.toString(command), e.getMessage());
+        }
+    }
+
+    public void attachStdIn(String containerName, InputStream stdin) {
+
+        try {
+
+            ExecCreateCmdResponse execCreateCmdResponse = client.execCreateCmd(containerName)
+                    .withAttachStdout(false)
+                    .withAttachStdin(true)
+                    .withCmd("cat")
+                    .exec();
+
+            boolean completed = client.execStartCmd(execCreateCmdResponse.getId())
+                    .withDetach(false)
+                    .withTty(true)
+                    .withStdIn(stdin)
+                    .exec(new ExecStartResultCallback())
+                    .awaitCompletion(5, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            logger.error("failed to attach stdin");
         }
     }
 

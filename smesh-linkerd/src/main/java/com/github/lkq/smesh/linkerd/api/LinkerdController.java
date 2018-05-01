@@ -6,6 +6,10 @@ import com.github.lkq.smesh.docker.SimpleDockerClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+
 public class LinkerdController {
     private static Logger logger = LoggerFactory.getLogger(LinkerdController.class);
 
@@ -23,9 +27,29 @@ public class LinkerdController {
                 .withVolume(context.volumeBinders())
                 .withPortBinders(context.portBinders())
                 .withCommand(context.commandBuilder().commands())
+                .withAttachStdIn(context.attachStdIn())
                 .build();
 
-        return dockerClient.startContainer(containerID);
+        Boolean started = dockerClient.startContainer(containerID);
+
+        try {
+            byte[] bytes = ("admin:\n" +
+                    "  port: 9990\n" +
+                    "  ip: 0.0.0.0\n" +
+                    "\n" +
+                    "routers:\n" +
+                    "- protocol: http\n" +
+                    "  dtab: /svc => /$/inet/127.1/9990;\n" +
+                    "  servers:\n" +
+                    "  - port: 8080\n" +
+                    "    ip: 0.0.0.0").getBytes("UTF-8");
+            InputStream stdin = new ByteArrayInputStream(bytes);
+
+            dockerClient.attachStdIn(containerID, stdin);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return started;
     }
 
     public void stopAndRemoveExistingInstance(String nodeName) {
