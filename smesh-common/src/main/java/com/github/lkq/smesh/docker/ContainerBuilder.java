@@ -83,12 +83,4 @@ public class ContainerBuilder {
         }
         return this;
     }
-
-    public ContainerBuilder withAttachStdIn(boolean attachStdIn) {
-//        createContainerCmd.withAttachStdin(attachStdIn);
-        createContainerCmd.withAttachStdin(true);
-        createContainerCmd.withStdinOpen(true);
-        createContainerCmd.withTty(true);
-        return this;
-    }
 }

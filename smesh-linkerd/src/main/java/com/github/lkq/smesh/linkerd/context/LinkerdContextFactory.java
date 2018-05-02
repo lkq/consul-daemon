@@ -16,8 +16,7 @@ public class LinkerdContextFactory {
                 .imageName(IMAGE_NAME)
                 .nodeName("linkerd")
                 .volumeBinders(Arrays.asList(new VolumeBinder("/Users/kingson/Sandbox/smesh/smesh-linkerd/src/main/resources", "/config")))
-                .portBinders(Arrays.asList(new PortBinder(9990, 9990, PortBinder.Protocol.TCP)))
-                .attachStdIn(true);
+                .portBinders(Arrays.asList(new PortBinder(9990, 9990, PortBinder.Protocol.TCP)));
     }
 
 }
