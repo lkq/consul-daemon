@@ -1,4 +1,4 @@
-package com.github.lkq.smesh.docker;
+package com.github.lkq.smesh.context;
 
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.Ports;

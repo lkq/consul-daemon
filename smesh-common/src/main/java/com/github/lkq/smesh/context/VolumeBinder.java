@@ -1,4 +1,4 @@
-package com.github.lkq.smesh.docker;
+package com.github.lkq.smesh.context;
 
 public class VolumeBinder {
     private String hostPath;

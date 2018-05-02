@@ -3,7 +3,7 @@ package com.github.lkq.smesh.consul.context;
 import com.github.lkq.smesh.consul.command.ConsulCommandBuilder;
 import com.github.lkq.smesh.consul.env.Environment;
 import com.github.lkq.smesh.context.ContainerContext;
-import com.github.lkq.smesh.docker.VolumeBinder;
+import com.github.lkq.smesh.context.VolumeBinder;
 
 import java.util.ArrayList;
 import java.util.Arrays;

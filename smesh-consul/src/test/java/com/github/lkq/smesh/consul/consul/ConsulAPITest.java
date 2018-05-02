@@ -2,7 +2,7 @@ package com.github.lkq.smesh.consul.consul;
 
 import com.github.lkq.smesh.consul.api.ConsulAPI;
 import com.github.lkq.smesh.consul.api.ConsulResponseParser;
-import com.github.lkq.smesh.docker.PortBinder;
+import com.github.lkq.smesh.context.PortBinder;
 import com.github.lkq.smesh.exception.SmeshException;
 import com.github.lkq.smesh.consul.IntegrationTest;
 import com.github.lkq.smesh.consul.LocalLauncher;

@@ -7,6 +7,8 @@ import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.Ports;
 import com.github.dockerjava.api.model.Volume;
 import com.github.lkq.smesh.StringUtils;
+import com.github.lkq.smesh.context.PortBinder;
+import com.github.lkq.smesh.context.VolumeBinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

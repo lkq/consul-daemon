@@ -13,7 +13,7 @@ import com.github.lkq.smesh.consul.routes.v1.ConsulRoutes;
 import com.github.lkq.smesh.consul.utils.HttpClientFactory;
 import com.github.lkq.smesh.context.ContainerContext;
 import com.github.lkq.smesh.docker.DockerClientFactory;
-import com.github.lkq.smesh.docker.PortBinder;
+import com.github.lkq.smesh.context.PortBinder;
 import com.github.lkq.smesh.docker.SimpleDockerClient;
 import com.github.lkq.smesh.logging.JulToSlf4jBridge;
 import org.slf4j.Logger;

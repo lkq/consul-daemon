@@ -1,8 +1,8 @@
 package com.github.lkq.smesh.linkerd.context;
 
 import com.github.lkq.smesh.context.ContainerContext;
-import com.github.lkq.smesh.docker.PortBinder;
-import com.github.lkq.smesh.docker.VolumeBinder;
+import com.github.lkq.smesh.context.PortBinder;
+import com.github.lkq.smesh.context.VolumeBinder;
 
 import java.util.Arrays;
 

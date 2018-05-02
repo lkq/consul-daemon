@@ -1,6 +1,6 @@
 package com.github.lkq.smesh.consul;
 
-import com.github.lkq.smesh.docker.PortBinder;
+import com.github.lkq.smesh.context.PortBinder;
 
 import java.util.ArrayList;
 import java.util.List;
