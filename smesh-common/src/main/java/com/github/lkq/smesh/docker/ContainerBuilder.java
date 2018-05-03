@@ -32,6 +32,7 @@ public class ContainerBuilder {
     public ContainerBuilder withVolume(List<VolumeBinder> volumeBinders) {
         List<Bind> binds = new ArrayList<>();
         for (VolumeBinder volumeBinder : volumeBinders) {
+            logger.info("binding volume: {} to {}", volumeBinder.hostPath(), volumeBinder.containerPath());
             binds.add(new Bind(volumeBinder.hostPath(), new Volume(volumeBinder.containerPath())));
         }
         this.createContainerCmd.withBinds(binds);

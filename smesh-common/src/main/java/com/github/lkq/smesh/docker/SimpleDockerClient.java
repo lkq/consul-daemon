@@ -35,6 +35,7 @@ public class SimpleDockerClient {
     public boolean removeContainer(String containerId) {
         try {
             client.removeContainerCmd(containerId).withForce(true).exec();
+            logger.info("container removed: {}", containerId);
             return true;
         } catch (Exception e) {
             logger.warn("failed to remove container: {}, cause: {}", containerId, e.getMessage());

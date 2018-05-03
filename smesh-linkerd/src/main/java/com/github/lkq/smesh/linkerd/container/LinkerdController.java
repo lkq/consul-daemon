@@ -23,6 +23,8 @@ public class LinkerdController {
                 .withVolume(context.volumeBinders())
                 .withPortBinders(context.portBinders())
                 .withCommand(context.commandBuilder().commands())
+                .withNetwork(context.network())
+                .withHostName(context.hostName())
                 .build();
 
         return dockerClient.startContainer(containerID);
@@ -30,7 +32,7 @@ public class LinkerdController {
 
     public void stopAndRemoveExistingInstance(String nodeName) {
         if (dockerClient.containerExists(nodeName)) {
-            logger.info("removing existing container: {}", nodeName);
+            logger.info("trying to remove existing container: {}", nodeName);
             dockerClient.stopContainer(nodeName);
             String tempContainerName = nodeName + "-remove-" + System.currentTimeMillis();
             dockerClient.renameContainer(nodeName, tempContainerName);

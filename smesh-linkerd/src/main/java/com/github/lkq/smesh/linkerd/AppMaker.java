@@ -2,16 +2,20 @@ package com.github.lkq.smesh.linkerd;
 
 import com.github.lkq.smesh.AppVersion;
 import com.github.lkq.smesh.context.ContainerContext;
+import com.github.lkq.smesh.context.PortBinder;
 import com.github.lkq.smesh.context.VolumeBinder;
 import com.github.lkq.smesh.docker.DockerClientFactory;
 import com.github.lkq.smesh.docker.SimpleDockerClient;
+import com.github.lkq.smesh.linkerd.config.ConfigExporter;
 import com.github.lkq.smesh.linkerd.container.LinkerdController;
 import com.github.lkq.smesh.linkerd.context.LinkerdCommandBuilder;
 import com.github.lkq.smesh.linkerd.context.LinkerdContextFactory;
 import com.github.lkq.smesh.linkerd.routes.v1.LinkerdRoutes;
 import com.github.lkq.smesh.server.WebServer;
 
+import java.io.File;
 import java.util.Arrays;
+import java.util.Map;
 
 public class AppMaker {
 
@@ -19,12 +23,19 @@ public class AppMaker {
 
     public App makeApp() {
         String localConfigPath = AppMaker.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        String configFileName = "smesh-linkerd-" + AppVersion.get(AppMaker.class) + ".yaml";
+
+        ConfigExporter configExporter = new ConfigExporter();
+        Map linkerdConfig = configExporter.loadFromResource("config.yaml");
+        configExporter.writeToFile(linkerdConfig, new File(localConfigPath, configFileName));
 
         LinkerdContextFactory contextFactory = new LinkerdContextFactory();
         ContainerContext context = contextFactory.createDefaultContext()
                 .volumeBinders(Arrays.asList(new VolumeBinder(localConfigPath, CONTAINER_CONFIG_PATH)))
-                .network("host")
-                .commandBuilder(new LinkerdCommandBuilder(CONTAINER_CONFIG_PATH + "/smesh-linkerd-" + AppVersion.get(AppMaker.class)+ ".yaml"));
+                .portBinders(Arrays.asList(new PortBinder(9990, PortBinder.Protocol.TCP),
+                        new PortBinder(8080, PortBinder.Protocol.TCP)))
+//                .network("host")
+                .commandBuilder(new LinkerdCommandBuilder(CONTAINER_CONFIG_PATH + "/" + configFileName));
 
         LinkerdController linkerdController = new LinkerdController(SimpleDockerClient.create(DockerClientFactory.get()));
 
