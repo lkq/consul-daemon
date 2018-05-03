@@ -1,15 +1,18 @@
 package com.github.lkq.smesh.linkerd.config;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.FileUtils;
-import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ConfigExporterTest {
 
@@ -21,12 +24,43 @@ class ConfigExporterTest {
     }
 
     @Test
-    void canWriteToTempFolder() throws IOException {
+    void canExportConfig() throws IOException {
         String configPath = ConfigExporterTest.class.getProtectionDomain().getCodeSource().getLocation().getFile();
-        String dest = configExporter.export(new LinkerdConfig(), new File(configPath, "config.yaml"));
 
-        assertThat(dest, CoreMatchers.is(configPath + "config.yaml"));
-        String content = FileUtils.readFileToString(new File(configPath, "config.yaml"));
-        assertTrue(content.startsWith("--- !com.github.lkq.smesh.linkerd.config.LinkerdConfig"));
+        Map config = createSampleConfig(123, 123);
+
+        String configFileName = "config-" + System.currentTimeMillis() + ".yaml";
+
+        String dest = configExporter.writeToFile(config, new File(configPath, configFileName));
+
+        assertThat(dest, is(configPath + configFileName));
+        String content = FileUtils.readFileToString(new File(configPath, configFileName), "UTF-8");
+        assertThat(content, is(
+                "admin:\n" +
+                "  port: 123\n" +
+                "  ip: 0.0.0.0\n" +
+                "routers:\n" +
+                "- protocol: http\n" +
+                "  dtab: /svc => /$/inet/127.1/9990;\n" +
+                "  servers:\n" +
+                "  - port: 123\n" +
+                "    ip: 0.0.0.0\n"));
+    }
+
+    @Test
+    void canLoadConfig() {
+        Map config = configExporter.loadFromResource("config.yaml");
+        Map expectedConfig = createSampleConfig(9990, 8080);
+        assertThat(config, is(expectedConfig));
+    }
+
+    private Map createSampleConfig(int adminPort, int serverPort) {
+        Map config = new LinkedHashMap();
+        config.put("admin", ImmutableMap.of("port", adminPort, "ip", "0.0.0.0"));
+        config.put("routers", ImmutableList.of(ImmutableMap.of(
+                "protocol", "http",
+                "dtab", "/svc => /$/inet/127.1/9990;",
+                "servers", ImmutableList.of(ImmutableMap.of("port", serverPort, "ip", "0.0.0.0")))));
+        return config;
     }
 }
