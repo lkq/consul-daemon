@@ -15,30 +15,27 @@ public class ConsulContextFactory {
     public static final String CONSUL_IMAGE = "consul:1.0.6";
     public static final String BIND_CLIENT_IP = "0.0.0.0";
 
-    public ContainerContext createClusterNodeContext() {
-
-        List<String> retryJoin = Environment.get().clusterMembers();
-        boolean isServer = Environment.get().isServer();
+    public ContainerContext createClusterNodeContext(String nodeName, String network, boolean runAsServer, List<String> clusterMembers, List<String> env) {
 
         ConsulCommandBuilder commandBuilder = new ConsulCommandBuilder()
-                .server(isServer)
-                .retryJoin(retryJoin);
+                .server(runAsServer)
+                .retryJoin(clusterMembers);
 
-        if (isServer) {
-            commandBuilder.bootstrapExpect(retryJoin.size());
+        if (runAsServer) {
+            commandBuilder.bootstrapExpect(clusterMembers.size());
         }
 
-        return createDefaultContext(Environment.get().nodeName()).commandBuilder(commandBuilder);
+        return createDefaultContext(nodeName, network, env).commandBuilder(commandBuilder);
     }
 
-    public ContainerContext createDefaultContext(String nodeName) {
+    public ContainerContext createDefaultContext(String nodeName, String network, List<String> env) {
         return new ContainerContext()
                 .imageName(CONSUL_IMAGE)
                 .nodeName(nodeName)
                 .hostName(nodeName)
-                .network(Environment.get().network())
+                .network(network)
                 .volumeBinders(Arrays.asList(new VolumeBinding(Environment.get().consulDataPath(), "/consul/data")))
-                .environmentVariables(getEnvironmentVariables());
+                .environmentVariables(env);
     }
 
 

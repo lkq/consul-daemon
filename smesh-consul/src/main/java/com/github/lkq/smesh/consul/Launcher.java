@@ -1,60 +1,37 @@
 package com.github.lkq.smesh.consul;
 
-import com.github.lkq.smesh.server.WebServer;
-import com.github.lkq.smesh.consul.api.ConsulAPI;
-import com.github.lkq.smesh.consul.container.ConsulController;
-import com.github.lkq.smesh.consul.api.ConsulResponseParser;
-import com.github.lkq.smesh.consul.context.ConsulContextFactory;
+import com.github.lkq.smesh.Env;
 import com.github.lkq.smesh.consul.env.Environment;
-import com.github.lkq.smesh.consul.health.ConsulHealthChecker;
-import com.github.lkq.smesh.consul.routes.v1.ConsulRoutes;
-import com.github.lkq.smesh.consul.utils.HttpClientFactory;
-import com.github.lkq.smesh.context.ContainerContext;
-import com.github.lkq.smesh.docker.DockerClientFactory;
-import com.github.lkq.smesh.docker.SimpleDockerClient;
+import com.github.lkq.smesh.consul.env.aws.EC2Client;
 import com.github.lkq.smesh.logging.JulToSlf4jBridge;
-import com.github.lkq.timeron.Timer;
+
+import java.util.List;
 
 public class Launcher {
-
-    private static final Timer timer = new Timer();
+    String ENV_NODE_NAME = "consul.nodeName";
+    String ENV_CONSUL_ROLE = "consul.role";
+    String ENV_CONSUL_CLUSTER_MEMBER = "consul.cluster.member";
 
     public static void main(String[] args) {
         JulToSlf4jBridge.setup();
-        setupTimers();
         new Launcher().start();
     }
 
     private void start() {
-        ConsulAPI consulAPI = new ConsulAPI(new HttpClientFactory().create(), new ConsulResponseParser(), Environment.get().consulAPIPort());
+        AppMaker appMaker = new AppMaker();
 
-        SimpleDockerClient dockerClient = timer.on(SimpleDockerClient.create(DockerClientFactory.get()));
+        EC2Client ec2 = EC2Client.instance();
 
-        ContainerContext context = new ConsulContextFactory().createClusterNodeContext();
-        String appVersion = Environment.get().appVersion();
-        ConsulHealthChecker consulHealthChecker = new ConsulHealthChecker(consulAPI, context.nodeName(), appVersion);
-        ConsulController consulController = new ConsulController(dockerClient);
-        WebServer webServer = new WebServer(new ConsulRoutes(consulHealthChecker), Environment.get().servicePort());
+        String nodeName = ec2.isEc2() ? ec2.getTagValue(ENV_NODE_NAME) : "consul";
 
-        App app = new App(context,
-                consulController,
-                consulHealthChecker,
-                webServer,
-                appVersion
-        );
+        List<String> clusterMembers = ec2.isEc2() ? ec2.getInstanceIPByTagValue(ENV_CONSUL_ROLE, "server") : Env.getList(ENV_CONSUL_CLUSTER_MEMBER, " ");
+
+        App app = appMaker.makeApp(nodeName, "host", true, clusterMembers, appMaker.getEnvironmentVariables());
 
         Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
 
         app.start(Environment.get().forceRestart());
     }
 
-    private static void setupTimers() {
-        SimpleDockerClient interceptor = timer.interceptor(SimpleDockerClient.class);
-        timer.measure(() -> interceptor.createContainer("", ""));
-        timer.measure(() -> interceptor.pullImage(""));
-        timer.measure(() -> interceptor.startContainer(""));
-        timer.measure(() -> interceptor.stopContainer(""));
-        timer.measure(() -> interceptor.execute("", null));
-    }
 
 }

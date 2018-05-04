@@ -42,8 +42,9 @@ public class LocalLauncher {
                 .ui(true)
                 .clientIP("0.0.0.0")
                 .bootstrap(true);
-        ContainerContext context = new ConsulContextFactory()
-                .createDefaultContext(Environment.get().nodeName())
+        final ConsulContextFactory consulContextFactory = new ConsulContextFactory();
+        ContainerContext context = consulContextFactory
+                .createDefaultContext(Environment.get().nodeName(), Environment.get().network(), consulContextFactory.getEnvironmentVariables())
                 .portBinders(portBindings)
                 .commandBuilder(builder);
 
