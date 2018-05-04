@@ -17,7 +17,7 @@ public class ConsulController {
     }
 
     public Boolean startNewInstance(ContainerContext context) {
-        logger.info("going to start new container from {}", context.imageName());
+        logger.info("starting new container instance: {}", context);
         dockerClient.pullImage(context.imageName());
 
         String containerID = dockerClient.createContainer(context.imageName(), context.nodeName())

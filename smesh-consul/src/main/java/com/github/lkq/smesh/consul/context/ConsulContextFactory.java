@@ -15,17 +15,15 @@ public class ConsulContextFactory {
     public static final String CONSUL_IMAGE = "consul:1.0.6";
     public static final String BIND_CLIENT_IP = "0.0.0.0";
 
-    public ContainerContext createClusterNodeContext(String nodeName, String network, boolean runAsServer, List<String> clusterMembers, List<String> env) {
-
-        ConsulCommandBuilder commandBuilder = new ConsulCommandBuilder()
-                .server(runAsServer)
-                .retryJoin(clusterMembers);
-
-        if (runAsServer) {
-            commandBuilder.bootstrapExpect(clusterMembers.size());
-        }
-
-        return createDefaultContext(nodeName, network, env).commandBuilder(commandBuilder);
+    public ContainerContext create(String nodeName, String network, List<String> env, ConsulCommandBuilder commandBuilder) {
+        return new ContainerContext()
+                .imageName(CONSUL_IMAGE)
+                .nodeName(nodeName)
+                .hostName(nodeName)
+                .network(network)
+                .volumeBinders(Arrays.asList(new VolumeBinding(Environment.get().consulDataPath(), "/consul/data")))
+                .environmentVariables(env)
+                .commandBuilder(commandBuilder);
     }
 
     public ContainerContext createDefaultContext(String nodeName, String network, List<String> env) {

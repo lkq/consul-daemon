@@ -27,6 +27,8 @@ import static org.mockito.Mockito.mock;
  */
 public class LocalClusterNode {
     public static final int MIN_CLUSTER_SIZE = 3;
+    public static final String BIND_CLIENT_IP = "0.0.0.0";
+
     private static Logger logger;
 
     public static void main(String[] args) {
@@ -64,7 +66,7 @@ public class LocalClusterNode {
         ConsulCommandBuilder builder = new ConsulCommandBuilder()
                 .server(isServer)
                 .ui(true)
-                .clientIP(ConsulContextFactory.BIND_CLIENT_IP)
+                .clientIP(BIND_CLIENT_IP)
                 .retryJoin(runningNodeIPs(dockerClient));
         if (isServer) {
             builder.bootstrapExpect(MIN_CLUSTER_SIZE);

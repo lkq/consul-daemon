@@ -1,10 +1,13 @@
 package com.github.lkq.smesh.consul;
 
 import com.github.lkq.smesh.Env;
+import com.github.lkq.smesh.consul.command.ConsulCommandBuilder;
 import com.github.lkq.smesh.consul.env.Environment;
-import com.github.lkq.smesh.consul.env.aws.EC2Client;
+import com.github.lkq.smesh.consul.env.aws.EC2;
+import com.github.lkq.smesh.consul.env.aws.EC2Factory;
 import com.github.lkq.smesh.logging.JulToSlf4jBridge;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Launcher {
@@ -20,17 +23,25 @@ public class Launcher {
     private void start() {
         AppMaker appMaker = new AppMaker();
 
-        EC2Client ec2 = EC2Client.instance();
+        EC2 ec2 = EC2Factory.get();
 
         String nodeName = ec2.isEc2() ? ec2.getTagValue(ENV_NODE_NAME) : "consul";
 
         List<String> clusterMembers = ec2.isEc2() ? ec2.getInstanceIPByTagValue(ENV_CONSUL_ROLE, "server") : Env.getList(ENV_CONSUL_CLUSTER_MEMBER, " ");
 
-        App app = appMaker.makeApp(nodeName, "host", true, clusterMembers, appMaker.getEnvironmentVariables());
+        ConsulCommandBuilder serverCommand = ConsulCommandBuilder.server(true, clusterMembers);
+
+        App app = appMaker.makeApp(nodeName, serverCommand, "host", getEnv());
 
         Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
 
         app.start(Environment.get().forceRestart());
+    }
+
+    public List<String> getEnv() {
+        List<String> env = new ArrayList<>();
+        env.add("CONSUL_BIND_INTERFACE=eth0");
+        return env;
     }
 
 

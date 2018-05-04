@@ -7,38 +7,23 @@ import com.amazonaws.util.EC2MetadataUtils;
 import com.github.lkq.smesh.exception.SmeshException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spark.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class EC2Client {
+public class EC2Impl implements EC2 {
 
-    private static Logger logger = LoggerFactory.getLogger(EC2Client.class);
+    private static Logger logger = LoggerFactory.getLogger(EC2Impl.class);
 
-    private static EC2Client instance = new EC2Client();
-
-    private Boolean isEc2;
     private final AmazonEC2 amazonEC2;
 
-    private EC2Client() {
+    protected EC2Impl() {
         amazonEC2 = AmazonEC2ClientBuilder.defaultClient();
     }
 
-    public static EC2Client instance() {
-        return instance;
-    }
-
     public boolean isEc2() {
-        if (isEc2 == null) {
-            try {
-                isEc2 = StringUtils.isNotEmpty(EC2MetadataUtils.getInstanceId());
-            } catch (Exception ignored) {
-                isEc2 = false;
-            }
-        }
-        return isEc2;
+        return true;
     }
 
     public String getPrivateIP() {
@@ -94,4 +79,9 @@ public class EC2Client {
         }
         return instanceIPs;
     }
+
 }
+
+
+
+

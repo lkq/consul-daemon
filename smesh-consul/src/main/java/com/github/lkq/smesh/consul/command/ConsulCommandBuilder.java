@@ -70,4 +70,16 @@ public class ConsulCommandBuilder implements CommandBuilder {
                 ", clientIP='" + clientIP + '\'' +
                 '}';
     }
+
+    public static ConsulCommandBuilder server(boolean isServerNode, List<String> clusterMembers) {
+
+        ConsulCommandBuilder commandBuilder = new ConsulCommandBuilder()
+                .server(isServerNode)
+                .retryJoin(clusterMembers);
+
+        if (isServerNode) {
+            commandBuilder.bootstrapExpect(clusterMembers.size());
+        }
+        return commandBuilder;
+    }
 }
