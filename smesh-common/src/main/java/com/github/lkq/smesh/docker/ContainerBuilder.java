@@ -7,8 +7,8 @@ import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.Ports;
 import com.github.dockerjava.api.model.Volume;
 import com.github.lkq.smesh.StringUtils;
-import com.github.lkq.smesh.context.PortBinder;
-import com.github.lkq.smesh.context.VolumeBinder;
+import com.github.lkq.smesh.context.PortBinding;
+import com.github.lkq.smesh.context.VolumeBinding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,11 +29,11 @@ public class ContainerBuilder {
         return createContainerCmd.exec().getId();
     }
 
-    public ContainerBuilder withVolume(List<VolumeBinder> volumeBinders) {
+    public ContainerBuilder withVolume(List<VolumeBinding> volumeBindings) {
         List<Bind> binds = new ArrayList<>();
-        for (VolumeBinder volumeBinder : volumeBinders) {
-            logger.info("binding volume: {} to {}", volumeBinder.hostPath(), volumeBinder.containerPath());
-            binds.add(new Bind(volumeBinder.hostPath(), new Volume(volumeBinder.containerPath())));
+        for (VolumeBinding volumeBinding : volumeBindings) {
+            logger.info("binding volume: {} to {}", volumeBinding.hostPath(), volumeBinding.containerPath());
+            binds.add(new Bind(volumeBinding.hostPath(), new Volume(volumeBinding.containerPath())));
         }
         this.createContainerCmd.withBinds(binds);
         return this;
@@ -69,15 +69,15 @@ public class ContainerBuilder {
         return this;
     }
 
-    public ContainerBuilder withPortBinders(List<PortBinder> portBinders) {
-        if (portBinders != null && portBinders.size() > 0) {
+    public ContainerBuilder withPortBinders(List<PortBinding> portBindings) {
+        if (portBindings != null && portBindings.size() > 0) {
             List<ExposedPort> exposedPorts = new ArrayList<>();
             Ports bindings = new Ports();
-            for (PortBinder portBinder : portBinders) {
-                ExposedPort exposedPort = portBinder.getExposedPort();
+            for (PortBinding portBinding : portBindings) {
+                ExposedPort exposedPort = portBinding.getExposedPort();
                 exposedPorts.add(exposedPort);
-                bindings.bind(exposedPort, portBinder.getPortBinding());
-                logger.info("binding port: {}", portBinder);
+                bindings.bind(exposedPort, portBinding.getPortBinding());
+                logger.info("binding port: {}", portBinding);
             }
 
             createContainerCmd.withExposedPorts(exposedPorts).withPortBindings(bindings);

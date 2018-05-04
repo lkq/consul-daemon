@@ -2,8 +2,8 @@ package com.github.lkq.smesh.linkerd;
 
 import com.github.lkq.smesh.AppVersion;
 import com.github.lkq.smesh.context.ContainerContext;
-import com.github.lkq.smesh.context.PortBinder;
-import com.github.lkq.smesh.context.VolumeBinder;
+import com.github.lkq.smesh.context.PortBinding;
+import com.github.lkq.smesh.context.VolumeBinding;
 import com.github.lkq.smesh.docker.DockerClientFactory;
 import com.github.lkq.smesh.docker.SimpleDockerClient;
 import com.github.lkq.smesh.linkerd.config.ConfigExporter;
@@ -22,7 +22,7 @@ public class AppMaker {
 
     public static final String CONTAINER_CONFIG_PATH = "/linkerd";
 
-    public App makeApp(String network, List<PortBinder> portBinders, String localConfigPath) {
+    public App makeApp(String network, List<PortBinding> portBindings, String localConfigPath) {
         String configFileName = "smesh-linkerd-" + AppVersion.get(AppMaker.class) + ".yaml";
 
         ConfigExporter configExporter = new ConfigExporter();
@@ -31,8 +31,8 @@ public class AppMaker {
 
         LinkerdContextFactory contextFactory = new LinkerdContextFactory();
         ContainerContext context = contextFactory.createDefaultContext()
-                .volumeBinders(Arrays.asList(new VolumeBinder(localConfigPath, CONTAINER_CONFIG_PATH)))
-                .portBinders(portBinders)
+                .volumeBinders(Arrays.asList(new VolumeBinding(localConfigPath, CONTAINER_CONFIG_PATH)))
+                .portBinders(portBindings)
                 .network(network)
                 .commandBuilder(new LinkerdCommandBuilder(CONTAINER_CONFIG_PATH + "/" + configFileName));
 

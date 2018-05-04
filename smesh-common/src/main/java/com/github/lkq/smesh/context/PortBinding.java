@@ -3,20 +3,20 @@ package com.github.lkq.smesh.context;
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.Ports;
 
-public class PortBinder {
+public class PortBinding {
     private int hostPort;
     private int containerPort;
     private Protocol protocol;
 
     public enum Protocol {TCP, UDP}
 
-    public PortBinder(int hostPort, int containerPort, Protocol protocol) {
+    public PortBinding(int hostPort, int containerPort, Protocol protocol) {
         this.hostPort = hostPort;
         this.containerPort = containerPort;
         this.protocol = protocol;
     }
 
-    public PortBinder(int port, Protocol protocol) {
+    public PortBinding(int port, Protocol protocol) {
         this.hostPort = port;
         this.containerPort = port;
         this.protocol = protocol;
@@ -37,7 +37,7 @@ public class PortBinder {
 
     @Override
     public String toString() {
-        return "PortBinder{" +
+        return "PortBinding{" +
                 "hostPort=" + hostPort +
                 ", containerPort=" + containerPort +
                 ", protocol=" + protocol +

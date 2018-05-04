@@ -1,45 +1,45 @@
 package com.github.lkq.smesh.consul;
 
-import com.github.lkq.smesh.context.PortBinder;
+import com.github.lkq.smesh.context.PortBinding;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ConsulPorts {
 
-    public List<PortBinder> defaultPortBindings() {
-        List<PortBinder> portBinders = new ArrayList<>();
-        portBinders.add(new PortBinder(8300, PortBinder.Protocol.TCP));
-        portBinders.add(new PortBinder(8301, PortBinder.Protocol.TCP));
-        portBinders.add(new PortBinder(8302, PortBinder.Protocol.TCP));
-        portBinders.add(new PortBinder(8400, PortBinder.Protocol.TCP));
-        portBinders.add(new PortBinder(8500, PortBinder.Protocol.TCP));
-        portBinders.add(new PortBinder(8301, PortBinder.Protocol.UDP));
-        portBinders.add(new PortBinder(8302, PortBinder.Protocol.UDP));
-        return portBinders;
+    public List<PortBinding> defaultPortBindings() {
+        List<PortBinding> portBindings = new ArrayList<>();
+        portBindings.add(new PortBinding(8300, PortBinding.Protocol.TCP));
+        portBindings.add(new PortBinding(8301, PortBinding.Protocol.TCP));
+        portBindings.add(new PortBinding(8302, PortBinding.Protocol.TCP));
+        portBindings.add(new PortBinding(8400, PortBinding.Protocol.TCP));
+        portBindings.add(new PortBinding(8500, PortBinding.Protocol.TCP));
+        portBindings.add(new PortBinding(8301, PortBinding.Protocol.UDP));
+        portBindings.add(new PortBinding(8302, PortBinding.Protocol.UDP));
+        return portBindings;
     }
 
-    public List<PortBinder> localServerPortBindings() {
-        List<PortBinder> portBinders = new ArrayList<>();
-        portBinders.add(new PortBinder(9300, 8300, PortBinder.Protocol.TCP));
-        portBinders.add(new PortBinder(9301, 8301, PortBinder.Protocol.TCP));
-        portBinders.add(new PortBinder(9302, 8302, PortBinder.Protocol.TCP));
-        portBinders.add(new PortBinder(9400, 8400, PortBinder.Protocol.TCP));
-        portBinders.add(new PortBinder(9500, 8500, PortBinder.Protocol.TCP));
-        portBinders.add(new PortBinder(9301, 8301, PortBinder.Protocol.UDP));
-        portBinders.add(new PortBinder(9302, 8302, PortBinder.Protocol.UDP));
-        return portBinders;
+    public List<PortBinding> localServerPortBindings() {
+        List<PortBinding> portBindings = new ArrayList<>();
+        portBindings.add(new PortBinding(9300, 8300, PortBinding.Protocol.TCP));
+        portBindings.add(new PortBinding(9301, 8301, PortBinding.Protocol.TCP));
+        portBindings.add(new PortBinding(9302, 8302, PortBinding.Protocol.TCP));
+        portBindings.add(new PortBinding(9400, 8400, PortBinding.Protocol.TCP));
+        portBindings.add(new PortBinding(9500, 8500, PortBinding.Protocol.TCP));
+        portBindings.add(new PortBinding(9301, 8301, PortBinding.Protocol.UDP));
+        portBindings.add(new PortBinding(9302, 8302, PortBinding.Protocol.UDP));
+        return portBindings;
     }
 
-    public List<PortBinder> localClientPortBindings() {
-        List<PortBinder> portBinders = new ArrayList<>();
-        portBinders.add(new PortBinder(7300, 8300, PortBinder.Protocol.TCP));
-        portBinders.add(new PortBinder(7301, 8301, PortBinder.Protocol.TCP));
-        portBinders.add(new PortBinder(7302, 8302, PortBinder.Protocol.TCP));
-        portBinders.add(new PortBinder(7400, 8400, PortBinder.Protocol.TCP));
-        portBinders.add(new PortBinder(7500, 8500, PortBinder.Protocol.TCP));
-        portBinders.add(new PortBinder(7301, 8301, PortBinder.Protocol.UDP));
-        portBinders.add(new PortBinder(7302, 8302, PortBinder.Protocol.UDP));
-        return portBinders;
+    public List<PortBinding> localClientPortBindings() {
+        List<PortBinding> portBindings = new ArrayList<>();
+        portBindings.add(new PortBinding(7300, 8300, PortBinding.Protocol.TCP));
+        portBindings.add(new PortBinding(7301, 8301, PortBinding.Protocol.TCP));
+        portBindings.add(new PortBinding(7302, 8302, PortBinding.Protocol.TCP));
+        portBindings.add(new PortBinding(7400, 8400, PortBinding.Protocol.TCP));
+        portBindings.add(new PortBinding(7500, 8500, PortBinding.Protocol.TCP));
+        portBindings.add(new PortBinding(7301, 8301, PortBinding.Protocol.UDP));
+        portBindings.add(new PortBinding(7302, 8302, PortBinding.Protocol.UDP));
+        return portBindings;
     }
 }

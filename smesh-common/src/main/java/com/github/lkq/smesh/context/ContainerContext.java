@@ -9,8 +9,8 @@ public class ContainerContext {
     private String hostName;
     private String network;
     private List<String> environmentVariables;
-    private List<PortBinder> portBinders;
-    private List<VolumeBinder> volumeBinders;
+    private List<PortBinding> portBindings;
+    private List<VolumeBinding> volumeBindings;
     private CommandBuilder commands;
 
     public String imageName() {
@@ -49,21 +49,21 @@ public class ContainerContext {
         return this;
     }
 
-    public List<PortBinder> portBinders() {
-        return portBinders;
+    public List<PortBinding> portBinders() {
+        return portBindings;
     }
 
-    public ContainerContext portBinders(List<PortBinder> portBinders) {
-        this.portBinders = portBinders;
+    public ContainerContext portBinders(List<PortBinding> portBindings) {
+        this.portBindings = portBindings;
         return this;
     }
 
-    public List<VolumeBinder> volumeBinders() {
-        return volumeBinders;
+    public List<VolumeBinding> volumeBinders() {
+        return volumeBindings;
     }
 
-    public ContainerContext volumeBinders(List<VolumeBinder> volumeBinders) {
-        this.volumeBinders = volumeBinders;
+    public ContainerContext volumeBinders(List<VolumeBinding> volumeBindings) {
+        this.volumeBindings = volumeBindings;
         return this;
     }
 
@@ -93,8 +93,8 @@ public class ContainerContext {
                 ", hostName='" + hostName + '\'' +
                 ", network='" + network + '\'' +
                 ", environmentVariables=" + environmentVariables +
-                ", portBinders=" + portBinders +
-                ", volumeBinders=" + volumeBinders +
+                ", portBindings=" + portBindings +
+                ", volumeBindings=" + volumeBindings +
                 ", commands=" + commands +
                 '}';
     }

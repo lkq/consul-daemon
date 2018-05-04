@@ -1,6 +1,7 @@
 package com.github.lkq.smesh.consul;
 
 import com.github.lkq.smesh.consul.command.ConsulCommandBuilder;
+import com.github.lkq.smesh.context.PortBinding;
 import com.github.lkq.smesh.server.WebServer;
 import com.github.lkq.smesh.consul.api.ConsulAPI;
 import com.github.lkq.smesh.consul.container.ConsulController;
@@ -13,7 +14,6 @@ import com.github.lkq.smesh.consul.routes.v1.ConsulRoutes;
 import com.github.lkq.smesh.consul.utils.HttpClientFactory;
 import com.github.lkq.smesh.context.ContainerContext;
 import com.github.lkq.smesh.docker.DockerClientFactory;
-import com.github.lkq.smesh.context.PortBinder;
 import com.github.lkq.smesh.docker.SimpleDockerClient;
 import com.github.lkq.smesh.logging.JulToSlf4jBridge;
 import org.slf4j.Logger;
@@ -34,7 +34,7 @@ public class LocalLauncher {
         }
     }
 
-    public void launch(Environment env, List<PortBinder> portBinders) {
+    public void launch(Environment env, List<PortBinding> portBindings) {
         EnvironmentProvider.set(env);
 
         ConsulCommandBuilder builder = new ConsulCommandBuilder()
@@ -44,7 +44,7 @@ public class LocalLauncher {
                 .bootstrap(true);
         ContainerContext context = new ConsulContextFactory()
                 .createDefaultContext(Environment.get().nodeName())
-                .portBinders(portBinders)
+                .portBinders(portBindings)
                 .commandBuilder(builder);
 
         ConsulAPI consulAPI = new ConsulAPI(new HttpClientFactory().create(), new ConsulResponseParser(), Environment.get().consulAPIPort());

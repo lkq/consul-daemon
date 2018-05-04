@@ -5,8 +5,8 @@ import com.github.dockerjava.api.command.CreateContainerCmd;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.model.*;
 import com.github.lkq.smesh.StringUtils;
-import com.github.lkq.smesh.context.PortBinder;
-import com.github.lkq.smesh.context.VolumeBinder;
+import com.github.lkq.smesh.context.PortBinding;
+import com.github.lkq.smesh.context.VolumeBinding;
 import com.github.lkq.smesh.docker.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -59,7 +59,7 @@ class ContainerBuilderTest {
 
         ContainerBuilder builder = new ContainerBuilder(dockerClient, imageNameTag, containerName);
 
-        builder.withVolume(Arrays.asList(new VolumeBinder("/opt/data", "/data"), new VolumeBinder("/etc/config", "/config")));
+        builder.withVolume(Arrays.asList(new VolumeBinding("/opt/data", "/data"), new VolumeBinding("/etc/config", "/config")));
 
         ArgumentCaptor<List> volumeCaptor = ArgumentCaptor.forClass(List.class);
         verify(createContainerCmd, times(1)).withBinds(volumeCaptor.capture());
@@ -77,11 +77,11 @@ class ContainerBuilderTest {
     void canSetupPorts() {
         given(dockerClient.createContainerCmd(imageNameTag).withName(containerName)).willReturn(createContainerCmd);
         given(createContainerCmd.withExposedPorts(anyListOf(ExposedPort.class))).willReturn(createContainerCmd);
-        given(createContainerCmd.withPortBindings(anyListOf(PortBinding.class))).willReturn(createContainerCmd);
+        given(createContainerCmd.withPortBindings(anyListOf(com.github.dockerjava.api.model.PortBinding.class))).willReturn(createContainerCmd);
 
         ContainerBuilder builder = new ContainerBuilder(dockerClient, imageNameTag, containerName);
 
-        builder.withPortBinders(Arrays.asList(new PortBinder(1000, PortBinder.Protocol.TCP), new PortBinder(2000, PortBinder.Protocol.UDP)));
+        builder.withPortBinders(Arrays.asList(new PortBinding(1000, com.github.lkq.smesh.context.PortBinding.Protocol.TCP), new com.github.lkq.smesh.context.PortBinding(2000, com.github.lkq.smesh.context.PortBinding.Protocol.UDP)));
 
         ArgumentCaptor<List> portCaptor = ArgumentCaptor.forClass(List.class);
         verify(createContainerCmd, times(1)).withExposedPorts(portCaptor.capture());

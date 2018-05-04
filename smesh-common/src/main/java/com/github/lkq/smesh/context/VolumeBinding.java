@@ -1,10 +1,10 @@
 package com.github.lkq.smesh.context;
 
-public class VolumeBinder {
+public class VolumeBinding {
     private String hostPath;
     private String containerPath;
 
-    public VolumeBinder(String hostPath, String containerPath) {
+    public VolumeBinding(String hostPath, String containerPath) {
         this.hostPath = hostPath;
         this.containerPath = containerPath;
     }
@@ -19,7 +19,7 @@ public class VolumeBinder {
 
     @Override
     public String toString() {
-        return "VolumeBinder{" +
+        return "VolumeBinding{" +
                 "hostPath='" + hostPath + '\'' +
                 ", containerPath='" + containerPath + '\'' +
                 '}';

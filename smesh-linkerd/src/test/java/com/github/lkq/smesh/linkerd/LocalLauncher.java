@@ -1,6 +1,6 @@
 package com.github.lkq.smesh.linkerd;
 
-import com.github.lkq.smesh.context.PortBinder;
+import com.github.lkq.smesh.context.PortBinding;
 import com.github.lkq.smesh.logging.JulToSlf4jBridge;
 
 import java.util.Arrays;
@@ -14,11 +14,11 @@ public class LocalLauncher {
 
     private void start() {
 
-        List<PortBinder> portBinders = Arrays.asList(new PortBinder(9990, PortBinder.Protocol.TCP),
-                new PortBinder(8080, PortBinder.Protocol.TCP));
+        List<PortBinding> portBindings = Arrays.asList(new PortBinding(9990, PortBinding.Protocol.TCP),
+                new PortBinding(8080, PortBinding.Protocol.TCP));
         String localConfigPath = AppMaker.class.getProtectionDomain().getCodeSource().getLocation().getPath();
 
-        App app = new AppMaker().makeApp("", portBinders, localConfigPath);
+        App app = new AppMaker().makeApp("", portBindings, localConfigPath);
 
         Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
 
