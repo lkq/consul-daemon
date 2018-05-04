@@ -49,7 +49,7 @@ class ConfigExporterTest {
 
     @Test
     void canLoadConfig() {
-        Map config = configExporter.loadFromResource("config.yaml");
+        Map config = configExporter.loadFromResource("smesh-linkerd.yaml");
         Map expectedConfig = createSampleConfig(9990, 8080);
         assertThat(config, is(expectedConfig));
     }

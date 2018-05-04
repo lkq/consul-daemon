@@ -15,26 +15,25 @@ import com.github.lkq.smesh.server.WebServer;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 public class AppMaker {
 
     public static final String CONTAINER_CONFIG_PATH = "/linkerd";
 
-    public App makeApp() {
-        String localConfigPath = AppMaker.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+    public App makeApp(String network, List<PortBinder> portBinders, String localConfigPath) {
         String configFileName = "smesh-linkerd-" + AppVersion.get(AppMaker.class) + ".yaml";
 
         ConfigExporter configExporter = new ConfigExporter();
-        Map linkerdConfig = configExporter.loadFromResource("config.yaml");
+        Map linkerdConfig = configExporter.loadFromResource("smesh-linkerd.yaml");
         configExporter.writeToFile(linkerdConfig, new File(localConfigPath, configFileName));
 
         LinkerdContextFactory contextFactory = new LinkerdContextFactory();
         ContainerContext context = contextFactory.createDefaultContext()
                 .volumeBinders(Arrays.asList(new VolumeBinder(localConfigPath, CONTAINER_CONFIG_PATH)))
-                .portBinders(Arrays.asList(new PortBinder(9990, PortBinder.Protocol.TCP),
-                        new PortBinder(8080, PortBinder.Protocol.TCP)))
-//                .network("host")
+                .portBinders(portBinders)
+                .network(network)
                 .commandBuilder(new LinkerdCommandBuilder(CONTAINER_CONFIG_PATH + "/" + configFileName));
 
         LinkerdController linkerdController = new LinkerdController(SimpleDockerClient.create(DockerClientFactory.get()));

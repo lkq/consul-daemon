@@ -10,7 +10,9 @@ public class Launcher {
 
     private void start() {
 
-        App app = new AppMaker().makeApp();
+        String localConfigPath = AppMaker.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+
+        App app = new AppMaker().makeApp("host", null, localConfigPath);
 
         Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
 
