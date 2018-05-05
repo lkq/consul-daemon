@@ -49,11 +49,11 @@ public class ContainerContext {
         return this;
     }
 
-    public List<PortBinding> portBinders() {
+    public List<PortBinding> portBindings() {
         return portBindings;
     }
 
-    public ContainerContext portBinders(List<PortBinding> portBindings) {
+    public ContainerContext portBindings(List<PortBinding> portBindings) {
         this.portBindings = portBindings;
         return this;
     }

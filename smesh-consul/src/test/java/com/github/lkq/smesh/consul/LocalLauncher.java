@@ -1,65 +1,36 @@
 package com.github.lkq.smesh.consul;
 
 import com.github.lkq.smesh.consul.command.ConsulCommandBuilder;
-import com.github.lkq.smesh.context.PortBinding;
-import com.github.lkq.smesh.server.WebServer;
-import com.github.lkq.smesh.consul.api.ConsulAPI;
-import com.github.lkq.smesh.consul.container.ConsulController;
-import com.github.lkq.smesh.consul.api.ConsulResponseParser;
-import com.github.lkq.smesh.consul.context.ConsulContextFactory;
 import com.github.lkq.smesh.consul.env.Environment;
-import com.github.lkq.smesh.consul.env.EnvironmentProvider;
-import com.github.lkq.smesh.consul.health.ConsulHealthChecker;
-import com.github.lkq.smesh.consul.routes.v1.ConsulRoutes;
-import com.github.lkq.smesh.consul.utils.HttpClientFactory;
-import com.github.lkq.smesh.context.ContainerContext;
-import com.github.lkq.smesh.docker.DockerClientFactory;
-import com.github.lkq.smesh.docker.SimpleDockerClient;
 import com.github.lkq.smesh.logging.JulToSlf4jBridge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
+import java.util.Collections;
 
 public class LocalLauncher {
     private static Logger logger;
+
     public static void main(String[] args) {
         JulToSlf4jBridge.setup();
         logger = LoggerFactory.getLogger(LocalLauncher.class);
         try {
-            new LocalLauncher().launch(new MacEnvironment(), new ConsulPorts().defaultPortBindings());
+            new LocalLauncher().start();
         } catch (Exception e) {
             logger.error("failed to start application", e);
             System.exit(1);
         }
     }
 
-    public void launch(Environment env, List<PortBinding> portBindings) {
-        EnvironmentProvider.set(env);
+    private void start() {
+        AppMaker appMaker = new AppMaker();
 
-        ConsulCommandBuilder builder = new ConsulCommandBuilder()
-                .server(true)
+        ConsulCommandBuilder serverCommand = ConsulCommandBuilder.server(true, Collections.emptyList())
                 .ui(true)
                 .clientIP("0.0.0.0")
                 .bootstrap(true);
-        final ConsulContextFactory consulContextFactory = new ConsulContextFactory();
-        ContainerContext context = consulContextFactory
-                .createDefaultContext(Environment.get().nodeName(), Environment.get().network(), consulContextFactory.getEnvironmentVariables())
-                .portBinders(portBindings)
-                .commandBuilder(builder);
 
-        ConsulAPI consulAPI = new ConsulAPI(new HttpClientFactory().create(), new ConsulResponseParser(), Environment.get().consulAPIPort());
-        SimpleDockerClient dockerClient = SimpleDockerClient.create(DockerClientFactory.get());
-
-        ConsulHealthChecker consulHealthChecker = new ConsulHealthChecker(consulAPI, context.nodeName(), Environment.get().appVersion());
-        ConsulController consulController = new ConsulController(dockerClient);
-        WebServer webServer = new WebServer(new ConsulRoutes(consulHealthChecker), 0);
-
-        App app = new App(context,
-                consulController,
-                consulHealthChecker,
-                webServer,
-                Environment.get().appVersion());
+        App app = appMaker.makeApp("consul", serverCommand, "", ConsulPortBindings.defaultBindings());
 
         Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
 

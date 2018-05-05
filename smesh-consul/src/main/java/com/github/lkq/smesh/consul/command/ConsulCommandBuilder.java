@@ -77,7 +77,7 @@ public class ConsulCommandBuilder implements CommandBuilder {
                 .server(isServerNode)
                 .retryJoin(clusterMembers);
 
-        if (isServerNode) {
+        if (isServerNode && clusterMembers != null) {
             commandBuilder.bootstrapExpect(clusterMembers.size());
         }
         return commandBuilder;

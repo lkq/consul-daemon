@@ -74,6 +74,7 @@ public class SimpleDockerClient {
     public boolean renameContainer(String containerName, String newName) {
         try {
             client.renameContainerCmd(containerName).withName(newName).exec();
+            logger.info("renaming container from {} to {}", containerName, newName);
             return true;
         } catch (Exception e) {
             logger.warn("failed to rename container from {} to {}, cause: {}", containerName, newName, e.getMessage());
@@ -135,7 +136,7 @@ public class SimpleDockerClient {
 
         new Thread(() -> {
             try {
-                logger.info("attaching container log: {}", containerID);
+                logger.info("attaching logs from container: {}", containerID);
                 client.logContainerCmd(containerID)
                         .withStdErr(true)
                         .withStdOut(true)

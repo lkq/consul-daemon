@@ -25,7 +25,7 @@ public class ConsulController {
                 .withEnvironmentVariable(context.environmentVariables())
                 .withHostName(context.hostName())
                 .withNetwork(context.network())
-                .withPortBinders(context.portBinders())
+                .withPortBinders(context.portBindings())
                 .withCommand(context.commandBuilder().commands())
                 .build();
 
@@ -34,7 +34,7 @@ public class ConsulController {
 
     public void stopAndRemoveExistingInstance(String nodeName) {
         if (dockerClient.containerExists(nodeName)) {
-            logger.info("removing existing container: {}", nodeName);
+            logger.info("found existing container: {}", nodeName);
             dockerClient.stopContainer(nodeName);
             String tempContainerName = nodeName + "-remove-" + System.currentTimeMillis();
             dockerClient.renameContainer(nodeName, tempContainerName);

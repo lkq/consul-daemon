@@ -20,7 +20,7 @@ public class ConsulHealthChecker {
     public ConsulHealthChecker(ConsulAPI consulAPI, String nodeName, String daemonVersion) {
         this.consulAPI = consulAPI;
         this.nodeName = nodeName;
-        this.daemonVersionKey = nodeName + "-daemon-version";
+        this.daemonVersionKey = "consul-version-" + nodeName;
         this.daemonVersion = daemonVersion;
     }
 

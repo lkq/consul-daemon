@@ -7,7 +7,6 @@ import com.github.lkq.smesh.consul.env.aws.EC2;
 import com.github.lkq.smesh.consul.env.aws.EC2Factory;
 import com.github.lkq.smesh.logging.JulToSlf4jBridge;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Launcher {
@@ -31,17 +30,11 @@ public class Launcher {
 
         ConsulCommandBuilder serverCommand = ConsulCommandBuilder.server(true, clusterMembers);
 
-        App app = appMaker.makeApp(nodeName, serverCommand, "host", getEnv());
+        App app = appMaker.makeApp(nodeName, serverCommand, "host", null);
 
         Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
 
         app.start(Environment.get().forceRestart());
-    }
-
-    public List<String> getEnv() {
-        List<String> env = new ArrayList<>();
-        env.add("CONSUL_BIND_INTERFACE=eth0");
-        return env;
     }
 
 

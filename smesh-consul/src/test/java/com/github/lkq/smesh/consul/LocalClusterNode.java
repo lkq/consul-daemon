@@ -73,9 +73,9 @@ public class LocalClusterNode {
         }
         ContainerContext context = contextFactory.createDefaultContext(nodeName, "", contextFactory.getEnvironmentVariables()).commandBuilder(builder);
         if (nodeIndex == 0) {
-            context.portBinders(new ConsulPorts().localServerPortBindings());
+            context.portBindings(new ConsulPortBindings().localServerBindings());
         } else if (nodeIndex == -1) {
-            context.portBinders(new ConsulPorts().localClientPortBindings());
+            context.portBindings(new ConsulPortBindings().localClientBindings());
         }
         App app = new App(context, consulController, healthChecker, webServer, "1.2.3");
         app.start(!nodeRunning(dockerClient, nodeName));

@@ -5,9 +5,9 @@ import com.github.lkq.smesh.context.PortBinding;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ConsulPorts {
+public class ConsulPortBindings {
 
-    public List<PortBinding> defaultPortBindings() {
+    public static List<PortBinding> defaultBindings() {
         List<PortBinding> portBindings = new ArrayList<>();
         portBindings.add(new PortBinding(8300, PortBinding.Protocol.TCP));
         portBindings.add(new PortBinding(8301, PortBinding.Protocol.TCP));
@@ -19,7 +19,7 @@ public class ConsulPorts {
         return portBindings;
     }
 
-    public List<PortBinding> localServerPortBindings() {
+    public static List<PortBinding> localServerBindings() {
         List<PortBinding> portBindings = new ArrayList<>();
         portBindings.add(new PortBinding(9300, 8300, PortBinding.Protocol.TCP));
         portBindings.add(new PortBinding(9301, 8301, PortBinding.Protocol.TCP));
@@ -31,7 +31,7 @@ public class ConsulPorts {
         return portBindings;
     }
 
-    public List<PortBinding> localClientPortBindings() {
+    public static List<PortBinding> localClientBindings() {
         List<PortBinding> portBindings = new ArrayList<>();
         portBindings.add(new PortBinding(7300, 8300, PortBinding.Protocol.TCP));
         portBindings.add(new PortBinding(7301, 8301, PortBinding.Protocol.TCP));
