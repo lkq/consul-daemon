@@ -20,7 +20,7 @@ public class LinkerdController {
         dockerClient.pullImage(context.imageName());
 
         String containerID = dockerClient.createContainer(context.imageName(), context.nodeName())
-                .withVolume(context.volumeBinders())
+                .withVolume(context.volumeBindings())
                 .withPortBinders(context.portBindings())
                 .withCommand(context.commandBuilder().commands())
                 .withNetwork(context.network())

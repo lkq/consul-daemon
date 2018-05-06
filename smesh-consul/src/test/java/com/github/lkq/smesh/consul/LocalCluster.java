@@ -7,6 +7,7 @@ import com.github.lkq.smesh.consul.context.ConsulContextFactory;
 import com.github.lkq.smesh.consul.env.EnvironmentProvider;
 import com.github.lkq.smesh.consul.health.ConsulHealthChecker;
 import com.github.lkq.smesh.context.ContainerContext;
+import com.github.lkq.smesh.context.PortBinding;
 import com.github.lkq.smesh.docker.DockerClientFactory;
 import com.github.lkq.smesh.docker.SimpleDockerClient;
 import com.github.lkq.smesh.logging.JulToSlf4jBridge;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import spark.utils.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.BDDMockito.given;
@@ -25,7 +27,7 @@ import static org.mockito.Mockito.mock;
  * start server nodes and form a cluster when provided -Dnode-index=
  * otherwise start as client node
  */
-public class LocalClusterNode {
+public class LocalCluster {
     public static final int MIN_CLUSTER_SIZE = 3;
     public static final String BIND_CLIENT_IP = "0.0.0.0";
 
@@ -34,17 +36,38 @@ public class LocalClusterNode {
     public static void main(String[] args) {
         JulToSlf4jBridge.setup();
 
-        logger = LoggerFactory.getLogger(LocalClusterNode.class);
+        logger = LoggerFactory.getLogger(LocalCluster.class);
 
-        new LocalClusterNode().start();
+        new LocalCluster().startNodes(3);
 
-        try {
-            Object lock = new Object();
-            synchronized (lock) {
-                lock.wait();
+    }
+
+    private void startNodes(int count) {
+
+        SimpleDockerClient dockerClient = SimpleDockerClient.create(DockerClientFactory.get());
+
+        AppMaker appMaker = new AppMaker();
+
+        for (int i = 0; i < count; i++) {
+
+            List<PortBinding> portBindings = null;
+            if (i == 0) {
+                portBindings = ConsulPortBindings.defaultBindings();
             }
-        } catch (InterruptedException e) {
-            logger.info("something unexpected", e);
+            ConsulCommandBuilder serverCommand = ConsulCommandBuilder.server(true, Collections.emptyList())
+                    .ui(true)
+                    .clientIP(BIND_CLIENT_IP)
+                    .retryJoin(runningNodeIPs(dockerClient))
+                    .bootstrapExpect(count);
+
+            String nodeName = "consul-server-" + i;
+            logger.info("================ starting server node {} ==================", nodeName);
+            String localDataPath = ClassLoader.getSystemResource(".").getPath() + "data/" + nodeName;
+            App app = appMaker.makeApp(nodeName, serverCommand, "", portBindings, "1.2.3", 1026 + i, localDataPath);
+
+            Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
+
+            app.start(true);
         }
     }
 
@@ -110,7 +133,7 @@ public class LocalClusterNode {
     private List<String> runningNodeIPs(SimpleDockerClient dockerClient) {
         List<String> runningNodeIPs = new ArrayList<>();
         for (int nodeIndex = 0; nodeIndex < MIN_CLUSTER_SIZE; nodeIndex++) {
-            String nodeName = "consul-server-" + nodeIndex;
+            String nodeName = nodeName(nodeIndex);
             InspectContainerResponse memberNode = dockerClient.inspectContainer(nodeName);
             if (memberNode != null && memberNode.getState().getRunning() != null && memberNode.getState().getRunning()) {
                 // collect cluster member ips

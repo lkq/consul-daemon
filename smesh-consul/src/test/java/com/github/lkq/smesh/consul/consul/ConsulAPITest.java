@@ -1,12 +1,10 @@
 package com.github.lkq.smesh.consul.consul;
 
+import com.github.lkq.smesh.consul.IntegrationTest;
+import com.github.lkq.smesh.consul.MacEnvironment;
 import com.github.lkq.smesh.consul.api.ConsulAPI;
 import com.github.lkq.smesh.consul.api.ConsulResponseParser;
-import com.github.lkq.smesh.context.PortBinding;
 import com.github.lkq.smesh.exception.SmeshException;
-import com.github.lkq.smesh.consul.IntegrationTest;
-import com.github.lkq.smesh.consul.LocalLauncher;
-import com.github.lkq.smesh.consul.MacEnvironment;
 import org.eclipse.jetty.client.HttpClient;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,7 +12,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.util.Arrays;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -47,7 +44,7 @@ class ConsulAPITest {
                 return apiPort;
             }
         };
-        new LocalLauncher().launch(env, Arrays.asList(new PortBinding(apiPort, 8500, PortBinding.Protocol.TCP)));
+//        new LocalLauncher().start(env, Arrays.asList(new PortBinding(apiPort, 8500, PortBinding.Protocol.TCP)));
     }
 
     private static int randomPort() {

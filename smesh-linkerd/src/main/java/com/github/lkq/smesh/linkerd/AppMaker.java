@@ -31,7 +31,7 @@ public class AppMaker {
 
         LinkerdContextFactory contextFactory = new LinkerdContextFactory();
         ContainerContext context = contextFactory.createDefaultContext()
-                .volumeBinders(Arrays.asList(new VolumeBinding(localConfigPath, CONTAINER_CONFIG_PATH)))
+                .volumeBindings(Arrays.asList(new VolumeBinding(localConfigPath, CONTAINER_CONFIG_PATH)))
                 .portBindings(portBindings)
                 .network(network)
                 .commandBuilder(new LinkerdCommandBuilder(CONTAINER_CONFIG_PATH + "/" + configFileName));

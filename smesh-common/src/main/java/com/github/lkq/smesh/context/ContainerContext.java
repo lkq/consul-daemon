@@ -58,11 +58,11 @@ public class ContainerContext {
         return this;
     }
 
-    public List<VolumeBinding> volumeBinders() {
+    public List<VolumeBinding> volumeBindings() {
         return volumeBindings;
     }
 
-    public ContainerContext volumeBinders(List<VolumeBinding> volumeBindings) {
+    public ContainerContext volumeBindings(List<VolumeBinding> volumeBindings) {
         this.volumeBindings = volumeBindings;
         return this;
     }

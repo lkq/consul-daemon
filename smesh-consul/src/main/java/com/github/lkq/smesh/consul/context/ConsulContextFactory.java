@@ -21,7 +21,6 @@ public class ConsulContextFactory {
                 .nodeName(nodeName)
                 .hostName(nodeName)
                 .network(network)
-                .volumeBinders(Arrays.asList(new VolumeBinding(Environment.get().consulDataPath(), "/consul/data")))
                 .environmentVariables(env)
                 .commandBuilder(commandBuilder);
     }
@@ -32,7 +31,7 @@ public class ConsulContextFactory {
                 .nodeName(nodeName)
                 .hostName(nodeName)
                 .network(network)
-                .volumeBinders(Arrays.asList(new VolumeBinding(Environment.get().consulDataPath(), "/consul/data")))
+                .volumeBindings(Arrays.asList(new VolumeBinding(Environment.get().consulDataPath(), "/consul/data")))
                 .environmentVariables(env);
     }
 

@@ -59,7 +59,7 @@ public class App {
         }
 
         if (!consulHealthChecker.registerConsulDaemonVersion(appVersion, 10)) {
-            throw new SmeshException("failed to register consul daemon version: " + appVersion);
+            logger.error("failed to register consul daemon version: " + appVersion);
         }
 
         webServer.start();
