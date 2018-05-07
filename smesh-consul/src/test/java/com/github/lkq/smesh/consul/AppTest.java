@@ -1,22 +1,17 @@
 package com.github.lkq.smesh.consul;
 
-import com.github.lkq.smesh.server.WebServer;
+import com.github.lkq.smesh.consul.api.VersionRegister;
 import com.github.lkq.smesh.consul.container.ConsulController;
-import com.github.lkq.smesh.context.ContainerContext;
-import com.github.lkq.smesh.exception.SmeshException;
 import com.github.lkq.smesh.consul.health.ConsulHealthChecker;
-import org.junit.jupiter.api.Assertions;
+import com.github.lkq.smesh.context.ContainerContext;
+import com.github.lkq.smesh.server.WebServer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 class AppTest {
@@ -30,18 +25,19 @@ class AppTest {
     private ConsulHealthChecker consulHealthChecker;
     @Mock
     private WebServer webServer;
+    @Mock
+    private VersionRegister versionRegister;
     private App app;
 
     @BeforeEach
     void setUp() {
         initMocks(this);
-        app = new App(context, consulController, consulHealthChecker, webServer, APP_VERSION);
+        app = new App(context, consulController, consulHealthChecker, versionRegister, webServer, APP_VERSION);
     }
 
     @Test
     void willCleanStartConsulIfItsNotAlreadyRunning() {
-        given(consulHealthChecker.registeredConsulDaemonVersion()).willReturn(null);
-        given(consulHealthChecker.registerConsulDaemonVersion(anyString(), anyInt())).willReturn(true);
+        given(versionRegister.registeredVersion()).willReturn(null);
         given(consulController.startNewInstance(any(ContainerContext.class))).willReturn(true);
         given(context.nodeName()).willReturn(TEST_NODE_NAME);
 
@@ -50,14 +46,12 @@ class AppTest {
         verify(consulController, times(1)).stopAndRemoveExistingInstance(TEST_NODE_NAME);
         verify(consulController, times(1)).startNewInstance(context);
         verify(consulController, times(1)).attachLogging(TEST_NODE_NAME);
-        verify(consulHealthChecker, times(1)).registerConsulDaemonVersion(APP_VERSION, 10);
         verify(webServer, times(1)).start();
     }
 
     @Test
     void willCleanStartConsulIfDaemonVersionNotMatch() {
-        given(consulHealthChecker.registeredConsulDaemonVersion()).willReturn(APP_VERSION + ".test");
-        given(consulHealthChecker.registerConsulDaemonVersion(anyString(), anyInt())).willReturn(true);
+        given(versionRegister.registeredVersion()).willReturn(APP_VERSION + ".test");
         given(consulController.startNewInstance(any(ContainerContext.class))).willReturn(true);
         given(context.nodeName()).willReturn(TEST_NODE_NAME);
 
@@ -66,31 +60,28 @@ class AppTest {
         verify(consulController, times(1)).stopAndRemoveExistingInstance(TEST_NODE_NAME);
         verify(consulController, times(1)).startNewInstance(context);
         verify(consulController, times(1)).attachLogging(TEST_NODE_NAME);
-        verify(consulHealthChecker, times(1)).registerConsulDaemonVersion(APP_VERSION, 10);
         verify(webServer, times(1)).start();
     }
 
     @Test
     void willAttachConsulLogIfDaemonVersionMatch() {
-        given(consulHealthChecker.registeredConsulDaemonVersion()).willReturn(APP_VERSION);
         given(consulController.startNewInstance(any(ContainerContext.class))).willReturn(true);
-        given(consulHealthChecker.registerConsulDaemonVersion(anyString(), anyInt())).willReturn(true);
         given(context.nodeName()).willReturn(TEST_NODE_NAME);
+        given(versionRegister.expectedVersion()).willReturn(APP_VERSION);
+        given(versionRegister.registeredVersion()).willReturn(APP_VERSION);
 
         app.start(null);
 
         verify(consulController, never()).stopAndRemoveExistingInstance(TEST_NODE_NAME);
         verify(consulController, never()).startNewInstance(context);
         verify(consulController, times(1)).attachLogging(TEST_NODE_NAME);
-        verify(consulHealthChecker, times(1)).registerConsulDaemonVersion(APP_VERSION, 10);
         verify(webServer, times(1)).start();
     }
 
     @Test
     void willCleanStartConsulIfToldTo() {
-        given(consulHealthChecker.registeredConsulDaemonVersion()).willReturn(APP_VERSION);
+        given(versionRegister.registeredVersion()).willReturn(APP_VERSION);
         given(consulController.startNewInstance(any(ContainerContext.class))).willReturn(true);
-        given(consulHealthChecker.registerConsulDaemonVersion(anyString(), anyInt())).willReturn(true);
         given(context.nodeName()).willReturn(TEST_NODE_NAME);
 
         app.start(true);
@@ -98,15 +89,13 @@ class AppTest {
         verify(consulController, times(1)).stopAndRemoveExistingInstance(TEST_NODE_NAME);
         verify(consulController, times(1)).startNewInstance(context);
         verify(consulController, times(1)).attachLogging(TEST_NODE_NAME);
-        verify(consulHealthChecker, times(1)).registerConsulDaemonVersion(APP_VERSION, 10);
         verify(webServer, times(1)).start();
     }
 
     @Test
     void willNotCleanStartConsulIfToldNotTo() {
-        given(consulHealthChecker.registeredConsulDaemonVersion()).willReturn(APP_VERSION + ".test");
+        given(versionRegister.registeredVersion()).willReturn(APP_VERSION + ".test");
         given(consulController.startNewInstance(any(ContainerContext.class))).willReturn(true);
-        given(consulHealthChecker.registerConsulDaemonVersion(anyString(), anyInt())).willReturn(true);
         given(context.nodeName()).willReturn(TEST_NODE_NAME);
 
         app.start(false);
@@ -114,25 +103,6 @@ class AppTest {
         verify(consulController, never()).stopAndRemoveExistingInstance(TEST_NODE_NAME);
         verify(consulController, never()).startNewInstance(context);
         verify(consulController, times(1)).attachLogging(TEST_NODE_NAME);
-        verify(consulHealthChecker, times(1)).registerConsulDaemonVersion(APP_VERSION, 10);
         verify(webServer, times(1)).start();
-    }
-
-    @Test
-    void willThrowExceptionIfCanNotRegisterNewConsulDaemonVersion() {
-        given(consulHealthChecker.registeredConsulDaemonVersion()).willReturn(APP_VERSION + ".test");
-        given(consulHealthChecker.registerConsulDaemonVersion(anyString(), anyInt())).willReturn(false);
-        given(consulController.startNewInstance(any(ContainerContext.class))).willReturn(true);
-        given(context.nodeName()).willReturn(TEST_NODE_NAME);
-
-        Assertions.assertThrows(SmeshException.class, () -> app.start(false), "expect failed to register new daemon version");
-
-
-        verify(consulController, never()).stopAndRemoveExistingInstance(TEST_NODE_NAME);
-        verify(consulController, never()).startNewInstance(context);
-        verify(consulController, times(1)).attachLogging(TEST_NODE_NAME);
-        verify(consulHealthChecker, times(1)).registerConsulDaemonVersion(APP_VERSION, 10);
-        verify(webServer, never()).start();
-
     }
 }

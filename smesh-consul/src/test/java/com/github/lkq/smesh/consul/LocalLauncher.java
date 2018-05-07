@@ -22,7 +22,7 @@ public class LocalLauncher {
                 .bootstrap(true);
 
         String nodeName = "consul";
-        String localDataPath = ClassLoader.getSystemResource(".").getPath() + "data/" + nodeName;
+        String localDataPath = ClassLoader.getSystemResource(".").getPath() + "data/" + nodeName + "-" + System.currentTimeMillis();
         App app = appMaker.makeApp(nodeName, serverCommand, "", ConsulPortBindings.defaultBindings(), "1.2.3", 1025, localDataPath);
 
         Runtime.getRuntime().addShutdownHook(new Thread(app::stop));

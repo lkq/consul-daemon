@@ -1,5 +1,6 @@
 package com.github.lkq.smesh.consul;
 
+import com.github.lkq.smesh.consul.api.VersionRegister;
 import com.github.lkq.smesh.server.WebServer;
 import com.github.lkq.smesh.context.ContainerContext;
 import com.github.lkq.smesh.consul.health.ConsulHealthChecker;
@@ -13,25 +14,25 @@ public class App {
     private static Logger logger = LoggerFactory.getLogger(App.class);
 
     private final ContainerContext context;
-    private final String appVersion;
     private final ConsulController consulController;
     private final ConsulHealthChecker consulHealthChecker;
     private final WebServer webServer;
+    private final VersionRegister versionRegister;
 
     /**
      * application entry point, a place to put together different pieces and make it run
-     *
-     * @param context
+     *  @param context
      * @param consulController
      * @param consulHealthChecker
+     * @param versionRegister
      * @param webServer
      * @param appVersion
      */
-    public App(ContainerContext context, ConsulController consulController, ConsulHealthChecker consulHealthChecker, WebServer webServer, String appVersion) {
+    public App(ContainerContext context, ConsulController consulController, ConsulHealthChecker consulHealthChecker, VersionRegister versionRegister, WebServer webServer, String appVersion) {
         this.context = context;
-        this.appVersion = appVersion;
-        this.consulHealthChecker = consulHealthChecker;
         this.consulController = consulController;
+        this.consulHealthChecker = consulHealthChecker;
+        this.versionRegister = versionRegister;
         this.webServer = webServer;
     }
 
@@ -42,8 +43,9 @@ public class App {
      *                   if not specified, will clean start if the registered consul daemon version does not match with current package version.
      */
     public void start(Boolean cleanStart) {
+        String appVersion = versionRegister.expectedVersion();
 
-        String registeredVersion = consulHealthChecker.registeredConsulDaemonVersion();
+        String registeredVersion = versionRegister.registeredVersion();
 
         cleanStart = shouldCleanStart(appVersion, registeredVersion, cleanStart);
         logger.info("old version: {}, new version: {}, force restart: {}", registeredVersion, appVersion, cleanStart);
@@ -58,9 +60,7 @@ public class App {
             consulController.attachLogging(context.nodeName());
         }
 
-        if (!consulHealthChecker.registerConsulDaemonVersion(appVersion, 10)) {
-            logger.error("failed to register consul daemon version: " + appVersion);
-        }
+        versionRegister.registerVersion();
 
         webServer.start();
 

@@ -2,6 +2,7 @@ package com.github.lkq.smesh.consul;
 
 import com.github.lkq.smesh.consul.api.ConsulAPI;
 import com.github.lkq.smesh.consul.api.ConsulResponseParser;
+import com.github.lkq.smesh.consul.api.VersionRegister;
 import com.github.lkq.smesh.consul.command.ConsulCommandBuilder;
 import com.github.lkq.smesh.consul.container.ConsulController;
 import com.github.lkq.smesh.consul.context.ConsulContextFactory;
@@ -37,6 +38,8 @@ public class AppMaker {
                 .portBindings(portBindings)
                 .volumeBindings(Arrays.asList(new VolumeBinding(localDataPath, "/consul/data")));
 
+        VersionRegister versionRegister = new VersionRegister(consulAPI, "consul-version-" + nodeName, appVersion, 10000);
+
         ConsulHealthChecker consulHealthChecker = new ConsulHealthChecker(consulAPI, context.nodeName(), appVersion);
         ConsulController consulController = new ConsulController(dockerClient);
         WebServer webServer = new WebServer(new ConsulRoutes(consulHealthChecker), restPort);
@@ -44,6 +47,7 @@ public class AppMaker {
         return new App(context,
                 consulController,
                 consulHealthChecker,
+                versionRegister,
                 webServer,
                 appVersion
         );

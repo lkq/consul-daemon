@@ -1,6 +1,10 @@
 package com.github.lkq.smesh.consul.api;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class VersionRegister {
+    private static Logger logger = LoggerFactory.getLogger(VersionRegister.class);
 
     private final int interval;
     private ConsulAPI consulAPI;
@@ -27,7 +31,8 @@ public class VersionRegister {
                     }
                 } catch (InterruptedException ignored) { }
             }
-        }).run();
+            logger.info("registered version: {}", registeredVersion);
+        }).start();
     }
 
     public String registeredVersion() {

@@ -146,7 +146,7 @@ public class SimpleDockerClient {
             } catch (Exception e) {
                 logger.error("failed to redirect container log");
             }
-        }).run();
+        }).start();
     }
 
     public boolean containerExists(String containerId) {
