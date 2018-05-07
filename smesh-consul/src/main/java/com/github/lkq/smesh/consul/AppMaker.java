@@ -36,9 +36,9 @@ public class AppMaker {
 
         ContainerContext context = contextFactory.create(nodeName, network, getEnv(), commandBuilder)
                 .portBindings(portBindings)
-                .volumeBindings(Arrays.asList(new VolumeBinding(localDataPath, "/consul/data")));
+                .volumeBindings(Arrays.asList(new VolumeBinding(localDataPath, Constants.CONTAINER_DATA_PATH)));
 
-        VersionRegister versionRegister = new VersionRegister(consulAPI, "consul-version-" + nodeName, appVersion, 10000);
+        VersionRegister versionRegister = new VersionRegister(consulAPI, Constants.APP_NAME + "-" + nodeName, appVersion, 10000);
 
         ConsulHealthChecker consulHealthChecker = new ConsulHealthChecker(consulAPI, context.nodeName(), appVersion);
         ConsulController consulController = new ConsulController(dockerClient);

@@ -5,3 +5,4 @@ target/
 .DS_Store
 data/
 dependency-reduced-pom.xml
+logs/
