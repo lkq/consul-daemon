@@ -50,8 +50,9 @@ class ConfigExporterTest {
     @Test
     void canLoadConfig() {
         Map config = configExporter.loadFromResource("smesh-linkerd.yaml");
-        Map expectedConfig = createSampleConfig(9990, 8080);
-        assertThat(config, is(expectedConfig));
+        Map admin = (Map) config.get("admin");
+        assertThat(admin.get("port"), is(9990));
+        assertThat(admin.get("ip"), is("0.0.0.0"));
     }
 
     private Map createSampleConfig(int adminPort, int serverPort) {

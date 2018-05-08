@@ -6,10 +6,10 @@ import com.github.lkq.smesh.logging.JulToSlf4jBridge;
 import java.util.Arrays;
 import java.util.List;
 
-public class LocalLauncher {
+public class LocalLinkerdLauncher {
     public static void main(String[] args) {
         JulToSlf4jBridge.setup();
-        new LocalLauncher().start();
+        new LocalLinkerdLauncher().start();
     }
 
     private void start() {
@@ -18,7 +18,7 @@ public class LocalLauncher {
                 new PortBinding(8080, PortBinding.Protocol.TCP));
         String localConfigPath = AppMaker.class.getProtectionDomain().getCodeSource().getLocation().getPath();
 
-        App app = new AppMaker().makeApp("", portBindings, localConfigPath);
+        App app = new AppMaker().makeApp("", portBindings, localConfigPath, "1.2.3");
 
         Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
 

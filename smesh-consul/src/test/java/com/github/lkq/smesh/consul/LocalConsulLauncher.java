@@ -6,11 +6,11 @@ import com.github.lkq.smesh.logging.JulToSlf4jBridge;
 
 import java.util.Collections;
 
-public class LocalLauncher {
+public class LocalConsulLauncher {
 
     public static void main(String[] args) {
         JulToSlf4jBridge.setup();
-        new LocalLauncher().start();
+        new LocalConsulLauncher().start();
     }
 
     public void start() {

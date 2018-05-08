@@ -1,5 +1,6 @@
 package com.github.lkq.smesh.linkerd;
 
+import com.github.lkq.smesh.AppVersion;
 import com.github.lkq.smesh.logging.JulToSlf4jBridge;
 
 public class Launcher {
@@ -10,9 +11,9 @@ public class Launcher {
 
     private void start() {
 
-        String localConfigPath = AppMaker.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        String hostConfigPath = AppMaker.class.getProtectionDomain().getCodeSource().getLocation().getPath();
 
-        App app = new AppMaker().makeApp("host", null, localConfigPath);
+        App app = new AppMaker().makeApp("host", null, hostConfigPath, AppVersion.get(AppMaker.class));
 
         Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
 

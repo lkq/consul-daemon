@@ -1,6 +1,5 @@
 package com.github.lkq.smesh.linkerd;
 
-import com.github.lkq.smesh.AppVersion;
 import com.github.lkq.smesh.context.ContainerContext;
 import com.github.lkq.smesh.context.PortBinding;
 import com.github.lkq.smesh.context.VolumeBinding;
@@ -20,26 +19,36 @@ import java.util.Map;
 
 public class AppMaker {
 
-    public static final String CONTAINER_CONFIG_PATH = "/linkerd";
+    /**
+     * put every piece together
+     * @param network
+     * @param portBindings
+     * @param hostConfigPath
+     * @param appVersion
+     * @return
+     */
+    public App makeApp(String network, List<PortBinding> portBindings, String hostConfigPath, String appVersion) {
+        String configFileName = Constants.LINKERD_CONFIG_PREFIX + "-" + appVersion + ".yaml";
 
-    public App makeApp(String network, List<PortBinding> portBindings, String localConfigPath) {
-        String configFileName = "smesh-linkerd-" + AppVersion.get(AppMaker.class) + ".yaml";
-
-        ConfigExporter configExporter = new ConfigExporter();
-        Map linkerdConfig = configExporter.loadFromResource("smesh-linkerd.yaml");
-        configExporter.writeToFile(linkerdConfig, new File(localConfigPath, configFileName));
+        exportLinkerdConfig(hostConfigPath, configFileName);
 
         LinkerdContextFactory contextFactory = new LinkerdContextFactory();
         ContainerContext context = contextFactory.createDefaultContext()
-                .volumeBindings(Arrays.asList(new VolumeBinding(localConfigPath, CONTAINER_CONFIG_PATH)))
+                .volumeBindings(Arrays.asList(new VolumeBinding(hostConfigPath, Constants.CONTAINER_CONFIG_PATH)))
                 .portBindings(portBindings)
                 .network(network)
-                .commandBuilder(new LinkerdCommandBuilder(CONTAINER_CONFIG_PATH + "/" + configFileName));
+                .commandBuilder(new LinkerdCommandBuilder(Constants.CONTAINER_CONFIG_PATH + "/" + configFileName));
 
         LinkerdController linkerdController = new LinkerdController(SimpleDockerClient.create(DockerClientFactory.get()));
 
         WebServer webServer = new WebServer(new LinkerdRoutes(), 8009);
 
         return new App(context, linkerdController, webServer);
+    }
+
+    private void exportLinkerdConfig(String hostConfigPath, String configFileName) {
+        ConfigExporter configExporter = new ConfigExporter();
+        Map linkerdConfig = configExporter.loadFromResource(Constants.LINKERD_CONFIG_PREFIX + ".yaml");
+        configExporter.writeToFile(linkerdConfig, new File(hostConfigPath, configFileName));
     }
 }
