@@ -12,14 +12,20 @@ public class TestEngine {
     private static Logger logger = LoggerFactory.getLogger(TestEngine.class);
 
     public void startEverything() throws IOException, InterruptedException {
-        buildWithMvn();
+        Artifact artifact = buildArtifact();
+        logger.info("test server build success: {}/{}", artifact.artifactPath, artifact.artifactName);
     }
 
-    private void buildWithMvn() throws IOException, InterruptedException {
+    private Artifact buildArtifact() throws IOException, InterruptedException {
         Process mvn = new ProcessBuilder("mvn", "clean", "install", "-DskipTests=true").start();
-        AttachLogger attachLogger = AttachLogger.attach(mvn.getInputStream());
+
+        ArtifactExtractor extractor = new ArtifactExtractor();
+        AttachLogging logging = AttachLogging.attach(mvn.getInputStream(), extractor);
+
         mvn.waitFor();
-        attachLogger.stop();
+        logging.stop();
+
+        return new Artifact(extractor.artifactPath(), extractor.artifactName());
     }
 
     private void buildWithMvnEmbedder() {
@@ -28,5 +34,15 @@ public class TestEngine {
 
         System.setProperty("maven.multiModuleProjectDirectory", pwd.getParent());
         mvn.doMain(new String[]{"clean", "install"}, pwd.getAbsolutePath(), System.out, System.err);
+    }
+
+    class Artifact {
+        public Artifact(String artifactPath, String artifactName) {
+            this.artifactPath = artifactPath;
+            this.artifactName = artifactName;
+        }
+
+        public String artifactPath;
+        public String artifactName;
     }
 }

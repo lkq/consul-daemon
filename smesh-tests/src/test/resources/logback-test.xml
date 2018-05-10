@@ -12,7 +12,7 @@
         </encoder>
     </appender>
 
-    <logger name="com.github.lkq.smesh.test.AttachLogger" level="info" additivity="false">
+    <logger name="com.github.lkq.smesh.test.AttachLogging" level="info" additivity="false">
         <appender-ref ref="AttachLogger"/>
     </logger>
 
