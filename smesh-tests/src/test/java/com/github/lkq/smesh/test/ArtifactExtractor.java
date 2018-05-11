@@ -16,8 +16,8 @@ public class ArtifactExtractor {
     private String artifactPath;
     private String artifactName;
 
-    public ArtifactExtractor() {
-        pattern = Pattern.compile("^(.*) Installing (?<path>.*)/(?<name>smesh-tests-\\d+\\.\\d+\\.\\d+.*\\.jar) to .*");
+    public ArtifactExtractor(String pattern) {
+        this.pattern = Pattern.compile(pattern);
     }
 
     public void match(String line) {

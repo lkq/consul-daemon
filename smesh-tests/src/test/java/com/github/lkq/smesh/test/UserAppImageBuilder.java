@@ -2,6 +2,7 @@ package com.github.lkq.smesh.test;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.core.command.BuildImageResultCallback;
+import com.github.lkq.smesh.Constants;
 import com.github.lkq.smesh.docker.DockerClientFactory;
 import com.github.lkq.smesh.exception.SmeshException;
 import com.google.common.collect.ImmutableSet;
@@ -22,10 +23,19 @@ public class UserAppImageBuilder {
 
     private static Logger logger = LoggerFactory.getLogger(UserAppImageBuilder.class);
 
-    public void build(String artifactPath, String artifactName) {
-        try {
-            DockerClient dockerClient = DockerClientFactory.get();
+    public static final String IMAGE_TAG = "user-app";
 
+    public static final String DOCKERFILE_NAME = "user-app.dockerfile";
+    public static final String VAR_NAME_ARTIFACT_PATH = "artifactPath";
+    public static final String VAR_NAME_ARTIFACT_NAME = "artifactName";
+    private final DockerClient dockerClient;
+
+    public UserAppImageBuilder() {
+        dockerClient = DockerClientFactory.get();
+    }
+
+    public String build(String artifactPath, String artifactName) {
+        try {
             File dockerFile = new File(prepareDockerFile(artifactPath, artifactName));
             File baseDir = dockerFile.getParentFile();
 
@@ -34,11 +44,12 @@ public class UserAppImageBuilder {
             String imageId = dockerClient.buildImageCmd()
                     .withDockerfile(dockerFile)
                     .withNoCache(true)
-                    .withTags(ImmutableSet.of("user-app"))
+                    .withTags(ImmutableSet.of(IMAGE_TAG))
                     .exec(new BuildImageResultCallback())
                     .awaitImageId();
 
-            logger.info("created image: {}, {}", imageId);
+            logger.info("created image: {}", imageId);
+            return imageId;
         } catch (Exception e) {
             throw new SmeshException("failed to build docker image", e);
         }
@@ -57,19 +68,19 @@ public class UserAppImageBuilder {
             File resourceRoot = new File(resourceRootURL.getPath());
             Configuration config = new Configuration(Configuration.VERSION_2_3_28);
             config.setTemplateLoader(new FileTemplateLoader(resourceRoot));
-            Template template = config.getTemplate("user-app.dockerfile", "UTF-8");
+            Template template = config.getTemplate(DOCKERFILE_NAME, Constants.ENCODING_UTF8);
 
             Map<String, String> variables = new HashMap<>();
-            variables.put("artifactPath", artifactPath);
-            variables.put("artifactName", artifactName);
+            variables.put(VAR_NAME_ARTIFACT_PATH, artifactPath);
+            variables.put(VAR_NAME_ARTIFACT_NAME, artifactName);
 
             File targetFolder = new File(resourceRoot, "docker-file-" + System.currentTimeMillis());
             targetFolder.mkdir();
-            File targetFile = new File(targetFolder, "user-app.dockerfile");
+            File targetFile = new File(targetFolder, DOCKERFILE_NAME);
 
-            template.process(variables, new FileWriterWithEncoding(targetFile, "UTF-8"));
+            template.process(variables, new FileWriterWithEncoding(targetFile, Constants.ENCODING_UTF8));
             logger.info("created docker file: {}", targetFile.getAbsolutePath());
-            logger.info(FileUtils.readFileToString(targetFile, "UTF-8"));
+            logger.info(FileUtils.readFileToString(targetFile, Constants.ENCODING_UTF8));
             return targetFile.getAbsolutePath();
         } catch (Exception e) {
             throw new SmeshException("failed to prepare docker file", e);
@@ -77,6 +88,8 @@ public class UserAppImageBuilder {
     }
 
     public static void main(String[] args) {
-        new UserAppImageBuilder().build("/Users/kingson/Sandbox/smesh/smesh-tests/target", "smesh-tests-0.1.0-SNAPSHOT.jar");
+        String[] artifact = new UserAppPackager().buildPackage();
+        UserAppImageBuilder imageBuilder = new UserAppImageBuilder();
+        imageBuilder.build(artifact[0], artifact[1]);
     }
 }

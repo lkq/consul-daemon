@@ -1,5 +1,6 @@
 package com.github.lkq.smesh.linkerd.config;
 
+import com.github.lkq.smesh.Constants;
 import com.github.lkq.smesh.exception.SmeshException;
 import org.apache.commons.io.FileUtils;
 import org.yaml.snakeyaml.Yaml;
@@ -22,7 +23,7 @@ public class ConfigExporter {
             if (!dest.getParentFile().exists() && !dest.getParentFile().mkdirs()) {
                 throw new SmeshException("failed to create parent folders: " + dest.getParent());
             }
-            FileUtils.write(dest, yaml.dumpAsMap(config), "UTF-8");
+            FileUtils.write(dest, yaml.dumpAsMap(config), Constants.ENCODING_UTF8);
             return dest.getAbsolutePath();
         } catch (IOException e) {
             throw new SmeshException("failed to export linkerd config to file: " + dest.getAbsolutePath(), e);

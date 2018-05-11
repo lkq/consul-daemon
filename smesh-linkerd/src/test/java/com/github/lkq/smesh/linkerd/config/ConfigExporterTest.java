@@ -1,5 +1,6 @@
 package com.github.lkq.smesh.linkerd.config;
 
+import com.github.lkq.smesh.Constants;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.FileUtils;
@@ -34,7 +35,7 @@ class ConfigExporterTest {
         String dest = configExporter.writeToFile(config, new File(configPath, configFileName));
 
         assertThat(dest, is(configPath + configFileName));
-        String content = FileUtils.readFileToString(new File(configPath, configFileName), "UTF-8");
+        String content = FileUtils.readFileToString(new File(configPath, configFileName), Constants.ENCODING_UTF8);
         assertThat(content, is(
                 "admin:\n" +
                 "  port: 123\n" +
