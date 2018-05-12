@@ -15,7 +15,7 @@ public class SmeshIntegrationTest {
     }
 
     @Test
-    void canRouteToTheCorrectServiceViaSmesh() {
-
+    void canRouteToTheCorrectServiceViaSmesh() throws InterruptedException {
+        Thread.sleep(100000000);
     }
 }

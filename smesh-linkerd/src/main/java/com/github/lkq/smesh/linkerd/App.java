@@ -15,11 +15,12 @@ public class App {
         this.webServer = webServer;
     }
 
-    public void start() {
+    public String start() {
         linkerdController.stopAndRemoveExistingInstance(context.nodeName());
         linkerdController.startNewInstance(context);
         linkerdController.attachLogging(context.nodeName());
         webServer.start();
+        return context.nodeName();
     }
 
     public void stop() {

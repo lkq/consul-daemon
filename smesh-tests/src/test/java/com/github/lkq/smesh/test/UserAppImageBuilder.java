@@ -30,8 +30,8 @@ public class UserAppImageBuilder {
     public static final String VAR_NAME_ARTIFACT_NAME = "artifactName";
     private final DockerClient dockerClient;
 
-    public UserAppImageBuilder() {
-        dockerClient = DockerClientFactory.get();
+    public UserAppImageBuilder(DockerClient dockerClient) {
+        this.dockerClient = dockerClient;
     }
 
     public String build(String artifactPath, String artifactName) {
@@ -89,7 +89,7 @@ public class UserAppImageBuilder {
 
     public static void main(String[] args) {
         String[] artifact = new UserAppPackager().buildPackage();
-        UserAppImageBuilder imageBuilder = new UserAppImageBuilder();
+        UserAppImageBuilder imageBuilder = new UserAppImageBuilder(DockerClientFactory.get());
         imageBuilder.build(artifact[0], artifact[1]);
     }
 }

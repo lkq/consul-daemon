@@ -12,6 +12,10 @@
         </encoder>
     </appender>
 
+    <logger name="com.github.lkq.smesh.docker.ContainerLogger" level="info" additivity="false">
+        <appender-ref ref="AttachLogger"/>
+    </logger>
+
     <logger name="com.github.lkq.smesh.test.AttachLogging" level="info" additivity="false">
         <appender-ref ref="AttachLogger"/>
     </logger>

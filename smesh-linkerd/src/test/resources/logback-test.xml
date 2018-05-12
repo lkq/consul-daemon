@@ -6,14 +6,14 @@
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS zZ} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
-    <appender name="ConsulLogAppender" class="ch.qos.logback.core.ConsoleAppender">
+    <appender name="ConsolLogAppender" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>[linkerd] %msg%n</pattern>
         </encoder>
     </appender>
 
     <logger name="com.github.lkq.smesh.docker.ContainerLogger" level="info" additivity="false">
-        <appender-ref ref="ConsulLogAppender"/>
+        <appender-ref ref="ConsolLogAppender"/>
     </logger>
 
     <logger name="com.lkq.services.docker.daemon" level="debug" additivity="false">

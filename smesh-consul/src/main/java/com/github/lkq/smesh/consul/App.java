@@ -42,7 +42,7 @@ public class App {
      * @param cleanStart weather should do a clean start or not,
      *                   if not specified, will clean start if the registered consul daemon version does not match with current package version.
      */
-    public void start(Boolean cleanStart) {
+    public String start(Boolean cleanStart) {
         String appVersion = versionRegister.expectedVersion();
 
         String registeredVersion = versionRegister.registeredVersion();
@@ -64,6 +64,7 @@ public class App {
 
         webServer.start();
 
+        return context.nodeName();
     }
 
     private boolean shouldCleanStart(String appVersion, String registeredVersion, Boolean cleanStart) {
