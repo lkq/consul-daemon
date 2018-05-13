@@ -43,7 +43,7 @@ public class TestEngine {
 
         String nodeName = "consul";
         String localDataPath = ClassLoader.getSystemResource(".").getPath() + "data/" + nodeName + "-" + System.currentTimeMillis();
-        App app = appMaker.makeApp(nodeName, serverCommand, "", null, "1.2.3", 1025, localDataPath);
+        App app = appMaker.makeApp(nodeName, serverCommand, "", Arrays.asList(new PortBinding(8500, PortBinding.Protocol.TCP)), "1.2.3", 1025, localDataPath);
 
         Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
 
@@ -74,7 +74,7 @@ public class TestEngine {
             simpleDockerClient.removeContainer(USER_APP_CONTAINER_ID);
         }
         String containerId = simpleDockerClient.createContainer(image, USER_APP_CONTAINER_ID)
-                .withPortBinders(Arrays.asList(new PortBinding(8080, PortBinding.Protocol.TCP)))
+                .withPortBinders(Arrays.asList(new PortBinding(8081, PortBinding.Protocol.TCP)))
                 .build();
         simpleDockerClient.startContainer(containerId);
         return containerId;

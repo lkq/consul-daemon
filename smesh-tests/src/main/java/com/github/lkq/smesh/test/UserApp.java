@@ -6,7 +6,7 @@ import static spark.Spark.port;
 public class UserApp {
     public static void main(String[] args) {
         UserService userService = new UserService();
-        port(8080);
+        port(8081);
         get("/users/:name", (req, res) -> userService.getUser(req.params("name")));
     }
 }
