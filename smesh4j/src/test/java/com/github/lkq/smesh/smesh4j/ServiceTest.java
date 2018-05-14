@@ -14,7 +14,7 @@ class ServiceTest {
         String service = new Service()
                 .withName("test-service")
                 .withAddress("127.0.0.1")
-                .withPort("1234")
+                .withPort(1234)
                 .withTags("tag1", "tag2", "tag3")
                 .withID("id123")
                 .withHttpCheck("http://localhost:1234", "5s")
@@ -23,7 +23,7 @@ class ServiceTest {
         logger.info(() -> "service definition: " + service);
         JSONAssert.assertEquals(service, "{\n" +
                 "  \"address\": \"127.0.0.1\",\n" +
-                "  \"port\": \"1234\",\n" +
+                "  \"port\": 1234,\n" +
                 "  \"name\": \"test-service\",\n" +
                 "  \"id\": \"id123\",\n" +
                 "  \"check\": {\n" +

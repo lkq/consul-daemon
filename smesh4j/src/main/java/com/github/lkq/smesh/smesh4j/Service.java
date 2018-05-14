@@ -30,7 +30,7 @@ public class Service {
         service.put("address", value);
         return this;
     }
-    public Service withPort(String value) {
+    public Service withPort(int value) {
         service.put("port", value);
         return this;
     }
