@@ -14,7 +14,7 @@ import java.util.Map;
 public class ConsulClient {
     private static Logger logger = LoggerFactory.getLogger(ConsulClient.class);
 
-    private static final String API_HOST = "http://localhost";
+    private static final String API_HOST = "http://localhost:8500";
 
     private String API_V1;
     private String API_V1_KV;
@@ -55,7 +55,7 @@ public class ConsulClient {
                 return Boolean.valueOf(response.getContentAsString());
             }
         } catch (Exception e) {
-            logger.error("failed to put kv: {}={}, cause={}", key, value, e.getMessage());
+            logger.error("failed to put kv: " + key + "=" + value, e);
         }
         return false;
     }
@@ -79,4 +79,6 @@ public class ConsulClient {
         }
         return null;
     }
+
+
 }
