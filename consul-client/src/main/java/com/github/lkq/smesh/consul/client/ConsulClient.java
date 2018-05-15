@@ -12,8 +12,6 @@ import java.util.Map;
 public class ConsulClient {
     private static Logger logger = LoggerFactory.getLogger(ConsulClient.class);
 
-    private static final String API_HOST = "http://localhost";
-
     private String API_V1;
     private String API_V1_KV;
     private String API_V1_HEALTH_NODE;
@@ -21,10 +19,10 @@ public class ConsulClient {
     private final SimpleHttpClient httpClient;
     private final ResponseParser responseParser;
 
-    public ConsulClient(SimpleHttpClient httpClient, ResponseParser responseParser, int port) {
+    public ConsulClient(SimpleHttpClient httpClient, ResponseParser responseParser, String baseURL, int port) {
         this.httpClient = httpClient;
         this.responseParser = responseParser;
-        this.API_V1 = API_HOST + ":" + port + "/v1/";
+        this.API_V1 = baseURL + ":" + port + "/v1/";
         this.API_V1_KV = API_V1 + "kv/";
         this.API_V1_HEALTH_NODE = API_V1 + "health/node/";
     }
@@ -45,12 +43,12 @@ public class ConsulClient {
         try {
             String uri = API_V1_KV + key;
             Response response = httpClient.put(uri, value);
-            logger.debug("put kv result: [{}], url: {}", response.body(), uri);
+            logger.debug("put kv: [{}], url: {}", response.body(), uri);
             if (response.status() == 200) {
                 return Boolean.valueOf(response.body());
             }
         } catch (Exception e) {
-            logger.error("failed to put kv " + key + "=" + value, e);
+            logger.error("failed to put kv: " + key + "=" + value, e);
         }
         return false;
     }
@@ -67,10 +65,10 @@ public class ConsulClient {
                     value = new String(Base64.getDecoder().decode(value.getBytes()));
                 }
             }
-            logger.debug("get kv {}={}, url: {}", key, value, uri);
+            logger.debug("get kv: {}={}, url: {}", key, value, uri);
             return value;
         } catch (Exception e) {
-            logger.error("failed to get kv " + key, e.getMessage());
+            logger.error("failed to get kv: " + key, e.getMessage());
         }
         return value;
     }
@@ -79,6 +77,7 @@ public class ConsulClient {
 
         private SimpleHttpClient httpClient;
         private ResponseParser responseParser;
+        private String baseURL = "http://localhost";
         private int port = 8500;
 
         public Builder httpClient(SimpleHttpClient httpClient) {
@@ -91,6 +90,11 @@ public class ConsulClient {
             return this;
         }
 
+        public Builder baseURL(String baseURL) {
+            this.baseURL = baseURL;
+            return this;
+        }
+
         public Builder port(int port) {
             this.port = port;
             return this;
@@ -99,7 +103,7 @@ public class ConsulClient {
         public ConsulClient build() {
             return new ConsulClient(httpClient == null ? new SimpleHttpClient() : httpClient,
                     responseParser == null ? new ResponseParser() : responseParser,
-                    port);
+                    baseURL, port);
         }
     }
 

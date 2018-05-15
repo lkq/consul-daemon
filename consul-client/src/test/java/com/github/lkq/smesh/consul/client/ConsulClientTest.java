@@ -26,7 +26,7 @@ class ConsulClientTest {
     @Mock
     private Response response;
     private ConsulClient client;
-    private String baseURL;
+    private String baseURL = "http://localhost";
 
     @BeforeEach
     void setUp() {
@@ -34,14 +34,14 @@ class ConsulClientTest {
         this.client = new ConsulClient.Builder()
                 .httpClient(httpClient)
                 .responseParser(parser)
+                .baseURL(baseURL)
                 .port(PORT)
                 .build();
-        baseURL = "http://localhost:" + PORT;
     }
 
     @Test
     void canGetKeyValue() {
-        given(httpClient.get(baseURL + "/v1/kv/test-key")).willReturn(new Response(200, "any"));
+        given(httpClient.get(baseURL + ":" + PORT + "/v1/kv/test-key")).willReturn(new Response(200, "any"));
         Map<String, String> res = new HashMap<>();
         res.put("Value", "dGVzdC12YWx1ZQ");
         given(parser.parse("any")).willReturn(res);
@@ -52,12 +52,12 @@ class ConsulClientTest {
 
     @Test
     void canPutKeyValue() {
-        given(httpClient.put(baseURL + "/v1/kv/test-key", "test-value")).willReturn(response);
+        given(httpClient.put(baseURL + ":" + PORT + "/v1/kv/test-key", "test-value")).willReturn(response);
         given(response.status()).willReturn(200);
         given(response.body()).willReturn("true");
         boolean success = client.putKeyValue("test-key", "test-value");
 
         assertTrue(success);
-        verify(httpClient, times(1)).put(baseURL + "/v1/kv/test-key", "test-value");
+        verify(httpClient, times(1)).put(baseURL + ":" + PORT + "/v1/kv/test-key", "test-value");
     }
 }
