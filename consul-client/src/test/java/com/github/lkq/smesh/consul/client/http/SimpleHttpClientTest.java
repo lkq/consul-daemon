@@ -1,7 +1,5 @@
-package com.github.lkq.smesh.consul.client;
+package com.github.lkq.smesh.consul.client.http;
 
-import com.github.lkq.smesh.consul.client.http.SimpleHttpClient;
-import com.github.lkq.smesh.consul.client.http.Response;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
