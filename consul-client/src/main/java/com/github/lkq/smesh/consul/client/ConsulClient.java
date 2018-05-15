@@ -75,5 +75,42 @@ public class ConsulClient {
         return value;
     }
 
+    public static class Builder {
+
+        private SimpleHttpClient httpClient;
+        private ResponseParser responseParser;
+        private int port = 8500;
+
+        public Builder httpClient(SimpleHttpClient httpClient) {
+            this.httpClient = httpClient;
+            return this;
+        }
+
+        public Builder responseParser(ResponseParser responseParser) {
+            this.responseParser = responseParser;
+            return this;
+        }
+
+        public Builder port(int port) {
+            this.port = port;
+            return this;
+        }
+
+        public ConsulClient build() {
+            return new ConsulClient(httpClient == null ? new SimpleHttpClient() : httpClient,
+                    responseParser == null ? new ResponseParser() : responseParser,
+                    port);
+        }
+    }
 
 }
+
+
+
+
+
+
+
+
+
+
