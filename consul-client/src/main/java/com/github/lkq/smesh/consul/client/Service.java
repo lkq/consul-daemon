@@ -1,4 +1,4 @@
-package com.github.lkq.smesh.smesh4j;
+package com.github.lkq.smesh.consul.client;
 
 import com.google.gson.Gson;
 

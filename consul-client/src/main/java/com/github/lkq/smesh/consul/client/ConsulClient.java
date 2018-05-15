@@ -2,7 +2,6 @@ package com.github.lkq.smesh.consul.client;
 
 import com.github.lkq.smesh.consul.client.http.Response;
 import com.github.lkq.smesh.consul.client.http.SimpleHttpClient;
-import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +13,7 @@ public class ConsulClient {
 
     private String API_V1;
     private String API_V1_KV;
+    private String API_V1_REG;
     private String API_V1_HEALTH_NODE;
 
     private final SimpleHttpClient httpClient;
@@ -24,13 +24,14 @@ public class ConsulClient {
         this.responseParser = responseParser;
         this.API_V1 = baseURL + ":" + port + "/v1/";
         this.API_V1_KV = API_V1 + "kv/";
+        this.API_V1_REG = API_V1 + "agent/service/register";
         this.API_V1_HEALTH_NODE = API_V1 + "health/node/";
     }
 
     public Map<String, String> getNodeHealth(String nodeName) {
         try {
             Response response = httpClient.get(API_V1_HEALTH_NODE + nodeName);
-            if (response.status() == HttpStatus.OK_200) {
+            if (response.status() == 200) {
                 return responseParser.parse(response.body());
             }
         } catch (Exception e) {
@@ -40,37 +41,33 @@ public class ConsulClient {
     }
 
     public boolean putKeyValue(String key, String value) {
-        try {
-            String uri = API_V1_KV + key;
-            Response response = httpClient.put(uri, value);
-            logger.debug("put kv: [{}], url: {}", response.body(), uri);
-            if (response.status() == 200) {
-                return Boolean.valueOf(response.body());
-            }
-        } catch (Exception e) {
-            logger.error("failed to put kv: " + key + "=" + value, e);
+        String uri = API_V1_KV + key;
+        Response response = httpClient.put(uri, value);
+        logger.debug("put kv: [{}], url: {}", response.body(), uri);
+        if (response.status() == 200) {
+            return Boolean.valueOf(response.body());
         }
         return false;
     }
 
     public String getKeyValue(String key) {
         String value = "";
-        try {
-            String uri = API_V1_KV + key;
-            Response response = httpClient.get(uri);
-            if (response.status() == 200) {
-                Map<String, String> kvMap = responseParser.parse(response.body());
-                value = kvMap.get("Value");
-                if (value != null && !"".equals(value.trim())) {
-                    value = new String(Base64.getDecoder().decode(value.getBytes()));
-                }
+        String uri = API_V1_KV + key;
+        Response response = httpClient.get(uri);
+        if (response.status() == 200) {
+            Map<String, String> kvMap = responseParser.parse(response.body());
+            value = kvMap.get("Value");
+            if (value != null && !"".equals(value.trim())) {
+                value = new String(Base64.getDecoder().decode(value.getBytes()));
             }
-            logger.debug("get kv: {}={}, url: {}", key, value, uri);
-            return value;
-        } catch (Exception e) {
-            logger.error("failed to get kv: " + key, e.getMessage());
         }
+        logger.debug("get kv: {}={}, url: {}", key, value, uri);
         return value;
+    }
+
+    public boolean register(String service) {
+        Response response = httpClient.put(API_V1_REG, service);
+        return response.status() == 200;
     }
 
     public static class Builder {

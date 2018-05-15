@@ -13,6 +13,7 @@ import java.util.Map;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -59,5 +60,13 @@ class ConsulClientTest {
 
         assertTrue(success);
         verify(httpClient, times(1)).put(baseURL + ":" + PORT + "/v1/kv/test-key", "test-value");
+    }
+
+    @Test
+    void willReturnTrueIfRegisterSuccess() {
+        given(httpClient.put(anyString(), anyString())).willReturn(response);
+        given(response.status()).willReturn(200);
+
+        assertTrue(client.register("test"));
     }
 }

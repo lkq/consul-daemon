@@ -37,8 +37,4 @@ public class SimpleHttpClient {
             throw new HttpException(e);
         }
     }
-
-    private boolean responseOK(okhttp3.Response response) {
-        return response.code() == 200 || response.code() == 201;
-    }
 }
