@@ -1,10 +1,12 @@
 package com.github.lkq.smesh.test;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
+@Disabled
 public class SmeshIntegrationTest {
 
     private static TestEngine testEngine = new TestEngine();

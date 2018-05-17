@@ -1,4 +1,4 @@
-package com.github.lkq.smesh.consul.client;
+package com.github.lkq.smesh.smesh4j;
 
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
