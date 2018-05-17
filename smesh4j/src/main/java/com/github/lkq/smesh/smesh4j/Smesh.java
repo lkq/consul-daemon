@@ -12,17 +12,5 @@ public class Smesh {
 
     public void register(String service) {
 
-        try {
-            Request request = new Request.Builder()
-                    .url(REG_URL)
-                    .put(RequestBody.create(JSON, service))
-                    .build();
-
-            Response response = client.newCall(request).execute();
-            System.out.println(service);
-            System.out.println(response);
-        } catch (Exception e) {
-            throw new RuntimeException("failed to register service", e);
-        }
     }
 }
