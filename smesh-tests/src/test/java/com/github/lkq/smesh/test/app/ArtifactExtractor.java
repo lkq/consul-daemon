@@ -1,4 +1,4 @@
-package com.github.lkq.smesh.test;
+package com.github.lkq.smesh.test.app;
 
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
@@ -10,21 +10,29 @@ import java.util.regex.Pattern;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
+/**
+ * extract the UserApp artifact path and name
+ */
 public class ArtifactExtractor {
 
-    private Pattern pattern;
+    private final String artifactPathGroup;
+    private final String artifactNameGroup;
+    private final Pattern pattern;
+
     private String artifactPath;
     private String artifactName;
 
-    public ArtifactExtractor(String pattern) {
+    public ArtifactExtractor(String pattern, String artifactPathGroup, String artifactNameGroup) {
         this.pattern = Pattern.compile(pattern);
+        this.artifactPathGroup = artifactPathGroup;
+        this.artifactNameGroup = artifactNameGroup;
     }
 
     public void match(String line) {
         Matcher matcher = pattern.matcher(line);
         if (matcher.matches()) {
-            artifactPath = matcher.group("path");
-            artifactName = matcher.group("name");
+            artifactPath = matcher.group(artifactPathGroup);
+            artifactName = matcher.group(artifactNameGroup);
         }
     }
 

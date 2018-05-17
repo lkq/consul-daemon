@@ -8,6 +8,8 @@ import com.github.lkq.smesh.consul.env.Environment;
 import com.github.lkq.smesh.context.PortBinding;
 import com.github.lkq.smesh.docker.DockerClientFactory;
 import com.github.lkq.smesh.docker.SimpleDockerClient;
+import com.github.lkq.smesh.test.app.UserAppImageBuilder;
+import com.github.lkq.smesh.test.app.UserAppPackager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +35,10 @@ public class TestEngine {
         String userApp = startUserApp();
     }
 
+    /**
+     * start a local consul docker container with binding port 8500 (due to unable to use host network in mac)
+     * @return container id
+     */
     private String startConsul() {
         AppMaker appMaker = new AppMaker();
 
@@ -50,7 +56,10 @@ public class TestEngine {
         return app.start(Environment.get().forceRestart());
     }
 
-
+    /**
+     * start a local linkerd docker container with binding port 8080 (due to unable to use host network in mac)
+     * @return container id
+     */
     private String startLinkerd() {
 
         List<PortBinding> portBindings = Arrays.asList(new PortBinding(9990, PortBinding.Protocol.TCP),
@@ -65,6 +74,10 @@ public class TestEngine {
         return app.start();
     }
 
+    /**
+     * build a docker image containing UserApp and start it
+     * @return container id
+     */
     private String startUserApp() {
         String[] artifact = packager.buildPackage();
         logger.info("test server build success: {}/{}", artifact[0], artifact[1]);

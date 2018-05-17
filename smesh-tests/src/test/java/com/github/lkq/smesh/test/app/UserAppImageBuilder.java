@@ -1,4 +1,4 @@
-package com.github.lkq.smesh.test;
+package com.github.lkq.smesh.test.app;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.core.command.BuildImageResultCallback;
@@ -19,6 +19,9 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * build a docker image from the UserApp package
+ */
 public class UserAppImageBuilder {
 
     private static Logger logger = LoggerFactory.getLogger(UserAppImageBuilder.class);

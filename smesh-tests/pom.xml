@@ -22,6 +22,11 @@
             <artifactId>smesh-linkerd</artifactId>
             <version>0.1.0-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.lkq</groupId>
+            <artifactId>smesh4j</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
+        </dependency>
 
         <!--testing depencency-->
         <dependency>

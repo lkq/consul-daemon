@@ -1,9 +1,13 @@
-package com.github.lkq.smesh.test;
+package com.github.lkq.smesh.test.app;
 
 import com.github.lkq.smesh.exception.SmeshException;
+import com.github.lkq.smesh.test.AttachLogging;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * build the UserApp package
+ */
 public class UserAppPackager {
 
     private static Logger logger = LoggerFactory.getLogger(UserAppPackager.class);
@@ -14,7 +18,7 @@ public class UserAppPackager {
         try {
             Process mvn = new ProcessBuilder("mvn", "clean", "install", "-DskipTests=true").start();
 
-            ArtifactExtractor extractor = new ArtifactExtractor(ARTIFACT_PATTERN);
+            ArtifactExtractor extractor = new ArtifactExtractor(ARTIFACT_PATTERN, "path", "name");
             AttachLogging logging = AttachLogging.attach(mvn.getInputStream(), extractor);
 
             mvn.waitFor();

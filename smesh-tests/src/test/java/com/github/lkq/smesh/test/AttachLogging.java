@@ -1,5 +1,6 @@
 package com.github.lkq.smesh.test;
 
+import com.github.lkq.smesh.test.app.ArtifactExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
