@@ -30,8 +30,8 @@ public class TestEngine {
 
     public void startEverything() throws IOException, InterruptedException {
 
-        String consul = startConsul();
-        String linkerd = startLinkerd();
+//        String consul = startConsul();
+//        String linkerd = startLinkerd();
         String userApp = startUserApp();
     }
 

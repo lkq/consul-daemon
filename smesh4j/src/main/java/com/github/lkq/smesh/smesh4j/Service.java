@@ -14,6 +14,10 @@ public class Service {
     private final Gson gson = new Gson();
     private Map<String, Object> service = new HashMap<>();
 
+    public static Service create() {
+        return new Service();
+    }
+
     public Service withID(String value) {
         service.put("id", value);
         return this;
