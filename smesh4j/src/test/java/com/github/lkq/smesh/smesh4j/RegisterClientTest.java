@@ -34,7 +34,7 @@ class RegisterClientTest {
     void canConnectToServer() throws URISyntaxException, IOException {
         client = new RegisterClient(new URI("ws://localhost:" + port + "/test-ws"));
         delay();
-        client.sayHello();
+        client.register("test-service");
         delay();
     }
 
@@ -49,7 +49,6 @@ class RegisterClientTest {
     @WebSocket
     public static class RegistrationWebSocket {
 
-        // Store sessions if you want to, for example, broadcast a message to all users
         private static final Queue<Session> sessions = new ConcurrentLinkedQueue<>();
 
         @OnWebSocketConnect
@@ -64,8 +63,8 @@ class RegisterClientTest {
 
         @OnWebSocketMessage
         public void message(Session session, String message) throws IOException {
-            System.out.println("server got: " + message);   // Print message
-            session.getRemote().sendString(message); // and send it back
+            System.out.println("server got: " + message);
+            session.getRemote().sendString(message);
         }
     }
 }

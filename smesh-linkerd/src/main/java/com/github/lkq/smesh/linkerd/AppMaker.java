@@ -41,7 +41,7 @@ public class AppMaker {
 
         LinkerdController linkerdController = new LinkerdController(SimpleDockerClient.create(DockerClientFactory.get()));
 
-        WebServer webServer = new WebServer(new LinkerdRoutes(), 8009);
+        WebServer webServer = new WebServer(8009, new LinkerdRoutes());
 
         return new App(context, linkerdController, webServer);
     }

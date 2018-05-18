@@ -9,6 +9,7 @@ import com.github.lkq.smesh.consul.context.ConsulContextFactory;
 import com.github.lkq.smesh.consul.env.Environment;
 import com.github.lkq.smesh.consul.health.ConsulHealthChecker;
 import com.github.lkq.smesh.consul.routes.v1.ConsulRoutes;
+import com.github.lkq.smesh.consul.routes.v1.RegistrationRoutes;
 import com.github.lkq.smesh.consul.utils.HttpClientFactory;
 import com.github.lkq.smesh.context.ContainerContext;
 import com.github.lkq.smesh.context.PortBinding;
@@ -42,7 +43,7 @@ public class AppMaker {
 
         ConsulHealthChecker consulHealthChecker = new ConsulHealthChecker(consulAPI, context.nodeName(), appVersion);
         ConsulController consulController = new ConsulController(dockerClient);
-        WebServer webServer = new WebServer(new ConsulRoutes(consulHealthChecker), restPort);
+        WebServer webServer = new WebServer(restPort, new RegistrationRoutes(), new ConsulRoutes(consulHealthChecker));
 
         return new App(context,
                 consulController,

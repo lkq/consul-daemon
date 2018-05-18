@@ -13,7 +13,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 @WebSocket
 public class RegistrationWebSocket {
 
-    // Store sessions if you want to, for example, broadcast a message to all users
     private static final Queue<Session> sessions = new ConcurrentLinkedQueue<>();
 
     @OnWebSocketConnect
@@ -28,7 +27,7 @@ public class RegistrationWebSocket {
 
     @OnWebSocketMessage
     public void message(Session session, String message) throws IOException {
-        System.out.println("Got: " + message);   // Print message
-        session.getRemote().sendString(message); // and send it back
+        System.out.println("server: " + message);
+        session.getRemote().sendString(message);
     }
 }

@@ -11,6 +11,7 @@ import static spark.Spark.port;
 
 public class UserApp {
     public static void main(String[] args) {
+        Parameter param = Parameter.load(args);
         UserService userService = new UserService();
         port(8081);
         get("/users/:name", (req, res) -> userService.getUser(req.params("name")));
@@ -21,7 +22,7 @@ public class UserApp {
                     .withName("user-app")
                     .withAddress(InetAddress.getLocalHost().getHostAddress())
                     .withPort(8081).build();
-            new Smesh().register(service);
+            new Smesh(param.consulURI()).register(service);
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
