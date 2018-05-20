@@ -6,21 +6,27 @@ import com.github.lkq.smesh.consul.AppMaker;
 import com.github.lkq.smesh.consul.command.ConsulCommandBuilder;
 import com.github.lkq.smesh.consul.env.Environment;
 import com.github.lkq.smesh.context.PortBinding;
+import com.github.lkq.smesh.docker.ContainerLogger;
 import com.github.lkq.smesh.docker.DockerClientFactory;
 import com.github.lkq.smesh.docker.SimpleDockerClient;
+import com.github.lkq.smesh.smesh4j.Service;
+import com.github.lkq.smesh.smesh4j.Smesh;
 import com.github.lkq.smesh.test.app.UserAppImageBuilder;
 import com.github.lkq.smesh.test.app.UserAppPackager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public class TestEngine {
 
-    public static final String USER_APP_CONTAINER_ID = "user-app";
+    public static final String USER_APP_CONTAINER_ID = "userapp";
     private static Logger logger = LoggerFactory.getLogger(TestEngine.class);
 
     private final UserAppPackager packager = new UserAppPackager();
@@ -30,16 +36,17 @@ public class TestEngine {
 
     public void startEverything() throws IOException, InterruptedException {
 
-//        String consul = startConsul();
-//        String linkerd = startLinkerd();
-        String userApp = startUserApp();
+        String consul = startConsul(1025);
+        String linkerd = startLinkerd(8080, 9990, 8009);
+        String userApp = startUserApp(8081, "ws://172.17.0.2:1025/register");
     }
 
     /**
      * start a local consul docker container with binding port 8500 (due to unable to use host network in mac)
      * @return container id
+     * @param appPort
      */
-    private String startConsul() {
+    public String startConsul(int appPort) {
         AppMaker appMaker = new AppMaker();
 
         ConsulCommandBuilder serverCommand = ConsulCommandBuilder.server(true, Collections.emptyList())
@@ -49,25 +56,41 @@ public class TestEngine {
 
         String nodeName = "consul";
         String localDataPath = ClassLoader.getSystemResource(".").getPath() + "data/" + nodeName + "-" + System.currentTimeMillis();
-        App app = appMaker.makeApp(nodeName, serverCommand, "", Arrays.asList(new PortBinding(8500, PortBinding.Protocol.TCP)), "1.2.3", 1025, localDataPath);
+        new File(localDataPath).mkdirs();
+        App app = appMaker.makeApp(nodeName, serverCommand, "", consulPortBindings(), "1.2.3", appPort, localDataPath);
 
         Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
 
         return app.start(Environment.get().forceRestart());
     }
 
+    public static List<PortBinding> consulPortBindings() {
+        List<PortBinding> portBindings = new ArrayList<>();
+        portBindings.add(new PortBinding(8300, PortBinding.Protocol.TCP));
+        portBindings.add(new PortBinding(8301, PortBinding.Protocol.TCP));
+        portBindings.add(new PortBinding(8302, PortBinding.Protocol.TCP));
+        portBindings.add(new PortBinding(8400, PortBinding.Protocol.TCP));
+        portBindings.add(new PortBinding(8500, PortBinding.Protocol.TCP));
+        portBindings.add(new PortBinding(8301, PortBinding.Protocol.UDP));
+        portBindings.add(new PortBinding(8302, PortBinding.Protocol.UDP));
+        return portBindings;
+    }
+
     /**
      * start a local linkerd docker container with binding port 8080 (due to unable to use host network in mac)
      * @return container id
+     * @param linkerdPort
+     * @param linkerdAdmPort
+     * @param appPort
      */
-    private String startLinkerd() {
+    public String startLinkerd(int linkerdPort, int linkerdAdmPort, int appPort) {
 
-        List<PortBinding> portBindings = Arrays.asList(new PortBinding(9990, PortBinding.Protocol.TCP),
-                new PortBinding(8080, PortBinding.Protocol.TCP));
+        List<PortBinding> portBindings = Arrays.asList(new PortBinding(linkerdAdmPort, PortBinding.Protocol.TCP),
+                new PortBinding(linkerdPort, PortBinding.Protocol.TCP));
         String localConfigPath = com.github.lkq.smesh.linkerd.AppMaker.class.getProtectionDomain().getCodeSource().getLocation().getPath();
 
         com.github.lkq.smesh.linkerd.AppMaker appMaker = new com.github.lkq.smesh.linkerd.AppMaker();
-        com.github.lkq.smesh.linkerd.App app = appMaker.makeApp("", portBindings, localConfigPath, "1.2.3");
+        com.github.lkq.smesh.linkerd.App app = appMaker.makeApp("", portBindings, localConfigPath, "1.2.3", appPort);
 
         Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
 
@@ -77,20 +100,42 @@ public class TestEngine {
     /**
      * build a docker image containing UserApp and start it
      * @return container id
+     * @param restPort
+     * @param registerURL
      */
-    private String startUserApp() {
+    public String startUserApp(int restPort, String registerURL) {
         String[] artifact = packager.buildPackage();
         logger.info("test server build success: {}/{}", artifact[0], artifact[1]);
-        String image = imageBuilder.build(artifact[0], artifact[1]);
+        String image = imageBuilder.build(artifact[0], artifact[1], registerURL);
 
         if (simpleDockerClient.containerExists(USER_APP_CONTAINER_ID)) {
             simpleDockerClient.removeContainer(USER_APP_CONTAINER_ID);
         }
         String containerId = simpleDockerClient.createContainer(image, USER_APP_CONTAINER_ID)
-                .withPortBinders(Arrays.asList(new PortBinding(8081, PortBinding.Protocol.TCP)))
+                .withPortBinders(Arrays.asList(new PortBinding(restPort, PortBinding.Protocol.TCP)))
                 .build();
         simpleDockerClient.startContainer(containerId);
+        simpleDockerClient.attachLogging(containerId, new ContainerLogger());
+
+        registerUserApp();
+
         return containerId;
+    }
+
+    private void registerUserApp() {
+        try {
+            String service = Service.create()
+                    .withID("userapp-" + System.currentTimeMillis())
+                    .withName("userapp")
+                    .withAddress("172.17.0.3")
+                    .withPort(8081).build();
+
+            Smesh smesh = new Smesh(new URI("ws://localhost:1025/register"));
+            smesh.register(service);
+            System.out.println("service registered: " + service);
+        } catch (Exception e) {
+            logger.error("failed to register user app", e);
+        }
     }
 
 }

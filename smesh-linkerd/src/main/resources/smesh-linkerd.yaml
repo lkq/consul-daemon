@@ -12,7 +12,7 @@ routers:
 
 namers:
 - kind: io.l5d.consul
-  host: 127.0.0.3
+  host: 172.17.0.4
   includeTag: true
   useHealthCheck: false
   healthStatuses:

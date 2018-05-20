@@ -26,20 +26,21 @@ public class UserAppImageBuilder {
 
     private static Logger logger = LoggerFactory.getLogger(UserAppImageBuilder.class);
 
-    public static final String IMAGE_TAG = "user-app";
+    public static final String IMAGE_TAG = "userapp";
 
-    public static final String DOCKERFILE_NAME = "user-app.dockerfile";
-    public static final String VAR_NAME_ARTIFACT_PATH = "artifactPath";
-    public static final String VAR_NAME_ARTIFACT_NAME = "artifactName";
+    public static final String DOCKERFILE_NAME = "userapp.dockerfile";
+    public static final String VAR_ARTIFACT_PATH = "artifactPath";
+    public static final String VAR_ARTIFACT_NAME = "artifactName";
+    public static final String VAR_REGISTER_URL = "registerURL";
     private final DockerClient dockerClient;
 
     public UserAppImageBuilder(DockerClient dockerClient) {
         this.dockerClient = dockerClient;
     }
 
-    public String build(String artifactPath, String artifactName) {
+    public String build(String artifactPath, String artifactName, String registerURL) {
         try {
-            File dockerFile = new File(prepareDockerFile(artifactPath, artifactName));
+            File dockerFile = new File(prepareDockerFile(artifactPath, artifactName, registerURL));
             File baseDir = dockerFile.getParentFile();
 
             FileUtils.copyFile(new File(artifactPath, artifactName), new File(baseDir, artifactName));
@@ -63,9 +64,10 @@ public class UserAppImageBuilder {
      *
      * @param artifactPath
      * @param artifactName
+     * @param registerURL
      * @return the exported docker file
      */
-    private String prepareDockerFile(String artifactPath, String artifactName) {
+    private String prepareDockerFile(String artifactPath, String artifactName, String registerURL) {
         URL resourceRootURL = UserAppImageBuilder.class.getClassLoader().getResource("");
         try {
             File resourceRoot = new File(resourceRootURL.getPath());
@@ -74,8 +76,9 @@ public class UserAppImageBuilder {
             Template template = config.getTemplate(DOCKERFILE_NAME, Constants.ENCODING_UTF8);
 
             Map<String, String> variables = new HashMap<>();
-            variables.put(VAR_NAME_ARTIFACT_PATH, artifactPath);
-            variables.put(VAR_NAME_ARTIFACT_NAME, artifactName);
+            variables.put(VAR_ARTIFACT_PATH, artifactPath);
+            variables.put(VAR_ARTIFACT_NAME, artifactName);
+            variables.put(VAR_REGISTER_URL, registerURL);
 
             File targetFolder = new File(resourceRoot, "docker-file-" + System.currentTimeMillis());
             targetFolder.mkdir();
@@ -93,6 +96,6 @@ public class UserAppImageBuilder {
     public static void main(String[] args) {
         String[] artifact = new UserAppPackager().buildPackage();
         UserAppImageBuilder imageBuilder = new UserAppImageBuilder(DockerClientFactory.get());
-        imageBuilder.build(artifact[0], artifact[1]);
+        imageBuilder.build(artifact[0], artifact[1], "http://172.17.0.2:1025");
     }
 }

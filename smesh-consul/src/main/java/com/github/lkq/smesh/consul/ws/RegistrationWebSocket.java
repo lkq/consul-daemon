@@ -1,5 +1,6 @@
 package com.github.lkq.smesh.consul.ws;
 
+import com.github.lkq.smesh.consul.client.ConsulClient;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
@@ -12,6 +13,12 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 @WebSocket
 public class RegistrationWebSocket {
+
+    private ConsulClient client;
+
+    public RegistrationWebSocket(ConsulClient client) {
+        this.client = client;
+    }
 
     private static final Queue<Session> sessions = new ConcurrentLinkedQueue<>();
 
@@ -29,5 +36,6 @@ public class RegistrationWebSocket {
     public void message(Session session, String message) throws IOException {
         System.out.println("server: " + message);
         session.getRemote().sendString(message);
+        client.register(message);
     }
 }

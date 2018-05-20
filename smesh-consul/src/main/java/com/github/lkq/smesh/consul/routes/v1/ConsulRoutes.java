@@ -14,6 +14,6 @@ public class ConsulRoutes implements Routes {
 
     @Override
     public void ignite(Service service) {
-        service.get("/smesh-consul/v1/health", consulHealthChecker::getNodeHealth);
+        service.get("/", consulHealthChecker::getNodeHealth);
     }
 }

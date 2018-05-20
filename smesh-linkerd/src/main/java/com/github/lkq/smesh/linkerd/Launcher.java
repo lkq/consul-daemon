@@ -13,7 +13,7 @@ public class Launcher {
 
         String hostConfigPath = AppMaker.class.getProtectionDomain().getCodeSource().getLocation().getPath();
 
-        App app = new AppMaker().makeApp("host", null, hostConfigPath, AppVersion.get(AppMaker.class));
+        App app = new AppMaker().makeApp("host", null, hostConfigPath, AppVersion.get(AppMaker.class), 8009);
 
         Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
 

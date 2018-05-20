@@ -25,9 +25,10 @@ public class AppMaker {
      * @param portBindings
      * @param hostConfigPath
      * @param appVersion
+     * @param appPort
      * @return
      */
-    public App makeApp(String network, List<PortBinding> portBindings, String hostConfigPath, String appVersion) {
+    public App makeApp(String network, List<PortBinding> portBindings, String hostConfigPath, String appVersion, int appPort) {
         String configFileName = Constants.LINKERD_CONFIG_PREFIX + "-" + appVersion + ".yaml";
 
         exportLinkerdConfig(hostConfigPath, configFileName);
@@ -41,7 +42,7 @@ public class AppMaker {
 
         LinkerdController linkerdController = new LinkerdController(SimpleDockerClient.create(DockerClientFactory.get()));
 
-        WebServer webServer = new WebServer(8009, new LinkerdRoutes());
+        WebServer webServer = new WebServer(appPort, new LinkerdRoutes());
 
         return new App(context, linkerdController, webServer);
     }

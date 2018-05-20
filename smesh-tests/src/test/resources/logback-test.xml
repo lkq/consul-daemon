@@ -6,18 +6,18 @@
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS zZ} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
-    <appender name="AttachLogger" class="ch.qos.logback.core.ConsoleAppender">
+    <appender name="ContainerLogger" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>[mvn] %msg%n</pattern>
+            <pattern>[container] %msg%n</pattern>
         </encoder>
     </appender>
 
     <logger name="com.github.lkq.smesh.docker.ContainerLogger" level="info" additivity="false">
-        <appender-ref ref="AttachLogger"/>
+        <appender-ref ref="ContainerLogger"/>
     </logger>
 
     <logger name="com.github.lkq.smesh.test.AttachLogging" level="info" additivity="false">
-        <appender-ref ref="AttachLogger"/>
+        <appender-ref ref="ApplicationLogAppender"/>
     </logger>
 
     <logger name="com.lkq.services.docker.daemon" level="debug" additivity="false">

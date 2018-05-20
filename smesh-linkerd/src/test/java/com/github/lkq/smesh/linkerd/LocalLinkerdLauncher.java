@@ -18,7 +18,7 @@ public class LocalLinkerdLauncher {
                 new PortBinding(8080, PortBinding.Protocol.TCP));
         String localConfigPath = AppMaker.class.getProtectionDomain().getCodeSource().getLocation().getPath();
 
-        App app = new AppMaker().makeApp("", portBindings, localConfigPath, "1.2.3");
+        App app = new AppMaker().makeApp("", portBindings, localConfigPath, "1.2.3", 8009);
 
         Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
 

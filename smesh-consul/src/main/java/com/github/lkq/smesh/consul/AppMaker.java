@@ -3,6 +3,9 @@ package com.github.lkq.smesh.consul;
 import com.github.lkq.smesh.consul.api.ConsulAPI;
 import com.github.lkq.smesh.consul.api.ConsulResponseParser;
 import com.github.lkq.smesh.consul.api.VersionRegister;
+import com.github.lkq.smesh.consul.client.ConsulClient;
+import com.github.lkq.smesh.consul.client.ResponseParser;
+import com.github.lkq.smesh.consul.client.http.SimpleHttpClient;
 import com.github.lkq.smesh.consul.command.ConsulCommandBuilder;
 import com.github.lkq.smesh.consul.container.ConsulController;
 import com.github.lkq.smesh.consul.context.ConsulContextFactory;
@@ -26,8 +29,6 @@ import java.util.List;
 public class AppMaker {
 
     public App makeApp(String nodeName, ConsulCommandBuilder commandBuilder, String network, List<PortBinding> portBindings, String appVersion, int restPort, String localDataPath) {
-//        Timer timer = new Timer();
-//        setupTimers(timer);
 
         ConsulAPI consulAPI = new ConsulAPI(new HttpClientFactory().create(), new ConsulResponseParser(), Environment.get().consulAPIPort());
 
@@ -43,7 +44,8 @@ public class AppMaker {
 
         ConsulHealthChecker consulHealthChecker = new ConsulHealthChecker(consulAPI, context.nodeName(), appVersion);
         ConsulController consulController = new ConsulController(dockerClient);
-        WebServer webServer = new WebServer(restPort, new RegistrationRoutes(), new ConsulRoutes(consulHealthChecker));
+        ConsulClient consulClient = new ConsulClient(new SimpleHttpClient(), new ResponseParser(), "http://localhost", 8500);
+        WebServer webServer = new WebServer(restPort, new RegistrationRoutes(consulClient), new ConsulRoutes(consulHealthChecker));
 
         return new App(context,
                 consulController,
