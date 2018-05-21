@@ -37,7 +37,7 @@ public class TestEngine {
     public void startEverything() throws IOException, InterruptedException {
 
         String consul = startConsul(1025);
-        String linkerd = startLinkerd(8080, 9990, 8009);
+        String linkerd = startLinkerd(8080, 9990, 1026);
         String userApp = startUserApp(8081, "ws://172.17.0.2:1025/register");
     }
 
@@ -56,7 +56,9 @@ public class TestEngine {
 
         String nodeName = "consul";
         String localDataPath = ClassLoader.getSystemResource(".").getPath() + "data/" + nodeName + "-" + System.currentTimeMillis();
-        new File(localDataPath).mkdirs();
+        if (new File(localDataPath).mkdirs()) {
+            logger.info("created config dir: {}", localDataPath);
+        }
         App app = appMaker.makeApp(nodeName, serverCommand, "", consulPortBindings(), "1.2.3", appPort, localDataPath);
 
         Runtime.getRuntime().addShutdownHook(new Thread(app::stop));

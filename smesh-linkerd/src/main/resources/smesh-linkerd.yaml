@@ -4,6 +4,10 @@ admin:
 
 routers:
 - protocol: http
+  identifier:
+   kind: io.l5d.path
+   segments: 1
+   consume: true
   dtab: |
     /svc => /#/io.l5d.consul/dc1;
   servers:
@@ -12,11 +16,10 @@ routers:
 
 namers:
 - kind: io.l5d.consul
-  host: 172.17.0.4
-  includeTag: true
-  useHealthCheck: false
-  healthStatuses:
-    - "passing"
-    - "warning"
-  setHost: true
+  host: 172.17.0.2
   consistencyMode: stale
+
+telemetry:
+- kind: io.l5d.tracelog
+  sampleRate: 1.0
+  level: TRACE

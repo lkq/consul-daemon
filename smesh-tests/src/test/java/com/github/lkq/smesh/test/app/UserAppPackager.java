@@ -16,7 +16,7 @@ public class UserAppPackager {
 
     public String[] buildPackage() {
         try {
-            Process mvn = new ProcessBuilder("mvn", "clean", "install", "-DskipTests=true").start();
+            Process mvn = new ProcessBuilder("mvn", "install", "-DskipTests=true").start();
 
             ArtifactExtractor extractor = new ArtifactExtractor(ARTIFACT_PATTERN, "path", "name");
             AttachLogging logging = AttachLogging.attach(mvn.getInputStream(), extractor);

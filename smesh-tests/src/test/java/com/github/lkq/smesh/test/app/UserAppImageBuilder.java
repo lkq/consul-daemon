@@ -70,7 +70,7 @@ public class UserAppImageBuilder {
     private String prepareDockerFile(String artifactPath, String artifactName, String registerURL) {
         URL resourceRootURL = UserAppImageBuilder.class.getClassLoader().getResource("");
         try {
-            File resourceRoot = new File(resourceRootURL.getPath());
+            File resourceRoot = new File(resourceRootURL.getPath() + "/template");
             Configuration config = new Configuration(Configuration.VERSION_2_3_28);
             config.setTemplateLoader(new FileTemplateLoader(resourceRoot));
             Template template = config.getTemplate(DOCKERFILE_NAME, Constants.ENCODING_UTF8);
