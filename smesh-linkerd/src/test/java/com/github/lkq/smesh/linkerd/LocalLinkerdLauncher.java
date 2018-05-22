@@ -13,7 +13,7 @@ public class LocalLinkerdLauncher {
 
         String localConfigPath = AppMaker.class.getProtectionDomain().getCodeSource().getLocation().getPath();
 
-        App app = new AppMaker().makeApp(1026, ContainerNetwork.LINKERD_MAC_LOCAL, localConfigPath, "1.2.3");
+        App app = new AppMaker().makeApp(1026, ContainerNetwork.LINKERD_MAC, localConfigPath, "1.2.3");
 
         Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
 

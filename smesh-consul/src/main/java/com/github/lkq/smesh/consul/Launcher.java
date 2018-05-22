@@ -2,10 +2,14 @@ package com.github.lkq.smesh.consul;
 
 import com.github.lkq.smesh.AppVersion;
 import com.github.lkq.smesh.Env;
+import com.github.lkq.smesh.consul.client.ConsulClient;
+import com.github.lkq.smesh.consul.client.ResponseParser;
+import com.github.lkq.smesh.consul.client.http.SimpleHttpClient;
 import com.github.lkq.smesh.consul.command.ConsulCommandBuilder;
 import com.github.lkq.smesh.consul.env.Environment;
 import com.github.lkq.smesh.consul.env.aws.EC2;
 import com.github.lkq.smesh.consul.env.aws.EC2Factory;
+import com.github.lkq.smesh.docker.ContainerNetwork;
 import com.github.lkq.smesh.logging.JulToSlf4jBridge;
 
 import java.io.File;
@@ -36,13 +40,13 @@ public class Launcher {
         ConsulCommandBuilder serverCommand = ConsulCommandBuilder.server(true, clusterMembers);
 
         String localDataPath = new File("").getAbsolutePath() + "/data/" + nodeName + "-" + System.currentTimeMillis();
-        App app = appMaker.makeApp(nodeName,
+        ConsulClient consulClient = new ConsulClient(new SimpleHttpClient(), new ResponseParser(), "http://localhost", 8500);
+        App app = appMaker.makeApp(0, nodeName,
+                ContainerNetwork.CONSUL_SERVER,
                 serverCommand,
-                Constants.NETWORK_HOST,
-                null,
-                AppVersion.get(App.class),
-                REST_PORT,
-                localDataPath);
+                localDataPath,
+                AppVersion.get(App.class), consulClient
+        );
 
         Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
 

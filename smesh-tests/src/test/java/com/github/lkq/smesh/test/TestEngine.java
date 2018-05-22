@@ -3,6 +3,9 @@ package com.github.lkq.smesh.test;
 import com.github.dockerjava.api.DockerClient;
 import com.github.lkq.smesh.consul.App;
 import com.github.lkq.smesh.consul.AppMaker;
+import com.github.lkq.smesh.consul.client.ConsulClient;
+import com.github.lkq.smesh.consul.client.ResponseParser;
+import com.github.lkq.smesh.consul.client.http.SimpleHttpClient;
 import com.github.lkq.smesh.consul.command.ConsulCommandBuilder;
 import com.github.lkq.smesh.consul.env.Environment;
 import com.github.lkq.smesh.context.PortBinding;
@@ -60,7 +63,15 @@ public class TestEngine {
         if (new File(localDataPath).mkdirs()) {
             logger.info("created config dir: {}", localDataPath);
         }
-        App app = appMaker.makeApp(nodeName, serverCommand, "", consulPortBindings(), "1.2.3", appPort, localDataPath);
+        ConsulClient consulClient = new ConsulClient(new SimpleHttpClient(), new ResponseParser(), "http://localhost", 8500);
+        App app = appMaker.makeApp(
+                appPort,
+                nodeName,
+                ContainerNetwork.CONSUL_MAC,
+                serverCommand,
+                localDataPath,
+                "1.2.3",
+                consulClient);
 
         Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
 
@@ -89,7 +100,7 @@ public class TestEngine {
         String localConfigPath = com.github.lkq.smesh.linkerd.AppMaker.class.getProtectionDomain().getCodeSource().getLocation().getPath();
 
         com.github.lkq.smesh.linkerd.AppMaker appMaker = new com.github.lkq.smesh.linkerd.AppMaker();
-        com.github.lkq.smesh.linkerd.App app = appMaker.makeApp(appPort, ContainerNetwork.LINKERD_MAC_LOCAL, localConfigPath, "1.2.3");
+        com.github.lkq.smesh.linkerd.App app = appMaker.makeApp(appPort, ContainerNetwork.LINKERD_MAC, localConfigPath, "1.2.3");
 
         Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
 

@@ -1,8 +1,12 @@
 package com.github.lkq.smesh.consul;
 
 import com.github.dockerjava.api.command.InspectContainerResponse;
+import com.github.lkq.smesh.consul.client.ConsulClient;
+import com.github.lkq.smesh.consul.client.ResponseParser;
+import com.github.lkq.smesh.consul.client.http.SimpleHttpClient;
 import com.github.lkq.smesh.consul.command.ConsulCommandBuilder;
 import com.github.lkq.smesh.context.PortBinding;
+import com.github.lkq.smesh.docker.ContainerNetwork;
 import com.github.lkq.smesh.docker.DockerClientFactory;
 import com.github.lkq.smesh.docker.SimpleDockerClient;
 import org.slf4j.Logger;
@@ -39,9 +43,16 @@ public class ClusterNode {
 
             String nodeName = nodeName(nodeIndex);
             logger.info("================ starting server node {} ==================", nodeName);
-            String localDataPath = ClassLoader.getSystemResource(".").getPath() + "data/" + nodeName + "-" + System.currentTimeMillis();
+            String hostDataPath = ClassLoader.getSystemResource(".").getPath() + "data/" + nodeName + "-" + System.currentTimeMillis();
 
-            App app = appMaker.makeApp(nodeName, serverCommand, "", portBindings, "1.2.3", 1026 + nodeIndex, localDataPath);
+            ConsulClient consulClient = new ConsulClient(new SimpleHttpClient(), new ResponseParser(), "http://localhost", 8500);
+            App app = appMaker.makeApp(
+                    1026 + nodeIndex,
+                    nodeName,
+                    ContainerNetwork.CONSUL_MAC,
+                    serverCommand,
+                    hostDataPath,
+                    "1.2.3", consulClient);
 
             Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
 

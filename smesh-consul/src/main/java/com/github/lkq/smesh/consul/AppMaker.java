@@ -4,8 +4,6 @@ import com.github.lkq.smesh.consul.api.ConsulAPI;
 import com.github.lkq.smesh.consul.api.ConsulResponseParser;
 import com.github.lkq.smesh.consul.api.VersionRegister;
 import com.github.lkq.smesh.consul.client.ConsulClient;
-import com.github.lkq.smesh.consul.client.ResponseParser;
-import com.github.lkq.smesh.consul.client.http.SimpleHttpClient;
 import com.github.lkq.smesh.consul.command.ConsulCommandBuilder;
 import com.github.lkq.smesh.consul.container.ConsulController;
 import com.github.lkq.smesh.consul.context.ConsulContextFactory;
@@ -15,8 +13,8 @@ import com.github.lkq.smesh.consul.routes.v1.ConsulRoutes;
 import com.github.lkq.smesh.consul.routes.v1.RegistrationRoutes;
 import com.github.lkq.smesh.consul.utils.HttpClientFactory;
 import com.github.lkq.smesh.context.ContainerContext;
-import com.github.lkq.smesh.context.PortBinding;
 import com.github.lkq.smesh.context.VolumeBinding;
+import com.github.lkq.smesh.docker.ContainerNetwork;
 import com.github.lkq.smesh.docker.DockerClientFactory;
 import com.github.lkq.smesh.docker.SimpleDockerClient;
 import com.github.lkq.smesh.server.WebServer;
@@ -28,7 +26,7 @@ import java.util.List;
 
 public class AppMaker {
 
-    public App makeApp(String nodeName, ConsulCommandBuilder commandBuilder, String network, List<PortBinding> portBindings, String appVersion, int restPort, String localDataPath) {
+    public App makeApp(int restPort, String nodeName, ContainerNetwork network, ConsulCommandBuilder commandBuilder, String hostDataPath, String appVersion, ConsulClient consulClient) {
 
         ConsulAPI consulAPI = new ConsulAPI(new HttpClientFactory().create(), new ConsulResponseParser(), Environment.get().consulAPIPort());
 
@@ -36,15 +34,14 @@ public class AppMaker {
 
         final ConsulContextFactory contextFactory = new ConsulContextFactory();
 
-        ContainerContext context = contextFactory.create(nodeName, network, getEnv(), commandBuilder)
-                .portBindings(portBindings)
-                .volumeBindings(Arrays.asList(new VolumeBinding(localDataPath, Constants.CONTAINER_DATA_PATH)));
+        ContainerContext context = contextFactory.create(nodeName, network.network(), getEnv(), commandBuilder)
+                .portBindings(network.portBindings())
+                .volumeBindings(Arrays.asList(new VolumeBinding(hostDataPath, Constants.CONTAINER_DATA_PATH)));
 
         VersionRegister versionRegister = new VersionRegister(consulAPI, Constants.APP_NAME + "-" + nodeName, appVersion, 10000);
 
         ConsulHealthChecker consulHealthChecker = new ConsulHealthChecker(consulAPI, context.nodeName(), appVersion);
         ConsulController consulController = new ConsulController(dockerClient);
-        ConsulClient consulClient = new ConsulClient(new SimpleHttpClient(), new ResponseParser(), "http://localhost", 8500);
         WebServer webServer = new WebServer(restPort, new RegistrationRoutes(consulClient), new ConsulRoutes(consulHealthChecker));
 
         return new App(context,
