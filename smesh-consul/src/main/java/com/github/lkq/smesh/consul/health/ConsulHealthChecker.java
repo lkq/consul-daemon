@@ -1,6 +1,6 @@
 package com.github.lkq.smesh.consul.health;
 
-import com.github.lkq.smesh.consul.api.ConsulAPI;
+import com.github.lkq.smesh.consul.client.ConsulClient;
 import spark.Request;
 import spark.Response;
 import spark.utils.StringUtils;
@@ -12,13 +12,13 @@ import java.util.Map;
  */
 public class ConsulHealthChecker {
 
-    private final ConsulAPI consulAPI;
+    private final ConsulClient consulClient;
     private final String nodeName;
     private final String daemonVersionKey;
     private final String daemonVersion;
 
-    public ConsulHealthChecker(ConsulAPI consulAPI, String nodeName, String daemonVersion) {
-        this.consulAPI = consulAPI;
+    public ConsulHealthChecker(ConsulClient consulClient, String nodeName, String daemonVersion) {
+        this.consulClient = consulClient;
         this.nodeName = nodeName;
         this.daemonVersionKey = "consul-version-" + nodeName;
         this.daemonVersion = daemonVersion;
@@ -26,7 +26,7 @@ public class ConsulHealthChecker {
 
     public String getNodeHealth(Request request, Response response) {
         String full = request.queryParams("full");
-        Map<String, String> nodeHealth = consulAPI.getNodeHealth(nodeName);
+        Map<String, String> nodeHealth = consulClient.getNodeHealth(nodeName);
         if (full == null) {
             String status = nodeHealth.get("Status");
             return String.valueOf("passing".equals(status));
@@ -36,20 +36,20 @@ public class ConsulHealthChecker {
 
     public boolean isHealthy() {
         String expectedVersionTag = createVersionTimestamp(daemonVersion);
-        consulAPI.putKeyValue(daemonVersionKey, expectedVersionTag);
+        consulClient.putKeyValue(daemonVersionKey, expectedVersionTag);
         String currentVersion = registeredConsulDaemonVersion();
         return currentVersion.equals(expectedVersionTag);
     }
 
     public String registeredConsulDaemonVersion() {
-        return consulAPI.getKeyValue(daemonVersionKey);
+        return consulClient.getKeyValue(daemonVersionKey);
     }
 
     public boolean registerConsulDaemonVersion(String appVersion, int timeoutInSeconds) {
         boolean success = false;
         do {
             try {
-                consulAPI.putKeyValue(daemonVersionKey, createVersionTimestamp(appVersion));
+                consulClient.putKeyValue(daemonVersionKey, createVersionTimestamp(appVersion));
                 String version = registeredConsulDaemonVersion();
                 if (StringUtils.isNotEmpty(version)) {
                     success = appVersion.equals(version.split("@")[0]);

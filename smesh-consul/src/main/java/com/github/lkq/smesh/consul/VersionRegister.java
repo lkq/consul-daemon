@@ -1,5 +1,6 @@
-package com.github.lkq.smesh.consul.api;
+package com.github.lkq.smesh.consul;
 
+import com.github.lkq.smesh.consul.client.ConsulClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -7,12 +8,12 @@ public class VersionRegister {
     private static Logger logger = LoggerFactory.getLogger(VersionRegister.class);
 
     private final int interval;
-    private ConsulAPI consulAPI;
+    private ConsulClient consulClient;
     private String versionKey;
     private String expectedVersion;
 
-    public VersionRegister(ConsulAPI consulAPI, String versionKey, String expectedVersion, int intervalInMs) {
-        this.consulAPI = consulAPI;
+    public VersionRegister(ConsulClient consulClient, String versionKey, String expectedVersion, int intervalInMs) {
+        this.consulClient = consulClient;
         this.versionKey = versionKey;
         this.expectedVersion = expectedVersion;
         this.interval = intervalInMs;
@@ -22,7 +23,7 @@ public class VersionRegister {
         new Thread(() -> {
             String registeredVersion = registeredVersion();
             while (!expectedVersion.equals(registeredVersion)) {
-                consulAPI.putKeyValue(versionKey, expectedVersion);
+                consulClient.putKeyValue(versionKey, expectedVersion);
                 registeredVersion = registeredVersion();
 
                 try {
@@ -36,7 +37,7 @@ public class VersionRegister {
     }
 
     public String registeredVersion() {
-        return consulAPI.getKeyValue(versionKey);
+        return consulClient.getKeyValue(versionKey);
     }
 
     public String expectedVersion() {

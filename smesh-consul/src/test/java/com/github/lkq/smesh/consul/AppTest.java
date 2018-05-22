@@ -1,6 +1,5 @@
 package com.github.lkq.smesh.consul;
 
-import com.github.lkq.smesh.consul.api.VersionRegister;
 import com.github.lkq.smesh.consul.container.ConsulController;
 import com.github.lkq.smesh.consul.health.ConsulHealthChecker;
 import com.github.lkq.smesh.context.ContainerContext;

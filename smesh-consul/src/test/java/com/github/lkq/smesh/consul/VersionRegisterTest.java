@@ -1,14 +1,13 @@
-package com.github.lkq.smesh.consul.api;
+package com.github.lkq.smesh.consul;
 
+import com.github.lkq.smesh.consul.client.ConsulClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 class VersionRegisterTest {
@@ -18,7 +17,7 @@ class VersionRegisterTest {
     public static final String CURRENT_VERSION = "1.2.0";
     private VersionRegister versionRegister;
     @Mock
-    private ConsulAPI consulAPI;
+    private ConsulClient consulAPI;
 
     @BeforeEach
     void setUp() {

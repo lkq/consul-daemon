@@ -1,17 +1,12 @@
 package com.github.lkq.smesh.consul;
 
-import com.github.lkq.smesh.consul.api.ConsulAPI;
-import com.github.lkq.smesh.consul.api.ConsulResponseParser;
-import com.github.lkq.smesh.consul.api.VersionRegister;
 import com.github.lkq.smesh.consul.client.ConsulClient;
 import com.github.lkq.smesh.consul.command.ConsulCommandBuilder;
 import com.github.lkq.smesh.consul.container.ConsulController;
 import com.github.lkq.smesh.consul.context.ConsulContextFactory;
-import com.github.lkq.smesh.consul.env.Environment;
 import com.github.lkq.smesh.consul.health.ConsulHealthChecker;
 import com.github.lkq.smesh.consul.routes.v1.ConsulRoutes;
 import com.github.lkq.smesh.consul.routes.v1.RegistrationRoutes;
-import com.github.lkq.smesh.consul.utils.HttpClientFactory;
 import com.github.lkq.smesh.context.ContainerContext;
 import com.github.lkq.smesh.context.VolumeBinding;
 import com.github.lkq.smesh.docker.ContainerNetwork;
@@ -28,8 +23,6 @@ public class AppMaker {
 
     public App makeApp(int restPort, String nodeName, ContainerNetwork network, ConsulCommandBuilder commandBuilder, String hostDataPath, String appVersion, ConsulClient consulClient) {
 
-        ConsulAPI consulAPI = new ConsulAPI(new HttpClientFactory().create(), new ConsulResponseParser(), Environment.get().consulAPIPort());
-
         SimpleDockerClient dockerClient = SimpleDockerClient.create(DockerClientFactory.get());
 
         final ConsulContextFactory contextFactory = new ConsulContextFactory();
@@ -38,9 +31,9 @@ public class AppMaker {
                 .portBindings(network.portBindings())
                 .volumeBindings(Arrays.asList(new VolumeBinding(hostDataPath, Constants.CONTAINER_DATA_PATH)));
 
-        VersionRegister versionRegister = new VersionRegister(consulAPI, Constants.APP_NAME + "-" + nodeName, appVersion, 10000);
+        VersionRegister versionRegister = new VersionRegister(consulClient, Constants.APP_NAME + "-" + nodeName, appVersion, 10000);
 
-        ConsulHealthChecker consulHealthChecker = new ConsulHealthChecker(consulAPI, context.nodeName(), appVersion);
+        ConsulHealthChecker consulHealthChecker = new ConsulHealthChecker(consulClient, context.nodeName(), appVersion);
         ConsulController consulController = new ConsulController(dockerClient);
         WebServer webServer = new WebServer(restPort, new RegistrationRoutes(consulClient), new ConsulRoutes(consulHealthChecker));
 
