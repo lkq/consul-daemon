@@ -7,6 +7,7 @@ import com.github.lkq.smesh.consul.command.ConsulCommandBuilder;
 import com.github.lkq.smesh.consul.env.Environment;
 import com.github.lkq.smesh.context.PortBinding;
 import com.github.lkq.smesh.docker.ContainerLogger;
+import com.github.lkq.smesh.docker.ContainerNetwork;
 import com.github.lkq.smesh.docker.DockerClientFactory;
 import com.github.lkq.smesh.docker.SimpleDockerClient;
 import com.github.lkq.smesh.smesh4j.Service;
@@ -37,7 +38,7 @@ public class TestEngine {
     public void startEverything() throws IOException, InterruptedException {
 
         String consul = startConsul(1025);
-        String linkerd = startLinkerd(8080, 9990, 1026);
+        String linkerd = startLinkerd(1026);
         String userApp = startUserApp(8081, "ws://172.17.0.2:1025/register");
     }
 
@@ -81,18 +82,14 @@ public class TestEngine {
     /**
      * start a local linkerd docker container with binding port 8080 (due to unable to use host network in mac)
      * @return container id
-     * @param linkerdPort
-     * @param linkerdAdmPort
      * @param appPort
      */
-    public String startLinkerd(int linkerdPort, int linkerdAdmPort, int appPort) {
+    public String startLinkerd(int appPort) {
 
-        List<PortBinding> portBindings = Arrays.asList(new PortBinding(linkerdAdmPort, PortBinding.Protocol.TCP),
-                new PortBinding(linkerdPort, PortBinding.Protocol.TCP));
         String localConfigPath = com.github.lkq.smesh.linkerd.AppMaker.class.getProtectionDomain().getCodeSource().getLocation().getPath();
 
         com.github.lkq.smesh.linkerd.AppMaker appMaker = new com.github.lkq.smesh.linkerd.AppMaker();
-        com.github.lkq.smesh.linkerd.App app = appMaker.makeApp("", portBindings, localConfigPath, "1.2.3", appPort);
+        com.github.lkq.smesh.linkerd.App app = appMaker.makeApp(appPort, ContainerNetwork.LINKERD_MAC_LOCAL, localConfigPath, "1.2.3");
 
         Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
 

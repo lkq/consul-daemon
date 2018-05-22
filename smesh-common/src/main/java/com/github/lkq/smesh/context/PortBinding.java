@@ -17,9 +17,11 @@ public class PortBinding {
     }
 
     public PortBinding(int port, Protocol protocol) {
-        this.hostPort = port;
-        this.containerPort = port;
-        this.protocol = protocol;
+        this(port, port, protocol);
+    }
+
+    public PortBinding(int port) {
+        this(port, port, Protocol.TCP);
     }
 
     public ExposedPort getExposedPort() {

@@ -1,8 +1,8 @@
 package com.github.lkq.smesh.linkerd;
 
 import com.github.lkq.smesh.context.ContainerContext;
-import com.github.lkq.smesh.context.PortBinding;
 import com.github.lkq.smesh.context.VolumeBinding;
+import com.github.lkq.smesh.docker.ContainerNetwork;
 import com.github.lkq.smesh.docker.DockerClientFactory;
 import com.github.lkq.smesh.docker.SimpleDockerClient;
 import com.github.lkq.smesh.linkerd.config.ConfigExporter;
@@ -14,7 +14,6 @@ import com.github.lkq.smesh.server.WebServer;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 public class AppMaker {
@@ -22,13 +21,11 @@ public class AppMaker {
     /**
      * put every piece together
      * @param network
-     * @param portBindings
      * @param hostConfigPath
      * @param appVersion
-     * @param appPort
      * @return
      */
-    public App makeApp(String network, List<PortBinding> portBindings, String hostConfigPath, String appVersion, int appPort) {
+    public App makeApp(int restPort, ContainerNetwork network, String hostConfigPath, String appVersion) {
         String configFileName = Constants.LINKERD_CONFIG_PREFIX + "-" + appVersion + ".yaml";
 
         exportLinkerdConfig(hostConfigPath, configFileName);
@@ -36,13 +33,13 @@ public class AppMaker {
         LinkerdContextFactory contextFactory = new LinkerdContextFactory();
         ContainerContext context = contextFactory.createDefaultContext()
                 .volumeBindings(Arrays.asList(new VolumeBinding(hostConfigPath, Constants.CONTAINER_CONFIG_PATH)))
-                .portBindings(portBindings)
-                .network(network)
+                .portBindings(network.portBindings())
+                .network(network.network())
                 .commandBuilder(new LinkerdCommandBuilder(Constants.CONTAINER_CONFIG_PATH + "/" + configFileName));
 
         LinkerdController linkerdController = new LinkerdController(SimpleDockerClient.create(DockerClientFactory.get()));
 
-        WebServer webServer = new WebServer(appPort, new LinkerdRoutes());
+        WebServer webServer = new WebServer(restPort, new LinkerdRoutes());
 
         return new App(context, linkerdController, webServer);
     }
