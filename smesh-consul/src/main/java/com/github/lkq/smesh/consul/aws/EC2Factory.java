@@ -1,4 +1,4 @@
-package com.github.lkq.smesh.consul.env.aws;
+package com.github.lkq.smesh.consul.aws;
 
 public class EC2Factory {
     private static Object lock = new Object();

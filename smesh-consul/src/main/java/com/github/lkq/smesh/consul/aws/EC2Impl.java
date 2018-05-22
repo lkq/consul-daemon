@@ -1,4 +1,4 @@
-package com.github.lkq.smesh.consul.env.aws;
+package com.github.lkq.smesh.consul.aws;
 
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;

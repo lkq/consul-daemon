@@ -6,8 +6,8 @@ import com.github.lkq.smesh.consul.client.ConsulClient;
 import com.github.lkq.smesh.consul.client.ResponseParser;
 import com.github.lkq.smesh.consul.client.http.SimpleHttpClient;
 import com.github.lkq.smesh.consul.command.ConsulCommandBuilder;
-import com.github.lkq.smesh.consul.env.aws.EC2;
-import com.github.lkq.smesh.consul.env.aws.EC2Factory;
+import com.github.lkq.smesh.consul.aws.EC2;
+import com.github.lkq.smesh.consul.aws.EC2Factory;
 import com.github.lkq.smesh.docker.ContainerNetwork;
 import com.github.lkq.smesh.logging.JulToSlf4jBridge;
 
