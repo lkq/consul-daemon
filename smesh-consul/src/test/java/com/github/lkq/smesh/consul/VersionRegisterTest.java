@@ -17,39 +17,39 @@ class VersionRegisterTest {
     public static final String CURRENT_VERSION = "1.2.0";
     private VersionRegister versionRegister;
     @Mock
-    private ConsulClient consulAPI;
+    private ConsulClient consulClient;
 
     @BeforeEach
     void setUp() {
         initMocks(this);
-        versionRegister = new VersionRegister(consulAPI, TEST_KEY, EXPECTED_VERSION, 10);
+        versionRegister = new VersionRegister(consulClient, TEST_KEY, EXPECTED_VERSION, 10);
     }
 
     @Test
     void canRegisterVersion() {
-        given(consulAPI.getKeyValue(TEST_KEY)).willReturn(CURRENT_VERSION).willReturn(EXPECTED_VERSION);
+        given(consulClient.getKeyValue(TEST_KEY)).willReturn(CURRENT_VERSION).willReturn(EXPECTED_VERSION);
         versionRegister.registerVersion();
         delay(30);
 
-        verify(consulAPI, times(1)).putKeyValue(TEST_KEY, EXPECTED_VERSION);
+        verify(consulClient, times(1)).putKeyValue(TEST_KEY, EXPECTED_VERSION);
     }
 
     @Test
     void willExistIfVersionAlreadyRegistered() {
-        given(consulAPI.getKeyValue(TEST_KEY)).willReturn(EXPECTED_VERSION);
+        given(consulClient.getKeyValue(TEST_KEY)).willReturn(EXPECTED_VERSION);
         versionRegister.registerVersion();
         delay(30);
 
-        verify(consulAPI, never()).putKeyValue(anyString(), anyString());
+        verify(consulClient, never()).putKeyValue(anyString(), anyString());
     }
 
     @Test
     void canRegisterVersionAfterRetry() {
-        given(consulAPI.getKeyValue(TEST_KEY)).willReturn(CURRENT_VERSION).willReturn(CURRENT_VERSION).willReturn(EXPECTED_VERSION);
+        given(consulClient.getKeyValue(TEST_KEY)).willReturn(CURRENT_VERSION).willReturn(CURRENT_VERSION).willReturn(EXPECTED_VERSION);
         versionRegister.registerVersion();
         delay(50);
 
-        verify(consulAPI, times(2)).putKeyValue(TEST_KEY, EXPECTED_VERSION);
+        verify(consulClient, times(2)).putKeyValue(TEST_KEY, EXPECTED_VERSION);
     }
 
     private void delay(int millis) {

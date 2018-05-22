@@ -7,7 +7,6 @@ import com.github.lkq.smesh.consul.client.ConsulClient;
 import com.github.lkq.smesh.consul.client.ResponseParser;
 import com.github.lkq.smesh.consul.client.http.SimpleHttpClient;
 import com.github.lkq.smesh.consul.command.ConsulCommandBuilder;
-import com.github.lkq.smesh.consul.env.Environment;
 import com.github.lkq.smesh.context.PortBinding;
 import com.github.lkq.smesh.docker.ContainerLogger;
 import com.github.lkq.smesh.docker.ContainerNetwork;
@@ -75,7 +74,7 @@ public class TestEngine {
 
         Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
 
-        return app.start(Environment.get().forceRestart());
+        return app.start(true);
     }
 
     public static List<PortBinding> consulPortBindings() {

@@ -1,5 +1,6 @@
 package com.github.lkq.smesh.context;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class ContainerContext {
@@ -62,8 +63,8 @@ public class ContainerContext {
         return volumeBindings;
     }
 
-    public ContainerContext volumeBindings(List<VolumeBinding> volumeBindings) {
-        this.volumeBindings = volumeBindings;
+    public ContainerContext volumeBindings(VolumeBinding... volumeBindings) {
+        this.volumeBindings = Arrays.asList(volumeBindings);
         return this;
     }
 

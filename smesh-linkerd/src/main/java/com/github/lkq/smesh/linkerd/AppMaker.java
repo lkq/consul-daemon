@@ -13,7 +13,6 @@ import com.github.lkq.smesh.linkerd.routes.v1.LinkerdRoutes;
 import com.github.lkq.smesh.server.WebServer;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.Map;
 
 public class AppMaker {
@@ -32,7 +31,7 @@ public class AppMaker {
 
         LinkerdContextFactory contextFactory = new LinkerdContextFactory();
         ContainerContext context = contextFactory.createDefaultContext()
-                .volumeBindings(Arrays.asList(new VolumeBinding(hostConfigPath, Constants.CONTAINER_CONFIG_PATH)))
+                .volumeBindings(new VolumeBinding(hostConfigPath, Constants.CONTAINER_CONFIG_PATH))
                 .portBindings(network.portBindings())
                 .network(network.network())
                 .commandBuilder(new LinkerdCommandBuilder(Constants.CONTAINER_CONFIG_PATH + "/" + configFileName));

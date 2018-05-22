@@ -16,7 +16,6 @@ import com.github.lkq.smesh.server.WebServer;
 import com.github.lkq.timeron.Timer;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class AppMaker {
@@ -29,7 +28,7 @@ public class AppMaker {
 
         ContainerContext context = contextFactory.create(nodeName, network.network(), getEnv(), commandBuilder)
                 .portBindings(network.portBindings())
-                .volumeBindings(Arrays.asList(new VolumeBinding(hostDataPath, Constants.CONTAINER_DATA_PATH)));
+                .volumeBindings(new VolumeBinding(hostDataPath, Constants.CONTAINER_DATA_PATH));
 
         VersionRegister versionRegister = new VersionRegister(consulClient, Constants.APP_NAME + "-" + nodeName, appVersion, 10000);
 

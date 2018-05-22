@@ -4,7 +4,6 @@ import com.github.lkq.smesh.consul.client.ConsulClient;
 import com.github.lkq.smesh.consul.client.ResponseParser;
 import com.github.lkq.smesh.consul.client.http.SimpleHttpClient;
 import com.github.lkq.smesh.consul.command.ConsulCommandBuilder;
-import com.github.lkq.smesh.consul.env.Environment;
 import com.github.lkq.smesh.docker.ContainerNetwork;
 import com.github.lkq.smesh.logging.JulToSlf4jBridge;
 
@@ -38,6 +37,6 @@ public class LocalConsulLauncher {
 
         Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
 
-        app.start(Environment.get().forceRestart());
+        app.start(true);
     }
 }
