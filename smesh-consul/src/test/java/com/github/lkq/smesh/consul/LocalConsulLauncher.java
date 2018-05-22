@@ -26,7 +26,7 @@ public class LocalConsulLauncher {
 
         String nodeName = "consul";
         String hostDataPath = ClassLoader.getSystemResource(".").getPath() + "data/" + nodeName + "-" + System.currentTimeMillis();
-        ConsulClient consulClient = new ConsulClient(new SimpleHttpClient(), new ResponseParser(), "http://localhost", 8500);
+        ConsulClient consulClient = new ConsulClient(new SimpleHttpClient(), new ResponseParser(), "http://localhost:8500");
         App app = appMaker.makeApp(
                 1025,
                 nodeName,

@@ -62,7 +62,7 @@ public class TestEngine {
         if (new File(localDataPath).mkdirs()) {
             logger.info("created config dir: {}", localDataPath);
         }
-        ConsulClient consulClient = new ConsulClient(new SimpleHttpClient(), new ResponseParser(), "http://localhost", 8500);
+        ConsulClient consulClient = new ConsulClient(new SimpleHttpClient(), new ResponseParser(), "http://localhost:8500");
         App app = appMaker.makeApp(
                 appPort,
                 nodeName,

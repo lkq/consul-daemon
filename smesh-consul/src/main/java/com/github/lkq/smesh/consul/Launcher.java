@@ -16,7 +16,6 @@ import java.net.InetAddress;
 import java.util.List;
 
 public class Launcher {
-    public static final int REST_PORT = 1026;
     String ENV_NODE_NAME = "consul.node.name";
     String ENV_CONSUL_ROLE = "consul.node.role";
     String ENV_CONSUL_CLUSTER_MEMBERS = "consul.cluster.members";
@@ -39,7 +38,7 @@ public class Launcher {
         ConsulCommandBuilder serverCommand = ConsulCommandBuilder.server(true, clusterMembers);
 
         String localDataPath = new File("").getAbsolutePath() + "/data/" + nodeName + "-" + System.currentTimeMillis();
-        ConsulClient consulClient = new ConsulClient(new SimpleHttpClient(), new ResponseParser(), "http://localhost", 8500);
+        ConsulClient consulClient = new ConsulClient(new SimpleHttpClient(), new ResponseParser(), "http://localhost:8500");
         App app = appMaker.makeApp(0, nodeName,
                 ContainerNetwork.CONSUL_SERVER,
                 serverCommand,

@@ -19,10 +19,10 @@ public class ConsulClient {
     private final SimpleHttpClient httpClient;
     private final ResponseParser responseParser;
 
-    public ConsulClient(SimpleHttpClient httpClient, ResponseParser responseParser, String baseURL, int port) {
+    public ConsulClient(SimpleHttpClient httpClient, ResponseParser responseParser, String baseURL) {
         this.httpClient = httpClient;
         this.responseParser = responseParser;
-        this.API_V1 = baseURL + ":" + port + "/v1/";
+        this.API_V1 = baseURL + "/v1/";
         this.API_V1_KV = API_V1 + "kv/";
         this.API_V1_REG = API_V1 + "agent/service/register";
         this.API_V1_HEALTH_NODE = API_V1 + "health/node/";
@@ -100,7 +100,7 @@ public class ConsulClient {
         public ConsulClient build() {
             return new ConsulClient(httpClient == null ? new SimpleHttpClient() : httpClient,
                     responseParser == null ? new ResponseParser() : responseParser,
-                    baseURL, port);
+                    baseURL);
         }
     }
 
