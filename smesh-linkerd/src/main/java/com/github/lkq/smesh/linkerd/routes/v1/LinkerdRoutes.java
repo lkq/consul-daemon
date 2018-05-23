@@ -6,6 +6,6 @@ import spark.Service;
 public class LinkerdRoutes implements Routes {
     @Override
     public void ignite(Service service) {
-        service.get("/smesh-linkerd/v1/health", (req, res) -> "Hello");
+        service.get("/", (req, res) -> "Hello");
     }
 }

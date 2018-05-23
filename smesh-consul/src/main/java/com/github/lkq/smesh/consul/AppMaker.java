@@ -22,8 +22,6 @@ public class AppMaker {
 
     public App makeApp(int restPort, String nodeName, ContainerNetwork network, ConsulCommandBuilder commandBuilder, String hostDataPath, String appVersion, ConsulClient consulClient) {
 
-        SimpleDockerClient dockerClient = SimpleDockerClient.create(DockerClientFactory.get());
-
         final ConsulContextFactory contextFactory = new ConsulContextFactory();
 
         ContainerContext context = contextFactory.create(nodeName, network.network(), getEnv(), commandBuilder)
@@ -33,7 +31,7 @@ public class AppMaker {
         VersionRegister versionRegister = new VersionRegister(consulClient, Constants.APP_NAME + "-" + nodeName, appVersion, 10000);
 
         ConsulHealthChecker consulHealthChecker = new ConsulHealthChecker(consulClient, context.nodeName(), appVersion);
-        ConsulController consulController = new ConsulController(dockerClient);
+        ConsulController consulController = new ConsulController(SimpleDockerClient.create(DockerClientFactory.get()));
         WebServer webServer = new WebServer(restPort, new RegistrationRoutes(consulClient), new ConsulRoutes(consulHealthChecker));
 
         return new App(context,

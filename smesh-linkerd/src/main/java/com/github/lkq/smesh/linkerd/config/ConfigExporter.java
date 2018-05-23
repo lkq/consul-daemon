@@ -18,7 +18,7 @@ public class ConfigExporter {
 
     private Yaml yaml = new Yaml();
 
-    public String writeToFile(Map config, File dest) {
+    public String writeToFile(File dest, Map config) {
         try {
             if (!dest.getParentFile().exists() && !dest.getParentFile().mkdirs()) {
                 throw new SmeshException("failed to create parent folders: " + dest.getParent());

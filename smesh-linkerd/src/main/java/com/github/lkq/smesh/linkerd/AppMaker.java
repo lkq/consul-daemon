@@ -25,19 +25,18 @@ public class AppMaker {
      * @return
      */
     public App makeApp(int restPort, ContainerNetwork network, String hostConfigPath, String appVersion) {
-        String configFileName = Constants.LINKERD_CONFIG_PREFIX + "-" + appVersion + ".yaml";
+        String containerConfigFileName = Constants.LINKERD_CONFIG_PREFIX + "-" + appVersion + ".yaml";
 
-        exportLinkerdConfig(hostConfigPath, configFileName);
+        exportLinkerdConfig(hostConfigPath, containerConfigFileName);
 
         LinkerdContextFactory contextFactory = new LinkerdContextFactory();
         ContainerContext context = contextFactory.createDefaultContext()
                 .volumeBindings(new VolumeBinding(hostConfigPath, Constants.CONTAINER_CONFIG_PATH))
                 .portBindings(network.portBindings())
                 .network(network.network())
-                .commandBuilder(new LinkerdCommandBuilder(Constants.CONTAINER_CONFIG_PATH + "/" + configFileName));
+                .commandBuilder(new LinkerdCommandBuilder(Constants.CONTAINER_CONFIG_PATH + "/" + containerConfigFileName));
 
         LinkerdController linkerdController = new LinkerdController(SimpleDockerClient.create(DockerClientFactory.get()));
-
         WebServer webServer = new WebServer(restPort, new LinkerdRoutes());
 
         return new App(context, linkerdController, webServer);
@@ -45,7 +44,7 @@ public class AppMaker {
 
     private void exportLinkerdConfig(String hostConfigPath, String configFileName) {
         ConfigExporter configExporter = new ConfigExporter();
-        Map linkerdConfig = configExporter.loadFromResource(Constants.LINKERD_CONFIG_PREFIX + ".yaml");
-        configExporter.writeToFile(linkerdConfig, new File(hostConfigPath, configFileName));
+        Map config = configExporter.loadFromResource("smesh-linkerd.yaml");
+        configExporter.writeToFile(new File(hostConfigPath, configFileName), config);
     }
 }

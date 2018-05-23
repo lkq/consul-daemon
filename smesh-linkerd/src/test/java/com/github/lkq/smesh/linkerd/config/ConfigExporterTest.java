@@ -32,7 +32,7 @@ class ConfigExporterTest {
 
         String configFileName = "config-" + System.currentTimeMillis() + ".yaml";
 
-        String dest = configExporter.writeToFile(config, new File(configPath, configFileName));
+        String dest = configExporter.writeToFile(new File(configPath, configFileName), config);
 
         assertThat(dest, is(configPath + configFileName));
         String content = FileUtils.readFileToString(new File(configPath, configFileName), Constants.ENCODING_UTF8);

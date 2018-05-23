@@ -16,9 +16,6 @@ import java.net.InetAddress;
 import java.util.List;
 
 public class Launcher {
-    String ENV_NODE_NAME = "consul.node.name";
-    String ENV_CONSUL_ROLE = "consul.node.role";
-    String ENV_CONSUL_CLUSTER_MEMBERS = "consul.cluster.members";
 
     public static void main(String[] args) {
         JulToSlf4jBridge.setup();
@@ -30,19 +27,17 @@ public class Launcher {
 
         EC2 ec2 = EC2Factory.get();
 
-        boolean isEC2 = ec2.isEc2();
-
         String nodeName = getNodeName(ec2);
-        List<String> clusterMembers = getClusterMembers(ec2, isEC2);
+        List<String> clusterMembers = getClusterMembers(ec2);
 
         ConsulCommandBuilder serverCommand = ConsulCommandBuilder.server(true, clusterMembers);
 
-        String localDataPath = new File("").getAbsolutePath() + "/data/" + nodeName + "-" + System.currentTimeMillis();
-        ConsulClient consulClient = new ConsulClient(new SimpleHttpClient(), new ResponseParser(), "http://localhost:8500");
+        String hostDataPath = new File("").getAbsolutePath() + "/data/" + nodeName + "-" + System.currentTimeMillis();
+        ConsulClient consulClient = new ConsulClient(new SimpleHttpClient(), new ResponseParser(), Constants.CONSUL_URL);
         App app = appMaker.makeApp(0, nodeName,
                 ContainerNetwork.CONSUL_SERVER,
                 serverCommand,
-                localDataPath,
+                hostDataPath,
                 AppVersion.get(App.class), consulClient
         );
 
@@ -52,11 +47,11 @@ public class Launcher {
     }
 
     private String getNodeName(EC2 ec2) {
-        return ec2.isEc2() ? ec2.getTagValue(ENV_NODE_NAME) : InetAddress.getLoopbackAddress().getHostName();
+        return ec2.isEc2() ? ec2.getTagValue(Constants.ENV_NODE_NAME) : InetAddress.getLoopbackAddress().getHostName();
     }
 
-    private List<String> getClusterMembers(EC2 ec2, boolean isEC2) {
-        return isEC2 ? ec2.getInstanceIPByTagValue(ENV_CONSUL_ROLE, "client") : Env.getList(ENV_CONSUL_CLUSTER_MEMBERS, " ");
+    private List<String> getClusterMembers(EC2 ec2) {
+        return ec2.isEc2() ? ec2.getInstanceIPByTagValue(Constants.ENV_CONSUL_ROLE, "server") : Env.getList(Constants.ENV_CONSUL_CLUSTER_MEMBERS, " ");
     }
 
 

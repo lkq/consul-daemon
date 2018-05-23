@@ -6,5 +6,8 @@ public interface Constants {
     String CONTAINER_DATA_PATH = "/consul/data";
     String APP_NAME = "smesh-consul";
     String CONSUL_IMAGE = "consul:1.0.6";
-    String NETWORK_HOST = "host";
+    String CONSUL_URL = "http://localhost:8500";
+    String ENV_NODE_NAME = "consul.node.name";
+    String ENV_CONSUL_ROLE = "consul.node.role";
+    String ENV_CONSUL_CLUSTER_MEMBERS = "consul.cluster.members";
 }
