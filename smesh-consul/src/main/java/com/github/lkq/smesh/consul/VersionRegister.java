@@ -21,23 +21,38 @@ public class VersionRegister {
 
     public void registerVersion() {
         new Thread(() -> {
-            String registeredVersion = registeredVersion();
-            while (!expectedVersion.equals(registeredVersion)) {
-                consulClient.putKeyValue(versionKey, expectedVersion);
-                registeredVersion = registeredVersion();
-
+            String registeredVersion = "";
+            do {
+                delay(interval);
                 try {
-                    if (interval > 0) {
-                        Thread.sleep(interval);
-                    }
-                } catch (InterruptedException ignored) { }
-            }
+                    consulClient.putKeyValue(versionKey, expectedVersion);
+                    registeredVersion = registeredVersion();
+
+                } catch (Exception e) {
+                    logger.error("failed to register version: {}", e.getMessage());
+                }
+
+            } while (!expectedVersion.equals(registeredVersion));
             logger.info("registered version: {}", registeredVersion);
         }).start();
     }
 
+    private void delay(int interval) {
+        try {
+            if (interval > 0) {
+                Thread.sleep(interval);
+            }
+        } catch (InterruptedException ignored) {
+        }
+    }
+
     public String registeredVersion() {
-        return consulClient.getKeyValue(versionKey);
+        try {
+            return consulClient.getKeyValue(versionKey);
+        } catch (Exception e) {
+            logger.warn("failed to get registered version: {}", e.getMessage());
+        }
+        return "";
     }
 
     public String expectedVersion() {

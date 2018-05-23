@@ -1,6 +1,7 @@
 package com.github.lkq.smesh.test;
 
 import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.lkq.smesh.consul.App;
 import com.github.lkq.smesh.consul.AppMaker;
 import com.github.lkq.smesh.consul.client.ConsulClient;
@@ -24,10 +25,13 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+
+import static com.github.lkq.smesh.linkerd.Constants.VAR_CONSUL_HOST;
 
 public class TestEngine {
 
-    public static final String USER_APP_CONTAINER_ID = "userapp";
+    public static final String USER_APP = "userapp";
     private static Logger logger = LoggerFactory.getLogger(TestEngine.class);
 
     private final UserAppPackager packager = new UserAppPackager();
@@ -38,8 +42,8 @@ public class TestEngine {
     public void startEverything() throws IOException, InterruptedException {
 
         String consul = startConsul(1025);
-        String linkerd = startLinkerd(1026);
-        String userApp = startUserApp(8081, "ws://172.17.0.2:1025/register");
+        String linkerd = startLinkerd(1026, consul);
+        String userApp = startUserApp(8081, "ws://127.0.0.1:1025/register");
     }
 
     /**
@@ -80,16 +84,27 @@ public class TestEngine {
      * @return container id
      * @param appPort
      */
-    public String startLinkerd(int appPort) {
+    public String startLinkerd(int appPort, String consulContainer) {
 
-        String localConfigPath = com.github.lkq.smesh.linkerd.AppMaker.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        String hostConfigPath = com.github.lkq.smesh.linkerd.AppMaker.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+
+        HashMap<String, String> configVariables = createConfigVariables(consulContainer);
 
         com.github.lkq.smesh.linkerd.AppMaker appMaker = new com.github.lkq.smesh.linkerd.AppMaker();
-        com.github.lkq.smesh.linkerd.App app = appMaker.makeApp(appPort, ContainerNetwork.LINKERD_MAC, localConfigPath, "1.2.3");
+        com.github.lkq.smesh.linkerd.App app = appMaker.makeApp(appPort, ContainerNetwork.LINKERD_MAC, configVariables, hostConfigPath, "1.2.3");
 
         Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
 
         return app.start();
+    }
+
+    private HashMap<String, String> createConfigVariables(String consulContainer) {
+        SimpleDockerClient docker = SimpleDockerClient.create(DockerClientFactory.get());
+        InspectContainerResponse consul = docker.inspectContainer(consulContainer);
+        String consulIP = consul.getNetworkSettings().getNetworks().get("bridge").getIpAddress();
+        HashMap<String, String> configVariables = new HashMap<>();
+        configVariables.put(VAR_CONSUL_HOST, consulIP);
+        return configVariables;
     }
 
     /**
@@ -103,10 +118,11 @@ public class TestEngine {
         logger.info("test server build success: {}/{}", artifact[0], artifact[1]);
         String image = imageBuilder.build(artifact[0], artifact[1], registerURL);
 
-        if (simpleDockerClient.containerExists(USER_APP_CONTAINER_ID)) {
-            simpleDockerClient.removeContainer(USER_APP_CONTAINER_ID);
+        if (simpleDockerClient.containerExists(USER_APP)) {
+            simpleDockerClient.stopContainer(USER_APP);
+            simpleDockerClient.removeContainer(USER_APP);
         }
-        String containerId = simpleDockerClient.createContainer(image, USER_APP_CONTAINER_ID)
+        String containerId = simpleDockerClient.createContainer(image, USER_APP)
                 .withPortBinders(Arrays.asList(new PortBinding(restPort, PortBinding.Protocol.TCP)))
                 .build();
         simpleDockerClient.startContainer(containerId);

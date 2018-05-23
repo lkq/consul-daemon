@@ -20,6 +20,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 
+import static com.github.lkq.smesh.linkerd.Constants.*;
+
 public class AppMaker {
 
     private static Logger logger = LoggerFactory.getLogger(AppMaker.class);
@@ -28,24 +30,23 @@ public class AppMaker {
      * put every piece together
      *
      * @param network
+     * @param configVariables
      * @param hostConfigPath
      * @param appVersion
      * @return
      */
-    public App makeApp(int restPort, ContainerNetwork network, String hostConfigPath, String appVersion) {
+    public App makeApp(int restPort, ContainerNetwork network, HashMap<String, String> configVariables, String hostConfigPath, String appVersion) {
 
-        String configFileName = Constants.LINKERD_CONFIG_PREFIX + "-" + appVersion + ".yaml";
+        String configFileName = LINKERD_CONFIG_PREFIX + "-" + appVersion + ".yaml";
 
-        HashMap<String, String> variables = new HashMap<>();
-        variables.put(com.github.lkq.smesh.linkerd.Constants.VAR_CONSUL_HOST, "172.17.0.2");
-        processConfig(new ConfigProcessor(), variables, "/template", Constants.CONFIG_FINENAME, hostConfigPath, configFileName);
+        processConfig(new ConfigProcessor(), configVariables, "/template", CONFIG_FINENAME, hostConfigPath, configFileName);
 
         LinkerdContextFactory contextFactory = new LinkerdContextFactory();
         ContainerContext context = contextFactory.createDefaultContext()
-                .volumeBindings(new VolumeBinding(hostConfigPath, Constants.CONTAINER_CONFIG_PATH))
+                .volumeBindings(new VolumeBinding(hostConfigPath, CONTAINER_CONFIG_PATH))
                 .portBindings(network.portBindings())
                 .network(network.network())
-                .commandBuilder(new LinkerdCommandBuilder(Constants.CONTAINER_CONFIG_PATH + "/" + configFileName));
+                .commandBuilder(new LinkerdCommandBuilder(CONTAINER_CONFIG_PATH + "/" + configFileName));
 
         LinkerdController linkerdController = new LinkerdController(SimpleDockerClient.create(DockerClientFactory.get()));
         WebServer webServer = new WebServer(restPort, new LinkerdRoutes());

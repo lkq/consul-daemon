@@ -37,7 +37,7 @@ public class ConfigProcessor {
             StringWriter configWriter = new StringWriter();
             template.process(variables, configWriter);
             String content = configWriter.toString();
-            logger.info("processed linkerd config: {}", content);
+            logger.info("loaded linkerd config: \n{}", content);
             return content;
         } catch (Exception e) {
             throw new SmeshException("failed to prepare config file", e);
