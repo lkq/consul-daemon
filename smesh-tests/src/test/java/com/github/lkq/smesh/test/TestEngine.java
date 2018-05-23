@@ -22,10 +22,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 public class TestEngine {
 
@@ -75,18 +73,6 @@ public class TestEngine {
         Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
 
         return app.start(true);
-    }
-
-    public static List<PortBinding> consulPortBindings() {
-        List<PortBinding> portBindings = new ArrayList<>();
-        portBindings.add(new PortBinding(8300, PortBinding.Protocol.TCP));
-        portBindings.add(new PortBinding(8301, PortBinding.Protocol.TCP));
-        portBindings.add(new PortBinding(8302, PortBinding.Protocol.TCP));
-        portBindings.add(new PortBinding(8400, PortBinding.Protocol.TCP));
-        portBindings.add(new PortBinding(8500, PortBinding.Protocol.TCP));
-        portBindings.add(new PortBinding(8301, PortBinding.Protocol.UDP));
-        portBindings.add(new PortBinding(8302, PortBinding.Protocol.UDP));
-        return portBindings;
     }
 
     /**
