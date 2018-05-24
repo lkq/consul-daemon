@@ -29,8 +29,8 @@ import java.util.HashMap;
 import static com.github.lkq.smesh.linkerd.Constants.VAR_CONSUL_HOST;
 
 public class TestEngine {
-
     public static final String USER_APP = "userapp";
+
     private static Logger logger = LoggerFactory.getLogger(TestEngine.class);
 
     private final UserAppPackager packager = new UserAppPackager();
@@ -39,12 +39,19 @@ public class TestEngine {
      */
     private final SimpleDockerClient simpleDockerClient = SimpleDockerClient.create(DockerClientFactory.create());
     private final UserAppImageBuilder imageBuilder = new UserAppImageBuilder(DockerClientFactory.create());
+    private App consulApp;
+    private com.github.lkq.smesh.linkerd.App linkerdApp;
 
     public void startEverything() throws IOException, InterruptedException {
 
         String consul = startConsul(1025);
         String linkerd = startLinkerd(1026, consul);
         String userApp = quickStartUserApp(8081, "ws://127.0.0.1:1025/register", "/Users/kingson/Sandbox/smesh/smesh-tests/target/", "smesh-tests-0.1.0-SNAPSHOT.jar");
+    }
+
+    public void stopEverything() {
+        consulApp.stop();
+        linkerdApp.stop();
     }
 
     /**
@@ -66,7 +73,7 @@ public class TestEngine {
             logger.info("created config dir: {}", localDataPath);
         }
         ConsulClient consulClient = new ConsulClient(new SimpleHttpClient(), new ResponseParser(), "http://localhost:8500");
-        App app = appMaker.makeApp(
+        consulApp = appMaker.makeApp(
                 appPort,
                 nodeName,
                 ContainerNetwork.CONSUL_MAC,
@@ -75,9 +82,7 @@ public class TestEngine {
                 "1.2.3",
                 consulClient);
 
-        Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
-
-        return app.start(true);
+        return consulApp.start(true);
     }
 
     /**
@@ -89,23 +94,12 @@ public class TestEngine {
 
         String hostConfigPath = com.github.lkq.smesh.linkerd.AppMaker.class.getProtectionDomain().getCodeSource().getLocation().getPath();
 
-        HashMap<String, String> configVariables = createConfigVariables(consulContainer);
+        HashMap<String, String> configVariables = createLinkerdConfigVariables(consulContainer);
 
         com.github.lkq.smesh.linkerd.AppMaker appMaker = new com.github.lkq.smesh.linkerd.AppMaker();
-        com.github.lkq.smesh.linkerd.App app = appMaker.makeApp(appPort, ContainerNetwork.LINKERD_MAC, configVariables, hostConfigPath, "1.2.3");
+        linkerdApp = appMaker.makeApp(appPort, ContainerNetwork.LINKERD_MAC, configVariables, hostConfigPath, "1.2.3");
 
-        Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
-
-        return app.start();
-    }
-
-    private HashMap<String, String> createConfigVariables(String consulContainer) {
-        SimpleDockerClient docker = SimpleDockerClient.create(DockerClientFactory.get());
-        InspectContainerResponse consul = docker.inspectContainer(consulContainer);
-        String consulIP = consul.getNetworkSettings().getNetworks().get("bridge").getIpAddress();
-        HashMap<String, String> configVariables = new HashMap<>();
-        configVariables.put(VAR_CONSUL_HOST, consulIP);
-        return configVariables;
+        return linkerdApp.start();
     }
 
     /**
@@ -154,4 +148,12 @@ public class TestEngine {
         }
     }
 
+    private HashMap<String, String> createLinkerdConfigVariables(String consulContainer) {
+        SimpleDockerClient docker = SimpleDockerClient.create();
+        InspectContainerResponse consul = docker.inspectContainer(consulContainer);
+        String consulIP = consul.getNetworkSettings().getNetworks().get("bridge").getIpAddress();
+        HashMap<String, String> configVariables = new HashMap<>();
+        configVariables.put(VAR_CONSUL_HOST, consulIP);
+        return configVariables;
+    }
 }

@@ -5,7 +5,6 @@ import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.command.StartContainerCmd;
 import com.github.dockerjava.api.model.Frame;
 import com.github.lkq.smesh.docker.ContainerLogger;
-import com.github.lkq.smesh.docker.DockerClientFactory;
 import com.github.lkq.smesh.docker.SimpleDockerClient;
 import com.github.lkq.smesh.exception.SmeshException;
 import org.hamcrest.CoreMatchers;
@@ -76,7 +75,7 @@ class SimpleDockerClientTest {
     @Test
     void testContainerLifeCycle() {
         String containerID = null;
-        SimpleDockerClient client = SimpleDockerClient.create(DockerClientFactory.get());
+        SimpleDockerClient client = SimpleDockerClient.create();
         try {
             String imageName = "hello-world";
             String containerName = imageName + "-" + System.currentTimeMillis();
@@ -96,7 +95,7 @@ class SimpleDockerClientTest {
     @Test
     void willReturnFalseIfContainerNotExists() {
         String currentName = "dummy-container-" + System.currentTimeMillis();
-        SimpleDockerClient client = SimpleDockerClient.create(DockerClientFactory.get());
+        SimpleDockerClient client = SimpleDockerClient.create();
         boolean renamed = client.renameContainer(currentName, "dummy-container");
         MatcherAssert.assertThat(renamed, CoreMatchers.is(false));
     }
@@ -105,7 +104,7 @@ class SimpleDockerClientTest {
     @Test
     void canRenameContainer() throws InterruptedException, IOException {
         String containerID = null;
-        SimpleDockerClient client = SimpleDockerClient.create(DockerClientFactory.get());
+        SimpleDockerClient client = SimpleDockerClient.create();
         try {
             client.pullImage(helloWorldImage);
             String oldContainerName = "hello-world-" + System.currentTimeMillis();
@@ -129,7 +128,7 @@ class SimpleDockerClientTest {
     @Test
     void canAttachContainerLogs() {
         String containerName = "hello-world-" + System.currentTimeMillis();
-        SimpleDockerClient client = SimpleDockerClient.create(DockerClientFactory.get());
+        SimpleDockerClient client = SimpleDockerClient.create();
         assertTrue(client.pullImage("busybox:latest"));
 
         String containerID = null;

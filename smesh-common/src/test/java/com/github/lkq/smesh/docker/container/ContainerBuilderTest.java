@@ -114,7 +114,7 @@ class ContainerBuilderTest {
     @Test
     void canActuallyCreateContainer() {
         String containerID = null;
-        DockerClient client = DockerClientFactory.get();
+        DockerClient client = DockerClientFactory.create();
         try {
             SimpleDockerClient simpleDockerClient = SimpleDockerClient.create(client);
 

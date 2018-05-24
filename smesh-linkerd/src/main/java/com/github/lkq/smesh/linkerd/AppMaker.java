@@ -3,7 +3,6 @@ package com.github.lkq.smesh.linkerd;
 import com.github.lkq.smesh.context.ContainerContext;
 import com.github.lkq.smesh.context.VolumeBinding;
 import com.github.lkq.smesh.docker.ContainerNetwork;
-import com.github.lkq.smesh.docker.DockerClientFactory;
 import com.github.lkq.smesh.docker.SimpleDockerClient;
 import com.github.lkq.smesh.exception.SmeshException;
 import com.github.lkq.smesh.linkerd.config.ConfigProcessor;
@@ -48,7 +47,7 @@ public class AppMaker {
                 .network(network.network())
                 .commandBuilder(new LinkerdCommandBuilder(CONTAINER_CONFIG_PATH + "/" + configFileName));
 
-        LinkerdController linkerdController = new LinkerdController(SimpleDockerClient.create(DockerClientFactory.get()));
+        LinkerdController linkerdController = new LinkerdController(SimpleDockerClient.create());
         WebServer webServer = new WebServer(restPort, new LinkerdRoutes());
 
         return new App(context, linkerdController, webServer);

@@ -47,7 +47,7 @@ public class ConsulController {
     }
 
     public void stop(String containerName) {
-        dockerClient.execute(containerName, new String[]{"consul", "leave"});
+//        dockerClient.execute(containerName, new String[]{"consul", "leave"});
         dockerClient.stopContainer(containerName);
     }
 }

@@ -95,7 +95,7 @@ public class UserAppImageBuilder {
 
     public static void main(String[] args) {
         String[] artifact = new UserAppPackager().buildPackage();
-        UserAppImageBuilder imageBuilder = new UserAppImageBuilder(DockerClientFactory.get());
+        UserAppImageBuilder imageBuilder = new UserAppImageBuilder(DockerClientFactory.create());
         imageBuilder.build(artifact[0], artifact[1], "http://172.17.0.2:1025");
     }
 }

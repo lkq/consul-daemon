@@ -24,6 +24,10 @@ public class SimpleDockerClient {
         return new SimpleDockerClient(client);
     }
 
+    public static SimpleDockerClient create() {
+        return new SimpleDockerClient(DockerClientFactory.create());
+    }
+
     private SimpleDockerClient(DockerClient client) {
         this.client = client;
     }
@@ -95,7 +99,7 @@ public class SimpleDockerClient {
     public boolean pullImage(String image) {
         try {
             if (!imageExists(image)) {
-                client.pullImageCmd(image).exec(new PullImageResultCallback()).awaitCompletion(3000, TimeUnit.SECONDS);
+                client.pullImageCmd(image).exec(new PullImageResultCallback()).awaitCompletion(300, TimeUnit.SECONDS);
             }
             return true;
         } catch (Exception e) {
@@ -125,7 +129,7 @@ public class SimpleDockerClient {
             ByteArrayOutputStream stderr = new ByteArrayOutputStream();
             ExecStartResultCallback resultCallback = client.execStartCmd(response.getId())
                     .exec(new ExecStartResultCallback(stdout, stderr));
-            resultCallback.awaitCompletion();
+            resultCallback.awaitCompletion(10, TimeUnit.SECONDS);
             logger.info("execute result: stdout: {}, stderr: {}", stdout.toString(), stderr.toString());
         } catch (Exception e) {
             logger.warn("failed to execute commands, container: {}, command: {}, cause: {}", containerName, Arrays.toString(command), e.getMessage());

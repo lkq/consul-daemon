@@ -4,9 +4,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.hamcrest.CoreMatchers;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.io.IOException;
 
@@ -21,6 +19,11 @@ public class SmeshIntegrationTest {
     @BeforeAll
     static void setUp() throws IOException, InterruptedException {
         testEngine.startEverything();
+    }
+
+    @AfterAll
+    static void tearDown() {
+        testEngine.stopEverything();
     }
 
     @Test

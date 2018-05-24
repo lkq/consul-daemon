@@ -31,7 +31,7 @@ public class AppMaker {
         VersionRegister versionRegister = new VersionRegister(consulClient, Constants.APP_NAME + "-" + nodeName, appVersion, 10000);
 
         ConsulHealthChecker consulHealthChecker = new ConsulHealthChecker(consulClient, context.nodeName(), appVersion);
-        ConsulController consulController = new ConsulController(SimpleDockerClient.create(DockerClientFactory.get()));
+        ConsulController consulController = new ConsulController(SimpleDockerClient.create());
         WebServer webServer = new WebServer(restPort, new RegistrationRoutes(consulClient), new ConsulRoutes(consulHealthChecker));
 
         return new App(context,

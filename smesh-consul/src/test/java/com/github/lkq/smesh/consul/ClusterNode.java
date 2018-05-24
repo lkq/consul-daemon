@@ -7,7 +7,6 @@ import com.github.lkq.smesh.consul.client.http.SimpleHttpClient;
 import com.github.lkq.smesh.consul.command.ConsulCommandBuilder;
 import com.github.lkq.smesh.context.PortBinding;
 import com.github.lkq.smesh.docker.ContainerNetwork;
-import com.github.lkq.smesh.docker.DockerClientFactory;
 import com.github.lkq.smesh.docker.SimpleDockerClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +26,7 @@ public class ClusterNode {
     private final SimpleDockerClient dockerClient;
 
     public ClusterNode() {
-        dockerClient = SimpleDockerClient.create(DockerClientFactory.get());
+        dockerClient = SimpleDockerClient.create();
     }
 
     public void startNodes(int nodeIndex, List<PortBinding> portBindings) {
