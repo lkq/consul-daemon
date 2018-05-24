@@ -1,6 +1,5 @@
 package com.github.lkq.smesh.test;
 
-import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.lkq.smesh.consul.App;
 import com.github.lkq.smesh.consul.AppMaker;
@@ -35,15 +34,17 @@ public class TestEngine {
     private static Logger logger = LoggerFactory.getLogger(TestEngine.class);
 
     private final UserAppPackager packager = new UserAppPackager();
-    private final DockerClient dockerClient = DockerClientFactory.get();
-    private final SimpleDockerClient simpleDockerClient = SimpleDockerClient.create(dockerClient);
-    private final UserAppImageBuilder imageBuilder = new UserAppImageBuilder(dockerClient);
+    /**
+     * if use same DockerClient instance across different threads, it will hang
+     */
+    private final SimpleDockerClient simpleDockerClient = SimpleDockerClient.create(DockerClientFactory.create());
+    private final UserAppImageBuilder imageBuilder = new UserAppImageBuilder(DockerClientFactory.create());
 
     public void startEverything() throws IOException, InterruptedException {
 
         String consul = startConsul(1025);
         String linkerd = startLinkerd(1026, consul);
-        String userApp = startUserApp(8081, "ws://127.0.0.1:1025/register");
+        String userApp = quickStartUserApp(8081, "ws://127.0.0.1:1025/register", "/Users/kingson/Sandbox/smesh/smesh-tests/target/", "smesh-tests-0.1.0-SNAPSHOT.jar");
     }
 
     /**
@@ -115,8 +116,12 @@ public class TestEngine {
      */
     public String startUserApp(int restPort, String registerURL) {
         String[] artifact = packager.buildPackage();
-        logger.info("test server build success: {}/{}", artifact[0], artifact[1]);
-        String image = imageBuilder.build(artifact[0], artifact[1], registerURL);
+        return quickStartUserApp(restPort, registerURL, artifact[0], artifact[1]);
+    }
+
+    public String quickStartUserApp(int restPort, String registerURL, String artifactPath, String artifactName) {
+        logger.info("test server build success: {}/{}", artifactPath, artifactName);
+        String image = imageBuilder.build(artifactPath, artifactName, registerURL);
 
         if (simpleDockerClient.containerExists(USER_APP)) {
             simpleDockerClient.stopContainer(USER_APP);

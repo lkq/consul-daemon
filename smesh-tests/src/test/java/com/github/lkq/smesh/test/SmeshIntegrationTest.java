@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Disabled
 public class SmeshIntegrationTest {
@@ -26,8 +27,19 @@ public class SmeshIntegrationTest {
     void canRouteToTheCorrectServiceViaSmesh() throws InterruptedException, IOException {
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder().url("http://localhost:8080/userapp/users/kingson").get().build();
-        Response response = client.newCall(request).execute();
+
+        int retry = 5;
+        Response response = null;
+        do {
+            try {
+                response = client.newCall(request).execute();
+                retry--;
+            } catch (Exception ignored) {
+                Thread.sleep(3000);
+            }
+        } while (retry > 0 && response == null);
         System.out.println(response.body().string());
+        assertNotNull(response);
         assertThat(response.code(), CoreMatchers.is(200));
     }
 }

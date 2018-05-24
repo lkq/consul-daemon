@@ -31,7 +31,7 @@ class VersionRegisterTest {
         versionRegister.registerVersion();
         delay(30);
 
-        verify(consulClient, times(1)).putKeyValue(TEST_KEY, EXPECTED_VERSION);
+        verify(consulClient, times(2)).putKeyValue(TEST_KEY, EXPECTED_VERSION);
     }
 
     @Test
@@ -40,7 +40,7 @@ class VersionRegisterTest {
         versionRegister.registerVersion();
         delay(30);
 
-        verify(consulClient, never()).putKeyValue(anyString(), anyString());
+        verify(consulClient, times(1)).putKeyValue(anyString(), anyString());
     }
 
     @Test
@@ -49,7 +49,7 @@ class VersionRegisterTest {
         versionRegister.registerVersion();
         delay(50);
 
-        verify(consulClient, times(2)).putKeyValue(TEST_KEY, EXPECTED_VERSION);
+        verify(consulClient, times(3)).putKeyValue(TEST_KEY, EXPECTED_VERSION);
     }
 
     private void delay(int millis) {

@@ -59,9 +59,11 @@ public class AppMaker {
         String configContent = processor.process(templateRoot, sourceFileName, variables, AppMaker.class);
 
         try {
-            FileUtils.writeStringToFile(new File(hostConfigRoot, targetFileName),
+            File targetFile = new File(hostConfigRoot, targetFileName);
+            FileUtils.writeStringToFile(targetFile,
                     configContent,
                     com.github.lkq.smesh.Constants.ENCODING_UTF8);
+            logger.info("writing linkerd config to: {}", targetFile);
         } catch (IOException e) {
             throw new SmeshException("failed to write config to file: " + hostConfigRoot + "/" + targetFileName, e);
         }

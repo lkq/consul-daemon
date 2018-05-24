@@ -10,9 +10,13 @@ public class DockerClientFactory {
 
     public synchronized static DockerClient get() {
         if (client == null) {
-            DefaultDockerClientConfig.Builder configBuilder = DefaultDockerClientConfig.createDefaultConfigBuilder();
-            client = DockerClientBuilder.getInstance(configBuilder.build()).build();
+            client = create();
         }
         return client;
+    }
+
+    public static DockerClient create() {
+        DefaultDockerClientConfig.Builder configBuilder = DefaultDockerClientConfig.createDefaultConfigBuilder();
+        return DockerClientBuilder.getInstance(configBuilder.build()).build();
     }
 }
