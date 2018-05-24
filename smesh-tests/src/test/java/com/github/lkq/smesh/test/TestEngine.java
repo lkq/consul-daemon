@@ -92,7 +92,7 @@ public class TestEngine {
      */
     public String startLinkerd(int appPort, String consulContainer) {
 
-        String hostConfigPath = com.github.lkq.smesh.linkerd.AppMaker.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        String hostConfigPath = ClassLoader.getSystemResource("").getPath();
 
         HashMap<String, String> configVariables = createLinkerdConfigVariables(consulContainer);
 
