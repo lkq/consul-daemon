@@ -5,6 +5,9 @@ import com.github.lkq.smesh.test.AttachLogging;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.net.URL;
+
 /**
  * build the UserApp package
  */
@@ -16,7 +19,10 @@ public class UserAppPackager {
 
     public String[] buildPackage() {
         try {
-            Process mvn = new ProcessBuilder("mvn", "install", "-DskipTests=true").start();
+            URL classRoot = ClassLoader.getSystemResource("");
+            File projectRoot = new File(classRoot.getFile()).getParentFile().getParentFile();
+            logger.info("running mvn in {}", projectRoot);
+            Process mvn = new ProcessBuilder("mvn", "install", "-DskipTests=true").directory(projectRoot).start();
 
             ArtifactExtractor extractor = new ArtifactExtractor(ARTIFACT_PATTERN, "path", "name");
             AttachLogging logging = AttachLogging.attach(mvn.getInputStream(), extractor);
