@@ -45,7 +45,6 @@ public class LinkerdController {
     }
 
     public void stop(String containerName) {
-        dockerClient.execute(containerName, new String[]{"consul", "leave"});
         dockerClient.stopContainer(containerName);
     }
 }

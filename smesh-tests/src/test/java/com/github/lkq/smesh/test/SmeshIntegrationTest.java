@@ -20,7 +20,6 @@ public class SmeshIntegrationTest {
     @BeforeAll
     static void setUp() throws IOException, InterruptedException {
         testEngine.startEverything();
-
     }
 
     @Test
