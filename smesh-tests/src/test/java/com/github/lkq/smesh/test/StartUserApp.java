@@ -2,7 +2,7 @@ package com.github.lkq.smesh.test;
 
 public class StartUserApp {
     public static void main(String[] args) {
-        new TestEngine().startUserApp(8081, "ws://localhost:1025/register");
+        TestEngine.get().startUserApp(8081, "ws://localhost:1025/register");
 
 
         try {

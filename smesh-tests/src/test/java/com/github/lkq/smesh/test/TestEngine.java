@@ -33,25 +33,42 @@ public class TestEngine {
 
     private static Logger logger = LoggerFactory.getLogger(TestEngine.class);
 
-    private final UserAppPackager packager = new UserAppPackager();
-    /**
-     * if use same DockerClient instance across different threads, it will hang
-     */
-    private final SimpleDockerClient simpleDockerClient = SimpleDockerClient.create(DockerClientFactory.create());
-    private final UserAppImageBuilder imageBuilder = new UserAppImageBuilder(DockerClientFactory.create());
+    private SimpleDockerClient simpleDockerClient = SimpleDockerClient.create(DockerClientFactory.create());
+
+    private UserAppPackager packager = new UserAppPackager();
+    private UserAppImageBuilder imageBuilder = new UserAppImageBuilder(DockerClientFactory.create());
+
     private App consulApp;
     private com.github.lkq.smesh.linkerd.App linkerdApp;
 
-    public void startEverything() throws IOException, InterruptedException {
+    private static Boolean started = false;
 
-        String consul = startConsul(1025);
-        String linkerd = startLinkerd(1026, consul);
-        String userApp = quickStartUserApp(8081, "ws://localhost:1025/register", "/Users/kingson/Sandbox/smesh/smesh-tests/target/", "smesh-tests-0.1.0-SNAPSHOT.jar");
+    private static TestEngine instance = new TestEngine();
+    private String consulContainer;
+    private String linkerdContainer;
+    private String userAppContainer;
+
+    public static TestEngine get() {
+        return instance;
+    }
+
+    private TestEngine(){}
+
+    public synchronized void startEverything() throws IOException, InterruptedException {
+        if (!started) {
+            consulContainer = startConsul(1025);
+            linkerdContainer = startLinkerd(1026, consulContainer);
+            userAppContainer = quickStartUserApp(8081, "ws://localhost:1025/register", "/Users/kingson/Sandbox/smesh/smesh-tests/target/", "smesh-tests-0.1.0-SNAPSHOT.jar");
+            started = true;
+        } else {
+            logger.info("test engine already started");
+        }
     }
 
     public void stopEverything() {
         consulApp.stop();
         linkerdApp.stop();
+        simpleDockerClient.stopContainer(userAppContainer);
     }
 
     /**

@@ -19,17 +19,15 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class SmeshIntegrationTest {
     private static Logger logger = LoggerFactory.getLogger(SmeshIntegrationTest.class);
 
-    private static TestEngine testEngine = new TestEngine();
-
     @BeforeAll
     static void setUp() throws IOException, InterruptedException {
         JulToSlf4jBridge.setup();
-        testEngine.startEverything();
+        TestEngine.get().startEverything();
     }
 
     @AfterAll
     static void tearDown() {
-        testEngine.stopEverything();
+        TestEngine.get().stopEverything();
     }
 
     @Test
