@@ -131,7 +131,7 @@ public class TestEngine {
     }
 
     public String quickStartUserApp(int restPort, String registerURL, String artifactPath, String artifactName) {
-        logger.info("test server build success: {}/{}", artifactPath, artifactName);
+        logger.info("test server build success: {}{}", artifactPath, artifactName);
         String image = imageBuilder.build(artifactPath, artifactName, registerURL);
 
         if (simpleDockerClient.containerExists(USER_APP)) {
@@ -144,17 +144,19 @@ public class TestEngine {
         simpleDockerClient.startContainer(containerId);
         simpleDockerClient.attachLogging(containerId, new ContainerLogger());
 
-        registerUserApp();
+        registerUserApp(containerId);
 
         return containerId;
     }
 
-    private void registerUserApp() {
+    private void registerUserApp(String containerId) {
         try {
+            InspectContainerResponse container = simpleDockerClient.inspectContainer(containerId);
+            String address = container.getNetworkSettings().getNetworks().get("bridge").getIpAddress();
             String service = Service.create()
                     .withID("userapp-" + System.currentTimeMillis())
                     .withName("userapp")
-                    .withAddress("172.17.0.3")
+                    .withAddress(address)
                     .withPort(8081).build();
 
             Smesh smesh = new Smesh(new URI("ws://localhost:1025/register"));
