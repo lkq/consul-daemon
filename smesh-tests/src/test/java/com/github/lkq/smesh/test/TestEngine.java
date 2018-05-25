@@ -46,7 +46,7 @@ public class TestEngine {
 
         String consul = startConsul(1025);
         String linkerd = startLinkerd(1026, consul);
-        String userApp = quickStartUserApp(8081, "ws://127.0.0.1:1025/register", "/Users/kingson/Sandbox/smesh/smesh-tests/target/", "smesh-tests-0.1.0-SNAPSHOT.jar");
+        String userApp = quickStartUserApp(8081, "ws://localhost:1025/register", "/Users/kingson/Sandbox/smesh/smesh-tests/target/", "smesh-tests-0.1.0-SNAPSHOT.jar");
     }
 
     public void stopEverything() {

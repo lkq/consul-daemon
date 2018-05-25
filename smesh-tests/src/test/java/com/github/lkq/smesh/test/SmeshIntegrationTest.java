@@ -8,6 +8,8 @@ import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -15,6 +17,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class SmeshIntegrationTest {
+    private static Logger logger = LoggerFactory.getLogger(SmeshIntegrationTest.class);
 
     private static TestEngine testEngine = new TestEngine();
 
@@ -44,7 +47,7 @@ public class SmeshIntegrationTest {
                 Thread.sleep(3000);
             }
         } while (retry > 0 && response == null);
-        System.out.println(response.body().string());
+        logger.info(response.body().string());
         assertNotNull(response);
         assertThat(response.code(), CoreMatchers.is(200));
     }
