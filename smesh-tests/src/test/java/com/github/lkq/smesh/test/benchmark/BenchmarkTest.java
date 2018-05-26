@@ -20,7 +20,7 @@ public class BenchmarkTest {
         TestEngine.get().stopEverything();
         System.exit(0);
     }
-;
+
     void runDefaultTests() throws IOException {
         OkHttpClient httpClient = new OkHttpClient();
         Request request = new Request.Builder().get().url("http://localhost:8080/userapp/users/kingson").build();

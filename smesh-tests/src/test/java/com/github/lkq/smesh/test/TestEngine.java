@@ -30,6 +30,8 @@ import static com.github.lkq.smesh.linkerd.Constants.VAR_CONSUL_HOST;
 
 public class TestEngine {
     public static final String USER_APP = "userapp";
+    public static final int REG_PORT = 1025;
+    public static final int LINKERD_PORT = 1026;
 
     private static Logger logger = LoggerFactory.getLogger(TestEngine.class);
 
@@ -56,9 +58,10 @@ public class TestEngine {
 
     public synchronized void startEverything() throws IOException, InterruptedException {
         if (!started) {
-            consulContainer = startConsul(1025);
-            linkerdContainer = startLinkerd(1026, consulContainer);
-            userAppContainer = quickStartUserApp(8081, "ws://localhost:1025/register", "/Users/kingson/Sandbox/smesh/smesh-tests/target/", "smesh-tests-0.1.0-SNAPSHOT.jar");
+            consulContainer = startConsul(REG_PORT);
+            linkerdContainer = startLinkerd(LINKERD_PORT, consulContainer);
+//            userAppContainer = quickStartUserApp(8081, "ws://localhost:1025/register", "/Users/kingson/Sandbox/smesh/smesh-tests/target/", "smesh-tests-0.1.0-SNAPSHOT.jar");
+            userAppContainer = startUserApp(8081, "ws://localhost:" + REG_PORT + "/register");
             started = true;
         } else {
             logger.info("test engine already started");
@@ -144,12 +147,12 @@ public class TestEngine {
         simpleDockerClient.startContainer(containerId);
         simpleDockerClient.attachLogging(containerId, new ContainerLogger());
 
-        registerUserApp(containerId);
+        registerUserApp(containerId, restPort, registerURL);
 
         return containerId;
     }
 
-    private void registerUserApp(String containerId) {
+    private void registerUserApp(String containerId, int restPort, String registerURL) {
         try {
             InspectContainerResponse container = simpleDockerClient.inspectContainer(containerId);
             String address = container.getNetworkSettings().getNetworks().get("bridge").getIpAddress();
@@ -157,9 +160,9 @@ public class TestEngine {
                     .withID("userapp-" + System.currentTimeMillis())
                     .withName("userapp")
                     .withAddress(address)
-                    .withPort(8081).build();
+                    .withPort(restPort).build();
 
-            Smesh smesh = new Smesh(new URI("ws://localhost:1025/register"));
+            Smesh smesh = new Smesh(new URI(registerURL));
             smesh.register(service);
             System.out.println("service registered: " + service);
         } catch (Exception e) {
