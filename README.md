@@ -7,19 +7,19 @@ a service mesh implementation using linkerd and consul
 
 ## Linkerd
 
-smesh-linkerd is a daemon process to manage linkerd docker container start/stop.
+used a java process (smesh-linkerd) to manage linkerd docker container start/stop.
 
 ## Consul
 
-smesh-consul is a daemon process to manage consul docker container start/stop and cluster construction
+used a java process (smesh-consul) to manage consul docker container start/stop and cluster construction
 
 ### Start / Stop
 
 a new consul container will be created and started together with the daemon process startup.
-when the daemon being shutdown gracefully, a shutdown hook will be triggered to stop the consul container.
+when the daemon being shutdown gracefully, a shutdown hook will be triggered to tell the consul container to leave the cluster before shutdown.
 
 #### start smesh-consul only
-if a running consul container already exists and it's created by the current smesh-consul version, it will attach the running container's log without restarting the container
+if a running consul container already exists and it's created by the current smesh-consul version, it will attach the running container's log without recreating a new one
 
 ## Clustering
 
