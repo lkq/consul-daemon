@@ -2,7 +2,7 @@ package com.github.lkq.smesh.consul;
 
 import com.github.lkq.smesh.server.WebServer;
 import com.github.lkq.smesh.context.ContainerContext;
-import com.github.lkq.smesh.consul.health.ConsulHealthChecker;
+import com.github.lkq.smesh.consul.handler.AppInfo;
 import com.github.lkq.smesh.consul.container.ConsulController;
 import com.github.lkq.smesh.exception.SmeshException;
 import org.slf4j.Logger;
@@ -14,7 +14,7 @@ public class App {
 
     private final ContainerContext context;
     private final ConsulController consulController;
-    private final ConsulHealthChecker consulHealthChecker;
+    private final AppInfo appInfo;
     private final WebServer webServer;
     private final VersionRegister versionRegister;
 
@@ -22,15 +22,15 @@ public class App {
      * application entry point, a place to put together different pieces and make it run
      *  @param context
      * @param consulController
-     * @param consulHealthChecker
+     * @param appInfo
      * @param versionRegister
      * @param webServer
      * @param appVersion
      */
-    public App(ContainerContext context, ConsulController consulController, ConsulHealthChecker consulHealthChecker, VersionRegister versionRegister, WebServer webServer, String appVersion) {
+    public App(ContainerContext context, ConsulController consulController, AppInfo appInfo, VersionRegister versionRegister, WebServer webServer, String appVersion) {
         this.context = context;
         this.consulController = consulController;
-        this.consulHealthChecker = consulHealthChecker;
+        this.appInfo = appInfo;
         this.versionRegister = versionRegister;
         this.webServer = webServer;
     }

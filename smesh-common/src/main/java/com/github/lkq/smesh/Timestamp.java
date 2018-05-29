@@ -16,14 +16,19 @@ public class Timestamp {
 
     public static String upTime() {
 
-        long upTime = (System.currentTimeMillis() - startTime) / 1000;
-        long days = upTime / SECONDS_OF_DAY;
-        long remainsHours = upTime % SECONDS_OF_DAY;
+        long totalSeconds = (System.currentTimeMillis() - startTime) / 1000;
+        long days = totalSeconds / SECONDS_OF_DAY;
+        long remainsHours = totalSeconds % SECONDS_OF_DAY;
         long hours = remainsHours / SECONDS_OF_HOUR;
         long minutes = remainsHours % SECONDS_OF_HOUR / SECONDS_OF_MINUTE;
 
-        return String.valueOf(days) + "d " +
-                hours + ":" +
-                minutes;
+        StringBuilder upTime = new StringBuilder();
+        if (days > 0) {
+            upTime.append(days).append("d ");
+        }
+        upTime.append(String.format("%02d", hours))
+                .append(":")
+                .append(String.format("%02d", minutes));
+        return upTime.toString();
     }
 }

@@ -4,13 +4,12 @@ import com.github.lkq.smesh.consul.client.ConsulClient;
 import com.github.lkq.smesh.consul.command.ConsulCommandBuilder;
 import com.github.lkq.smesh.consul.container.ConsulController;
 import com.github.lkq.smesh.consul.context.ConsulContextFactory;
-import com.github.lkq.smesh.consul.health.ConsulHealthChecker;
+import com.github.lkq.smesh.consul.handler.AppInfo;
 import com.github.lkq.smesh.consul.routes.v1.ConsulRoutes;
 import com.github.lkq.smesh.consul.routes.v1.RegistrationRoutes;
 import com.github.lkq.smesh.context.ContainerContext;
 import com.github.lkq.smesh.context.VolumeBinding;
 import com.github.lkq.smesh.docker.ContainerNetwork;
-import com.github.lkq.smesh.docker.DockerClientFactory;
 import com.github.lkq.smesh.docker.SimpleDockerClient;
 import com.github.lkq.smesh.server.WebServer;
 import com.github.lkq.timeron.Timer;
@@ -30,13 +29,13 @@ public class AppMaker {
 
         VersionRegister versionRegister = new VersionRegister(consulClient, Constants.APP_NAME + "-" + nodeName, appVersion, 10000);
 
-        ConsulHealthChecker consulHealthChecker = new ConsulHealthChecker(consulClient, context.nodeName(), appVersion);
+        AppInfo appInfo = new AppInfo(consulClient, context.nodeName());
         ConsulController consulController = new ConsulController(SimpleDockerClient.create());
-        WebServer webServer = new WebServer(restPort, new RegistrationRoutes(consulClient), new ConsulRoutes(consulHealthChecker));
+        WebServer webServer = new WebServer(restPort, new RegistrationRoutes(consulClient), new ConsulRoutes(appInfo));
 
         return new App(context,
                 consulController,
-                consulHealthChecker,
+                appInfo,
                 versionRegister,
                 webServer,
                 appVersion

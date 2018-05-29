@@ -20,6 +20,6 @@ class TimestampTest {
         String upTime = Timestamp.upTime();
         Thread.sleep(10);
         logger.info("upTime: {}", upTime);
-        assertTrue(upTime.matches("\\d+d \\d+:\\d+"));
+        assertTrue(upTime.matches("(\\d+d )?\\d{2}:\\d{2}"));
     }
 }

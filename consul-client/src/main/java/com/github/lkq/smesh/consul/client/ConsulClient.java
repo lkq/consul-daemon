@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.Map;
 
 public class ConsulClient {
@@ -33,11 +34,15 @@ public class ConsulClient {
             Response response = httpClient.get(API_V1_HEALTH_NODE + nodeName);
             if (response.status() == 200) {
                 return responseParser.parse(response.body());
+            } else {
+                logger.error("consul is not healthy: " + response);
             }
         } catch (Exception e) {
-            logger.error("failed to get node health: {}, cause={}", nodeName, e.getMessage());
+            logger.error("failed to get node handler: {}, cause={}", nodeName, e.getMessage());
         }
-        return null;
+        Map<String, String> error = new HashMap<>();
+        error.put("Status", "failing");
+        return error;
     }
 
     public boolean putKeyValue(String key, String value) {

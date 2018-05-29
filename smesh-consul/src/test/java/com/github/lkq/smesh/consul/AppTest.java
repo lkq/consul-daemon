@@ -1,7 +1,7 @@
 package com.github.lkq.smesh.consul;
 
 import com.github.lkq.smesh.consul.container.ConsulController;
-import com.github.lkq.smesh.consul.health.ConsulHealthChecker;
+import com.github.lkq.smesh.consul.handler.AppInfo;
 import com.github.lkq.smesh.context.ContainerContext;
 import com.github.lkq.smesh.server.WebServer;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +21,7 @@ class AppTest {
     @Mock
     private ConsulController consulController;
     @Mock
-    private ConsulHealthChecker consulHealthChecker;
+    private AppInfo appInfo;
     @Mock
     private WebServer webServer;
     @Mock
@@ -31,7 +31,7 @@ class AppTest {
     @BeforeEach
     void setUp() {
         initMocks(this);
-        app = new App(context, consulController, consulHealthChecker, versionRegister, webServer, APP_VERSION);
+        app = new App(context, consulController, appInfo, versionRegister, webServer, APP_VERSION);
     }
 
     @Test
