@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import java.io.IOException;
 
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -17,7 +18,8 @@ import static org.mockito.MockitoAnnotations.initMocks;
 class RegistrationWebSocketTest {
 
     public static final String REQUEST_BODY = "test-register";
-    public static final String SUCCESS_RESPONSE = "{\"status\": \"success\", \"service\":\"test-register\"}";
+    public static final String SUCCESS_RESPONSE = "{\"status\": \"success\",\"service\":\"test-register\"}";
+    public static final String FAIL_RESPONSE = "{\"status\": \"fail\",\"reason\":\"not connected\",\"service\":\"test-register\"}";
     private RegistrationWebSocket socket;
     @Mock
     private ConsulClient client;
@@ -27,6 +29,8 @@ class RegistrationWebSocketTest {
     private ConsulRegistrar registrar;
     @Mock
     private RemoteEndpoint remote;
+    @Mock
+    private ResponseFactory responseFactory;
 
     @BeforeEach
     void setUp() {
@@ -38,8 +42,9 @@ class RegistrationWebSocketTest {
 
         given(registrar.register(REQUEST_BODY)).willReturn(SUCCESS_RESPONSE);
         given(session.getRemote()).willReturn(remote);
+        given(responseFactory.responseSuccess(anyString())).willReturn(SUCCESS_RESPONSE);
 
-        socket = new RegistrationWebSocket(client, () -> registrar);
+        socket = new RegistrationWebSocket(client, () -> registrar, responseFactory);
         socket.connected(session);
         socket.message(session, REQUEST_BODY);
 
@@ -49,7 +54,7 @@ class RegistrationWebSocketTest {
 
     @Test
     void canDeRegisterServiceOnSessionClose() throws IOException {
-        socket = new RegistrationWebSocket(client, () -> registrar);
+        socket = new RegistrationWebSocket(client, () -> registrar, responseFactory);
         socket.connected(session);
         socket.closed(session, 400, "test-deregister");
 
@@ -59,14 +64,15 @@ class RegistrationWebSocketTest {
     @Test
     void canHandleMessageAfterSessionClose() throws IOException {
         given(session.getRemote()).willReturn(remote);
+        given(responseFactory.responseFail(anyString(), anyString())).willReturn(FAIL_RESPONSE);
 
-        socket = new RegistrationWebSocket(client, () -> registrar);
+        socket = new RegistrationWebSocket(client, () -> registrar, responseFactory);
         socket.connected(session);
         socket.closed(session, 400, "test-deregister");
 
         socket.message(session, REQUEST_BODY);
 
         verify(registrar, times(1)).deRegister();
-        verify(remote, times(1)).sendString("");
+        verify(remote, times(1)).sendString(FAIL_RESPONSE);
     }
 }

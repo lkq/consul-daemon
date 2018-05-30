@@ -22,14 +22,16 @@ public class RegistrationWebSocket {
 
     private ConsulClient client;
     private Provider<ConsulRegistrar> registrarFactory;
+    private ResponseFactory responseFactory;
 
     private Map<Session, ConsulRegistrar> registrars;
 
     private static final Queue<Session> sessions = new ConcurrentLinkedQueue<>();
 
-    public RegistrationWebSocket(ConsulClient client, Provider<ConsulRegistrar> registrarFactory) {
+    public RegistrationWebSocket(ConsulClient client, Provider<ConsulRegistrar> registrarFactory, ResponseFactory responseFactory) {
         this.client = client;
         this.registrarFactory = registrarFactory;
+        this.responseFactory = responseFactory;
         this.registrars = new ConcurrentHashMap<>();
     }
 
@@ -54,13 +56,15 @@ public class RegistrationWebSocket {
     @OnWebSocketMessage
     public void message(Session session, String message) throws IOException {
         logger.info("service registration begin, session: {}, request: {}", session.getRemoteAddress(), message);
-        ConsulRegistrar register = registrars.get(session);
-        if (register != null) {
-            String result = register.register(message);
-            session.getRemote().sendString(result);
+        ConsulRegistrar registrar = registrars.get(session);
+        if (registrar != null) {
+            String result = registrar.register(message);
+            String response = responseFactory.responseSuccess(result);
+            session.getRemote().sendString(response);
         } else {
             logger.error("session is invalid: {}", session.getRemoteAddress());
-            session.getRemote().sendString("");
+            String response = responseFactory.responseFail("not connected", String.valueOf(session.getRemoteAddress()));
+            session.getRemote().sendString(response);
         }
     }
 }
