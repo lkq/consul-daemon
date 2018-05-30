@@ -2,7 +2,6 @@ package com.github.lkq.smesh.consul.client;
 
 import com.github.lkq.smesh.consul.client.http.Response;
 import com.github.lkq.smesh.consul.client.http.SimpleHttpClient;
-import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -10,6 +9,7 @@ import org.mockito.Mock;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
@@ -48,7 +48,7 @@ class ConsulClientTest {
         given(parser.parse("any")).willReturn(res);
 
         String value = client.getKeyValue("test-key");
-        assertThat(value, CoreMatchers.is("test-value"));
+        assertThat(value, is("test-value"));
     }
 
     @Test
@@ -67,6 +67,8 @@ class ConsulClientTest {
         given(httpClient.put(anyString(), anyString())).willReturn(response);
         given(response.status()).willReturn(200);
 
-        assertTrue(client.register("test"));
+        assertThat(client.register("test").status(), is(200));
+
+        verify(httpClient, times(1)).put(baseURL + "/v1/agent/service/register", "test");
     }
 }

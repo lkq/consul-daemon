@@ -60,8 +60,7 @@ public class TestEngine {
         if (!started) {
             consulContainer = startConsul(REG_PORT);
             linkerdContainer = startLinkerd(LINKERD_PORT, consulContainer);
-//            userAppContainer = quickStartUserApp(8081, "ws://localhost:1025/register", "/Users/kingson/Sandbox/smesh/smesh-tests/target/", "smesh-tests-0.1.0-SNAPSHOT.jar");
-            userAppContainer = startUserApp(8081, "ws://localhost:" + REG_PORT + "/register");
+            userAppContainer = startUserApp(8081, "ws://localhost:" + REG_PORT + "/register/v1");
             started = true;
         } else {
             logger.info("test engine already started");

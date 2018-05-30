@@ -70,9 +70,8 @@ public class ConsulClient {
         return value;
     }
 
-    public boolean register(String service) {
-        Response response = httpClient.put(API_V1_REG, service);
-        return response.status() == 200;
+    public Response register(String service) {
+        return httpClient.put(API_V1_REG, service);
     }
 
     public static class Builder {

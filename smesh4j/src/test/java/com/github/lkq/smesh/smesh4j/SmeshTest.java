@@ -9,7 +9,7 @@ class SmeshTest {
 
     @Test
     void canRegisterService() throws URISyntaxException {
-        Smesh smesh = new Smesh(new URI("ws://localhost:8080/register"));
+        Smesh smesh = new Smesh(new URI("ws://localhost:8080/register/v1"));
         smesh.register("abc");
     }
 }
