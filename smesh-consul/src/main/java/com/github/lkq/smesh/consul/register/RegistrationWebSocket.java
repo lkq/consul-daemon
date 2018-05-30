@@ -38,7 +38,11 @@ public class RegistrationWebSocket {
     @OnWebSocketConnect
     public void connected(Session session) {
         logger.info("session connected: {}", session.getRemoteAddress());
-        registrars.put(session, registrarFactory.get());
+        if (!registrars.containsKey(session)) {
+            registrars.put(session, registrarFactory.get());
+        } else {
+            logger.error("session already exists: {}", session.getRemoteAddress());
+        }
     }
 
     @OnWebSocketClose
@@ -47,10 +51,10 @@ public class RegistrationWebSocket {
         if (register != null) {
             register.deRegister();
             registrars.remove(session);
+            logger.info("session closed: {}", session.getRemoteAddress());
         } else {
-            logger.warn("register not found for session: {}", session.getRemoteAddress());
+            logger.error("register not found for session: {}", session.getRemoteAddress());
         }
-        logger.info("session closed: {}", session.getRemoteAddress());
     }
 
     @OnWebSocketMessage

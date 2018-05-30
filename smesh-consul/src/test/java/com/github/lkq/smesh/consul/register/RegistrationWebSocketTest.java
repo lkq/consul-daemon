@@ -7,10 +7,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
+import javax.inject.Provider;
 import java.io.IOException;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -53,9 +55,35 @@ class RegistrationWebSocketTest {
     }
 
     @Test
+    void willIgnoreDuplicateConnection() throws IOException {
+
+        given(registrar.register(REQUEST_BODY)).willReturn(SUCCESS_RESPONSE);
+        given(responseFactory.responseSuccess(anyString())).willReturn(SUCCESS_RESPONSE);
+
+        Provider<ConsulRegistrar> provider = mock(Provider.class);
+        given(provider.get()).willReturn(registrar);
+
+        socket = new RegistrationWebSocket(client, provider, responseFactory);
+        socket.connected(session);
+        socket.connected(session);
+
+        verify(provider, times(1)).get();
+    }
+
+    @Test
     void canDeRegisterServiceOnSessionClose() throws IOException {
         socket = new RegistrationWebSocket(client, () -> registrar, responseFactory);
         socket.connected(session);
+        socket.closed(session, 400, "test-deregister");
+
+        verify(registrar, times(1)).deRegister();
+    }
+
+    @Test
+    void willRemoveSessionAfterClose() throws IOException {
+        socket = new RegistrationWebSocket(client, () -> registrar, responseFactory);
+        socket.connected(session);
+        socket.closed(session, 400, "test-deregister");
         socket.closed(session, 400, "test-deregister");
 
         verify(registrar, times(1)).deRegister();
