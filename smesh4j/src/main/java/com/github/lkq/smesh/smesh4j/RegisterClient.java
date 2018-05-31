@@ -46,8 +46,8 @@ public class RegisterClient {
     }
 
     @OnWebSocketMessage
-    public void onMessage(String message) {
-        logger.info("client got: " + message);
+    public void onMessage(Session session, String message) {
+        logger.info("received server response: " + message);
     }
 
     public void register(String service) {

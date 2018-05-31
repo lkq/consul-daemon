@@ -59,7 +59,7 @@ public class RegistrationWebSocket {
 
     @OnWebSocketMessage
     public void message(Session session, String message) throws IOException {
-        logger.info("service registration begin, session: {}, request: {}", session.getRemoteAddress(), message);
+        logger.info("registering service, session: {}, request: {}", session.getRemoteAddress(), message);
         ConsulRegistrar registrar = registrars.get(session);
         if (registrar != null) {
             String result = registrar.register(message);
