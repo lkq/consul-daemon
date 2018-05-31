@@ -15,6 +15,7 @@ public class ConsulClient {
     private String API_V1;
     private String API_V1_KV;
     private String API_V1_REG;
+    private String API_V1_DEREG;
     private String API_V1_HEALTH_NODE;
 
     private final SimpleHttpClient httpClient;
@@ -26,6 +27,7 @@ public class ConsulClient {
         this.API_V1 = baseURL + "/v1/";
         this.API_V1_KV = API_V1 + "kv/";
         this.API_V1_REG = API_V1 + "agent/service/register";
+        this.API_V1_DEREG = API_V1 + "agent/service/deregister";
         this.API_V1_HEALTH_NODE = API_V1 + "health/node/";
     }
 
@@ -74,12 +76,15 @@ public class ConsulClient {
         return httpClient.put(API_V1_REG, service);
     }
 
+    public Response deregister(String service) {
+        return httpClient.put(API_V1_DEREG, service);
+    }
+
     public static class Builder {
 
         private SimpleHttpClient httpClient;
         private ResponseParser responseParser;
-        private String baseURL = "http://localhost";
-        private int port = 8500;
+        private String baseURL = "http://localhost:8500";
 
         public Builder httpClient(SimpleHttpClient httpClient) {
             this.httpClient = httpClient;
@@ -93,11 +98,6 @@ public class ConsulClient {
 
         public Builder baseURL(String baseURL) {
             this.baseURL = baseURL;
-            return this;
-        }
-
-        public Builder port(int port) {
-            this.port = port;
             return this;
         }
 

@@ -36,7 +36,6 @@ class ConsulClientTest {
                 .httpClient(httpClient)
                 .responseParser(parser)
                 .baseURL(baseURL)
-                .port(PORT)
                 .build();
     }
 
@@ -63,12 +62,23 @@ class ConsulClientTest {
     }
 
     @Test
-    void willReturnTrueIfRegisterSuccess() {
+    void canRegisterService() {
         given(httpClient.put(anyString(), anyString())).willReturn(response);
         given(response.status()).willReturn(200);
 
         assertThat(client.register("test").status(), is(200));
 
         verify(httpClient, times(1)).put(baseURL + "/v1/agent/service/register", "test");
+    }
+
+    @Test
+    void canDeRegisterService() {
+        given(httpClient.put(anyString(), anyString())).willReturn(response);
+        given(response.status()).willReturn(200);
+
+        assertThat(client.deregister("test").status(), is(200));
+
+        verify(httpClient, times(1)).put(baseURL + "/v1/agent/service/deregister", "test");
+
     }
 }

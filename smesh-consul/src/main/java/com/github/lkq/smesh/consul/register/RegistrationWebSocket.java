@@ -37,38 +37,50 @@ public class RegistrationWebSocket {
 
     @OnWebSocketConnect
     public void connected(Session session) {
-        logger.info("session connected: {}", session.getRemoteAddress());
-        if (!registrars.containsKey(session)) {
-            registrars.put(session, registrarFactory.get());
-        } else {
-            logger.error("session already exists: {}", session.getRemoteAddress());
+        try {
+            logger.info("session connected: {}", session.getRemoteAddress());
+            if (!registrars.containsKey(session)) {
+                registrars.put(session, registrarFactory.get());
+            } else {
+                logger.error("session already exists: {}", session.getRemoteAddress());
+            }
+        } catch (Exception e) {
+            logger.error("failed when session connected", e);
         }
     }
 
     @OnWebSocketClose
     public void closed(Session session, int statusCode, String reason) {
-        ConsulRegistrar register = registrars.get(session);
-        if (register != null) {
-            register.deRegister();
-            registrars.remove(session);
-            logger.info("session closed: {}", session.getRemoteAddress());
-        } else {
-            logger.error("register not found for session: {}", session.getRemoteAddress());
+        try {
+            ConsulRegistrar register = registrars.get(session);
+            if (register != null) {
+                logger.info("de-registering service, session: {}", session.getRemoteAddress());
+                register.deRegister();
+                registrars.remove(session);
+            } else {
+                logger.error("register not found for session: {}", session.getRemoteAddress());
+            }
+        } catch (Exception e) {
+            logger.error("failed when closing connection");
         }
     }
 
     @OnWebSocketMessage
     public void message(Session session, String message) throws IOException {
         logger.info("registering service, session: {}, request: {}", session.getRemoteAddress(), message);
-        ConsulRegistrar registrar = registrars.get(session);
-        if (registrar != null) {
-            String result = registrar.register(message);
-            String response = responseFactory.responseSuccess(result);
-            session.getRemote().sendString(response);
-        } else {
-            logger.error("session is invalid: {}", session.getRemoteAddress());
-            String response = responseFactory.responseFail("not connected", String.valueOf(session.getRemoteAddress()));
-            session.getRemote().sendString(response);
+        try {
+            ConsulRegistrar registrar = registrars.get(session);
+            if (registrar != null) {
+                String result = registrar.register(message);
+                String response = responseFactory.responseSuccess(result);
+                session.getRemote().sendString(response);
+            } else {
+                logger.error("session is invalid: {}", session.getRemoteAddress());
+                String response = responseFactory.responseFail("not connected", String.valueOf(session.getRemoteAddress()));
+                session.getRemote().sendString(response);
+            }
+        } catch (Exception e) {
+            logger.error("failed to register service", e);
         }
     }
 }
