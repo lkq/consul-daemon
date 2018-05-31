@@ -10,26 +10,19 @@ import java.util.logging.Logger;
 public class Smesh implements ReconnectListener {
 
     private static Logger logger = Logger.getLogger(Smesh.class.getName());
-
-    private static final String BASE_URL = "http://localhost:8500";
-    private static final String DEREG_URL = BASE_URL + "/v1/agent/service/deregister/";
-    private static final String REG_URL = BASE_URL + "/v1/agent/service/register";
-    private static final String KV_URL = BASE_URL + "/v1/kv/";
     private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-
-    private String[] uris;
+    private String[] URIs;
     private String service;
     private WebSocketClientFactory webSocketFactory;
-    private int retryURI = 0;
+    private int currentURIIndex = 0;
 
     private boolean alive = true;
 
-    private RegisterClient client;
     private WebSocketClient webSocketClient;
 
-    private Smesh(String[] uris, String service, WebSocketClientFactory webSocketFactory) {
-        this.uris = uris;
+    private Smesh(String[] URIs, String service, WebSocketClientFactory webSocketFactory) {
+        this.URIs = URIs;
         this.service = service;
         this.webSocketFactory = webSocketFactory;
     }
@@ -37,6 +30,7 @@ public class Smesh implements ReconnectListener {
     public static Smesh register(String[] registerURI, String service, WebSocketClientFactory webSocketFactory, int reconnectIntervalInMS) {
         Smesh smesh = new Smesh(registerURI, service, webSocketFactory);
         scheduler.scheduleAtFixedRate(smesh::tryNextURI, 0, reconnectIntervalInMS, TimeUnit.MILLISECONDS);
+        logger.info("registering service: " + service);
         return smesh;
     }
 
@@ -48,9 +42,9 @@ public class Smesh implements ReconnectListener {
         try {
             if (alive) {
                 if (webSocketClient == null) {
-                    String uri = this.uris[retryURI++];
-                    if (retryURI >= uris.length) {
-                        retryURI = 0;
+                    String uri = this.URIs[currentURIIndex++];
+                    if (currentURIIndex >= URIs.length) {
+                        currentURIIndex = 0;
                     }
                     webSocketClient = webSocketFactory.create(URI.create(uri), service, this);
                     webSocketClient.start();
@@ -67,13 +61,5 @@ public class Smesh implements ReconnectListener {
     public void onDisconnect() {
         webSocketClient.stop();
         webSocketClient = null;
-    }
-
-    public Smesh(URI uri) {
-        client = new RegisterClient(uri);
-    }
-    public void register(String service) {
-        client.register(service);
-        logger.info("registered service: " + service);
     }
 }

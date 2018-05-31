@@ -1,19 +1,15 @@
 package com.github.lkq.smesh.smesh4j;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 
@@ -31,13 +27,6 @@ class SmeshTest {
     @BeforeEach
     void setUp() {
         initMocks(this);
-    }
-
-    @Disabled
-    @Test
-    void canRegisterService() throws URISyntaxException {
-        Smesh smesh = new Smesh(new URI("ws://localhost:8080/register/v1"));
-        smesh.register(SERVICE_DEFINITION);
     }
 
     @Test

@@ -26,8 +26,6 @@ public class UserAppImageBuilder {
 
     private static Logger logger = LoggerFactory.getLogger(UserAppImageBuilder.class);
 
-    public static final String IMAGE_TAG = "userapp";
-
     public static final String DOCKERFILE_NAME = "userapp.dockerfile";
     public static final String VAR_ARTIFACT_PATH = "artifactPath";
     public static final String VAR_ARTIFACT_NAME = "artifactName";
@@ -38,7 +36,7 @@ public class UserAppImageBuilder {
         this.dockerClient = dockerClient;
     }
 
-    public String build(String artifactPath, String artifactName, String registerURL) {
+    public String build(String artifactPath, String artifactName, String registerURL, String imageTag) {
         try {
             File dockerFile = new File(prepareDockerFile(artifactPath, artifactName, registerURL));
             File baseDir = dockerFile.getParentFile();
@@ -48,7 +46,7 @@ public class UserAppImageBuilder {
             String imageId = dockerClient.buildImageCmd()
                     .withDockerfile(dockerFile)
                     .withNoCache(true)
-                    .withTags(ImmutableSet.of(IMAGE_TAG))
+                    .withTags(ImmutableSet.of(imageTag))
                     .exec(new BuildImageResultCallback())
                     .awaitImageId();
 
@@ -96,6 +94,6 @@ public class UserAppImageBuilder {
     public static void main(String[] args) {
         String[] artifact = new UserAppPackager().buildPackage();
         UserAppImageBuilder imageBuilder = new UserAppImageBuilder(DockerClientFactory.create());
-        imageBuilder.build(artifact[0], artifact[1], "http://172.17.0.2:1025");
+        imageBuilder.build(artifact[0], artifact[1], "http://172.17.0.2:1025", "userapp");
     }
 }

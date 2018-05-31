@@ -3,6 +3,7 @@ package com.github.lkq.smesh.smesh4j;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -52,6 +53,11 @@ public class WebSocketClient {
     public void onOpen(Session session) {
         this.session = session;
         logger.info("connection established" + this.session);
+        try {
+            session.getRemote().sendString(service);
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, "failed to register service", e);
+        }
         connected.countDown();
     }
 
@@ -69,7 +75,7 @@ public class WebSocketClient {
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) {
-        logger.info("received server response: " + message);
+        logger.info("service registration result: " + message);
     }
 
 }

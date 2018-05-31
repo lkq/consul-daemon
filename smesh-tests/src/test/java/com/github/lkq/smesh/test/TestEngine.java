@@ -14,6 +14,7 @@ import com.github.lkq.smesh.docker.DockerClientFactory;
 import com.github.lkq.smesh.docker.SimpleDockerClient;
 import com.github.lkq.smesh.smesh4j.Service;
 import com.github.lkq.smesh.smesh4j.Smesh;
+import com.github.lkq.smesh.smesh4j.WebSocketClientFactory;
 import com.github.lkq.smesh.test.app.UserAppImageBuilder;
 import com.github.lkq.smesh.test.app.UserAppPackager;
 import org.slf4j.Logger;
@@ -21,7 +22,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -134,7 +134,8 @@ public class TestEngine {
 
     public String quickStartUserApp(int restPort, String registerURL, String artifactPath, String artifactName) {
         logger.info("test server build success: {}{}", artifactPath, artifactName);
-        String image = imageBuilder.build(artifactPath, artifactName, registerURL);
+        simpleDockerClient.removeContainer(USER_APP);
+        String image = imageBuilder.build(artifactPath, artifactName, registerURL, USER_APP);
 
         if (simpleDockerClient.containerExists(USER_APP)) {
             simpleDockerClient.stopContainer(USER_APP);
@@ -161,9 +162,7 @@ public class TestEngine {
                     .withAddress(address)
                     .withPort(restPort).build();
 
-            Smesh smesh = new Smesh(new URI(registerURL));
-            smesh.register(service);
-            System.out.println("service registered: " + service);
+            Smesh.register(new String[]{registerURL}, service, new WebSocketClientFactory(), 10000);
         } catch (Exception e) {
             logger.error("failed to register user app", e);
         }

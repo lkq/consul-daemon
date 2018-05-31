@@ -32,7 +32,7 @@ public class SmeshIntegrationTest extends IntegrationTestBase {
                 Thread.sleep(3000);
             }
         } while (retry > 0 && response == null);
-        logger.info(response.body().string());
+        logger.info("response: " + response.body().string());
         assertNotNull(response);
         assertThat(response.code(), CoreMatchers.is(200));
     }
