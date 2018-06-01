@@ -42,10 +42,13 @@ public class WebSocketClient {
 
     public void stop() {
         try {
-            this.client.stop();
-            this.client = null;
+            if (client.isRunning()) {
+                client.stop();
+            }
         } catch (Exception e) {
-            logger.log(Level.WARNING, "failed to stop websocket client", e);
+            logger.log(Level.WARNING, "failed to stop websocket client: " + e.getMessage());
+        } finally {
+            client = null;
         }
     }
 

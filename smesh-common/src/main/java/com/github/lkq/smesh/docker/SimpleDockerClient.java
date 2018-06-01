@@ -103,7 +103,20 @@ public class SimpleDockerClient {
             }
             return true;
         } catch (Exception e) {
-            logger.warn("failed to pull image: {}, reason: {}", image, e.getMessage());
+            logger.warn("failed to pull image: " + image, e);
+        }
+        return false;
+    }
+
+    public boolean removeImage(String imageName) {
+        try {
+            if (imageExists(imageName)) {
+                client.removeImageCmd(imageName).withForce(true).exec();
+                logger.info("removed image: {}", imageName);
+            }
+            return true;
+        } catch (Exception e) {
+            logger.warn("failed to remove image: " + imageName, e);
         }
         return false;
     }

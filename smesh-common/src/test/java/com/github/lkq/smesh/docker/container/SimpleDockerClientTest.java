@@ -20,6 +20,7 @@ import spark.utils.StringUtils;
 
 import java.io.IOException;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyString;
@@ -28,6 +29,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 class SimpleDockerClientTest {
 
+    public static final String HELLO_WORLD = "hello-world";
     private SimpleDockerClient simpleDockerClient;
 
     private final String helloWorldImage = "hello-world:latest";
@@ -77,7 +79,7 @@ class SimpleDockerClientTest {
         String containerID = null;
         SimpleDockerClient client = SimpleDockerClient.create();
         try {
-            String imageName = "hello-world";
+            String imageName = HELLO_WORLD;
             String containerName = imageName + "-" + System.currentTimeMillis();
             client.pullImage(imageName);
             containerID = client.createContainer(imageName, containerName).build();
@@ -126,10 +128,11 @@ class SimpleDockerClientTest {
 
     @IntegrationTest
     @Test
-    void canAttachContainerLogs() {
+    void pullImageAttachContainerLogsAndRemoveImage() {
         String containerName = "hello-world-" + System.currentTimeMillis();
         SimpleDockerClient client = SimpleDockerClient.create();
-        assertTrue(client.pullImage("busybox:latest"));
+        assertTrue(client.pullImage(HELLO_WORLD));
+        assertTrue(client.imageExists(HELLO_WORLD));
 
         String containerID = null;
         try {
@@ -145,6 +148,9 @@ class SimpleDockerClientTest {
                 e.printStackTrace();
             }
             verify(containerLogger, Mockito.atLeast(1)).onNext(Matchers.any(Frame.class));
+
+            assertTrue(client.removeImage(HELLO_WORLD));
+            assertFalse(client.imageExists(HELLO_WORLD));
         }finally {
             if (StringUtils.isNotEmpty(containerID)) {
                 client.removeContainer(containerID);

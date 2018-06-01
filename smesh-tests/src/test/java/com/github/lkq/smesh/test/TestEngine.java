@@ -134,7 +134,9 @@ public class TestEngine {
 
     public String quickStartUserApp(int restPort, String registerURL, String artifactPath, String artifactName) {
         logger.info("test server build success: {}{}", artifactPath, artifactName);
-        simpleDockerClient.removeContainer(USER_APP);
+        if (simpleDockerClient.imageExists(USER_APP)) {
+            simpleDockerClient.removeImage(USER_APP);
+        }
         String image = imageBuilder.build(artifactPath, artifactName, registerURL, USER_APP);
 
         if (simpleDockerClient.containerExists(USER_APP)) {

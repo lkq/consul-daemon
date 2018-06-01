@@ -50,8 +50,6 @@ public class Smesh implements ReconnectListener {
                     }
                     webSocketClient = webSocketFactory.create(URI.create(uri), service, this);
                     webSocketClient.start();
-                } else {
-                    logger.info("service already registered");
                 }
             }
         } catch (Exception e) {
@@ -61,7 +59,9 @@ public class Smesh implements ReconnectListener {
 
     @Override
     public void onDisconnect() {
-        webSocketClient.stop();
+        if (webSocketClient != null) {
+            webSocketClient.stop();
+        }
         webSocketClient = null;
     }
 }
