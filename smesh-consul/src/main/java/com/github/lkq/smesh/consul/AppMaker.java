@@ -1,6 +1,7 @@
 package com.github.lkq.smesh.consul;
 
 import com.github.lkq.smesh.consul.client.ConsulClient;
+import com.github.lkq.smesh.consul.client.ServiceRegistrar;
 import com.github.lkq.smesh.consul.command.ConsulCommandBuilder;
 import com.github.lkq.smesh.consul.container.ConsulController;
 import com.github.lkq.smesh.consul.context.ConsulContextFactory;
@@ -31,7 +32,9 @@ public class AppMaker {
 
         AppInfo appInfo = new AppInfo(consulClient, context.nodeName());
         ConsulController consulController = new ConsulController(SimpleDockerClient.create());
-        WebServer webServer = new WebServer(restPort, new RegistrationRoutes(consulClient), new ConsulRoutes(appInfo));
+        ServiceRegistrar registrar = new ServiceRegistrar(consulClient);
+        RegistrationRoutes registrationRoutes = new RegistrationRoutes(registrar);
+        WebServer webServer = new WebServer(restPort, registrationRoutes, new ConsulRoutes(appInfo));
 
         return new App(context,
                 consulController,

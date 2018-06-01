@@ -24,13 +24,13 @@ class ServiceRegistrarTest {
     @BeforeEach
     void setUp() {
         initMocks(this);
-        registrar = new ServiceRegistrar(client, SERVICE_DEFINITION);
+        registrar = new ServiceRegistrar(client);
     }
 
     @Test
     void canRegisterService() {
         given(client.register(anyString())).willReturn(response);
-        Response response = registrar.register();
+        Response response = registrar.register(SERVICE_DEFINITION);
 
         assertThat(response, is(response));
     }
@@ -38,7 +38,7 @@ class ServiceRegistrarTest {
     @Test
     void canDeRegisterService() {
         given(client.register(SERVICE_ID)).willReturn(response);
-        Response response = registrar.deRegister();
+        Response response = registrar.deRegister(SERVICE_DEFINITION);
 
         assertThat(response, is(response));
     }

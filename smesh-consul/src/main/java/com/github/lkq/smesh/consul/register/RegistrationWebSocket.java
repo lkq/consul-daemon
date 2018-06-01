@@ -1,6 +1,5 @@
 package com.github.lkq.smesh.consul.register;
 
-import com.github.lkq.smesh.consul.client.ConsulClient;
 import com.github.lkq.smesh.consul.client.ServiceRegistrar;
 import com.github.lkq.smesh.consul.client.http.Response;
 import org.eclipse.jetty.websocket.api.Session;
@@ -10,6 +9,7 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spark.utils.StringUtils;
 
 import java.io.IOException;
 import java.util.Map;
@@ -19,15 +19,15 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RegistrationWebSocket {
     private static Logger logger = LoggerFactory.getLogger(RegistrationWebSocket.class);
 
-    private ConsulClient client;
     private ResponseFactory responseFactory;
 
-    private Map<Session, ServiceRegistrar> registrars;
+    private Map<Session, String> services;
+    private ServiceRegistrar registrar;
 
-    public RegistrationWebSocket(ConsulClient client, ResponseFactory responseFactory) {
-        this.client = client;
+    public RegistrationWebSocket(ServiceRegistrar registrar, ResponseFactory responseFactory) {
+        this.registrar = registrar;
         this.responseFactory = responseFactory;
-        this.registrars = new ConcurrentHashMap<>();
+        this.services = new ConcurrentHashMap<>();
     }
 
     @OnWebSocketConnect
@@ -38,14 +38,14 @@ public class RegistrationWebSocket {
     @OnWebSocketClose
     public void closed(Session session, int statusCode, String reason) {
         try {
-            ServiceRegistrar register = registrars.get(session);
-            if (register != null) {
+            String service = services.get(session);
+            if (StringUtils.isNotBlank(service)) {
                 logger.info("de-registering service, session: {}", session.getRemoteAddress());
-                Response response = register.deRegister();
+                Response response = registrar.deRegister(service);
                 logger.info("de-register result: {}", response);
-                registrars.remove(session);
+                services.remove(session);
             } else {
-                logger.error("register not found for session: {}", session.getRemoteAddress());
+                logger.error("session doesn't binded to any service registration: {}", session.getRemoteAddress());
             }
         } catch (Exception e) {
             logger.error("failed when closing connection");
@@ -53,14 +53,14 @@ public class RegistrationWebSocket {
     }
 
     @OnWebSocketMessage
-    public void message(Session session, String message) throws IOException {
-        logger.info("registering service, session: {}, request: {}", session.getRemoteAddress(), message);
+    public void message(Session session, String service) throws IOException {
+        logger.info("registering service, session: {}, request: {}", session.getRemoteAddress(), service);
         try {
-            ServiceRegistrar registrar = registrars.computeIfAbsent(session, (s) -> new ServiceRegistrar(client, message));
+            services.putIfAbsent(session, service);
 
             String response;
             try {
-                Response result = registrar.register();
+                Response result = registrar.register(service);
                 response = responseFactory.responseNormal(result);
             } catch (Exception e) {
                 response = responseFactory.responseError(e.getClass().getName(), e.getMessage());

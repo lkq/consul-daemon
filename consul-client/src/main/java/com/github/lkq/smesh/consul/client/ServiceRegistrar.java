@@ -9,14 +9,12 @@ import com.google.gson.JsonParser;
  */
 public class ServiceRegistrar {
     private ConsulClient client;
-    private String service;
 
-    public ServiceRegistrar(ConsulClient client, String service) {
+    public ServiceRegistrar(ConsulClient client) {
         this.client = client;
-        this.service = service;
     }
 
-    public Response deRegister() {
+    public Response deRegister(String service) {
         JsonParser jsonParser = new JsonParser();
         JsonElement jsonElement = jsonParser.parse(service);
         String serviceId = jsonElement.getAsJsonObject().get("id").getAsString();
@@ -26,8 +24,9 @@ public class ServiceRegistrar {
     /**
      * it should be save to register multiple time without any side effect
      * @return response from consul
+     * @param service
      */
-    public Response register() {
+    public Response register(String service) {
         return client.register(service);
     }
 }
