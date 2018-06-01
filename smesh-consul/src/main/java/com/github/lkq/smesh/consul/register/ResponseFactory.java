@@ -1,18 +1,20 @@
 package com.github.lkq.smesh.consul.register;
 
+import com.github.lkq.smesh.consul.client.http.Response;
 import com.google.gson.JsonObject;
 
 public class ResponseFactory {
-    public String responseSuccess(String message) {
+    public String responseNormal(Response response) {
         JsonObject res = new JsonObject();
-        res.addProperty("status", "success");
-        res.addProperty("message", message);
+        res.addProperty("status", response.status() == 200 ? "success" : "fail");
+        res.addProperty("code", response.status());
+        res.addProperty("message", response.body());
         return res.toString();
     }
 
-    public String responseFail(String reason, String message) {
+    public String responseError(String reason, String message) {
         JsonObject res = new JsonObject();
-        res.addProperty("status", "fail");
+        res.addProperty("status", "error");
         res.addProperty("reason", reason);
         res.addProperty("message", message);
         return res.toString();

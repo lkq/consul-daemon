@@ -16,4 +16,12 @@ public class Response {
     public String body() {
         return body;
     }
+
+    @Override
+    public String toString() {
+        return "Response{" +
+                "status=" + status +
+                ", body='" + body + '\'' +
+                '}';
+    }
 }

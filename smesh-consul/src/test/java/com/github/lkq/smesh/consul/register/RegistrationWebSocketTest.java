@@ -1,25 +1,25 @@
 package com.github.lkq.smesh.consul.register;
 
 import com.github.lkq.smesh.consul.client.ConsulClient;
+import com.github.lkq.smesh.consul.client.ServiceRegistrar;
+import com.github.lkq.smesh.consul.client.http.Response;
 import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import org.eclipse.jetty.websocket.api.Session;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
-import javax.inject.Provider;
 import java.io.IOException;
 
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 class RegistrationWebSocketTest {
 
-    public static final String REQUEST_BODY = "test-register";
+    public static final String REQUEST_BODY = "{\"address\":\"172.17.0.4\",\"port\":8081,\"name\":\"userapp\",\"id\":\"userapp-1527783998470\"}";
+    public static final String SERVICE_ID = "userapp-1527783998470";
     public static final String SUCCESS_RESPONSE = "{\"status\": \"success\",\"service\":\"test-register\"}";
     public static final String FAIL_RESPONSE = "{\"status\": \"fail\",\"reason\":\"not connected\",\"service\":\"test-register\"}";
     private RegistrationWebSocket socket;
@@ -28,11 +28,13 @@ class RegistrationWebSocketTest {
     @Mock
     private Session session;
     @Mock
-    private ConsulRegistrar registrar;
+    private ServiceRegistrar registrar;
     @Mock
     private RemoteEndpoint remote;
     @Mock
     private ResponseFactory responseFactory;
+    @Mock
+    private Response successResponse;
 
     @BeforeEach
     void setUp() {
@@ -42,65 +44,54 @@ class RegistrationWebSocketTest {
     @Test
     void canRegisterAndDeRegisterService() throws IOException {
 
-        given(registrar.register(REQUEST_BODY)).willReturn(SUCCESS_RESPONSE);
         given(session.getRemote()).willReturn(remote);
-        given(responseFactory.responseSuccess(anyString())).willReturn(SUCCESS_RESPONSE);
+        given(responseFactory.responseNormal(successResponse)).willReturn(SUCCESS_RESPONSE);
+        given(client.register(REQUEST_BODY)).willReturn(successResponse);
+        given(successResponse.body()).willReturn(SUCCESS_RESPONSE);
 
-        socket = new RegistrationWebSocket(client, () -> registrar, responseFactory);
+        socket = new RegistrationWebSocket(client, responseFactory);
         socket.connected(session);
         socket.message(session, REQUEST_BODY);
 
-        verify(registrar, times(1)).register(REQUEST_BODY);
         verify(remote, times(1)).sendString(SUCCESS_RESPONSE);
+
+        given(client.deregister(REQUEST_BODY)).willReturn(successResponse);
+
+        socket.closed(session, 400, "test");
+
+        verify(client, times(1)).deregister(SERVICE_ID);
+
     }
 
     @Test
-    void willIgnoreDuplicateConnection() throws IOException {
+    void registrationIsIdempotent() throws IOException {
 
-        given(registrar.register(REQUEST_BODY)).willReturn(SUCCESS_RESPONSE);
-        given(responseFactory.responseSuccess(anyString())).willReturn(SUCCESS_RESPONSE);
+        given(successResponse.body()).willReturn(SUCCESS_RESPONSE);
+        given(responseFactory.responseNormal(successResponse)).willReturn(SUCCESS_RESPONSE);
+        given(session.getRemote()).willReturn(remote);
+        given(client.register(REQUEST_BODY)).willReturn(successResponse);
+        given(successResponse.body()).willReturn("success");
 
-        Provider<ConsulRegistrar> provider = mock(Provider.class);
-        given(provider.get()).willReturn(registrar);
+        socket = new RegistrationWebSocket(client, responseFactory);
+        socket.message(session, REQUEST_BODY);
+        socket.message(session, REQUEST_BODY);
 
-        socket = new RegistrationWebSocket(client, provider, responseFactory);
-        socket.connected(session);
-        socket.connected(session);
-
-        verify(provider, times(1)).get();
-    }
-
-    @Test
-    void canDeRegisterServiceOnSessionClose() throws IOException {
-        socket = new RegistrationWebSocket(client, () -> registrar, responseFactory);
-        socket.connected(session);
-        socket.closed(session, 400, "test-deregister");
-
-        verify(registrar, times(1)).deRegister();
+        verify(remote, times(2)).sendString("{\"status\": \"success\",\"service\":\"test-register\"}");
+        verify(client, times(2)).register(REQUEST_BODY);
     }
 
     @Test
     void willRemoveSessionAfterClose() throws IOException {
-        socket = new RegistrationWebSocket(client, () -> registrar, responseFactory);
-        socket.connected(session);
-        socket.closed(session, 400, "test-deregister");
-        socket.closed(session, 400, "test-deregister");
+        socket = new RegistrationWebSocket(client, responseFactory);
 
-        verify(registrar, times(1)).deRegister();
-    }
-
-    @Test
-    void canHandleMessageAfterSessionClose() throws IOException {
+        given(client.deregister(SERVICE_ID)).willReturn(successResponse);
+        given(successResponse.body()).willReturn("success");
         given(session.getRemote()).willReturn(remote);
-        given(responseFactory.responseFail(anyString(), anyString())).willReturn(FAIL_RESPONSE);
-
-        socket = new RegistrationWebSocket(client, () -> registrar, responseFactory);
-        socket.connected(session);
-        socket.closed(session, 400, "test-deregister");
 
         socket.message(session, REQUEST_BODY);
+        socket.closed(session, 400, "");
+        socket.closed(session, 400, "");
 
-        verify(registrar, times(1)).deRegister();
-        verify(remote, times(1)).sendString(FAIL_RESPONSE);
+        verify(client, times(1)).deregister(SERVICE_ID);
     }
 }
