@@ -5,62 +5,42 @@ a service mesh implementation using linkerd and consul
 ## Overview
 ![architecture](src/smesh.png)
 
-## Linkerd
-
-used a java process (smesh-linkerd) to manage linkerd docker container start/stop.
-
-## Consul
-
-used a java process (smesh-consul) to manage consul docker container start/stop and cluster construction
-
-### Start / Stop
-
-a new consul container will be created and started together with the daemon process startup.
-when the daemon being shutdown gracefully, a shutdown hook will be triggered to tell the consul container to leave the cluster before shutdown.
-
-#### start smesh-consul only
-if a running consul container already exists and it's created by the current smesh-consul version, it will attach the running container's log without recreating a new one
-
-## Clustering
-
-#### On EC2 environment
-requires tags / values on your instances
-
-    consul.role=<server | client>
-    consul.nodeName=<unique node name>
-
-#### On non EC2 environment
-requires VM options:
-
-    -Dconsul.role=<server | client>
-    -Dconsul.cluster.member=<server list>
-
-or environment variables:
-
-    export consul.role=<server | client>
-    export consul.cluster.member=<server list>
+smesh consisted of:
+- the linkerd docker container and smesh-linkerd - a process to manage the linkerd container
+- consul docker container and smesh-consul - a process to manage the consul container cluster
+- smesh4j - a client lib for registering REST service to smesh
 
 
-### Build
+consul clustering
 
-tests annotated with @IntegrationTest requires docker to be installed
+- EC2: tags your VM running consul
 
-tests with @IntegrationTest are ignored by default if run by:
+        consul.role=<server | client>
+        consul.nodeName=<unique node name>
+
+- linux host: provide VM options, or environment variables
+
+        -Dconsul.role=<server | client>
+        -Dconsul.cluster.member=<server list>
+
+        export consul.role=<server | client>
+        export consul.cluster.member=<server list>
+
+### Build & Test
 
     mvn clean test
 
-to run all tests including @IntegrationTest
+to run integration tests
 
     mvn clean test -PtestAll
 
 ### Benchmark
 
+a simple benchmark test
 [Benchmark test](smesh-tests/src/test/java/com/github/lkq/smesh/test/benchmark/BenchmarkTest.java)
 
+1k request results on Mac Core i5 2.4 GHz with 10G Memory
 - smesh
-
-    {"total": 3269, "count": 100, "avg": 32}
-
+    {"total": 12667243786 ns, "count": 1000, "avg": 12667243 ns}
 - direct access
-
-    {"total": 1002, "count": 100, "avg": 10}
+    {"total": 1331499682 ns, "count": 1000, "avg": 1331499 ns}

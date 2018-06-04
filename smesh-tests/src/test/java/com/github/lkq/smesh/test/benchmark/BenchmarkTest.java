@@ -23,13 +23,13 @@ public class BenchmarkTest {
         System.exit(0);
     }
 
-    void runDefaultTests() throws IOException {
+    public void runDefaultTests() throws IOException {
         OkHttpClient httpClient = new OkHttpClient();
         Request request = new Request.Builder().get().url("http://localhost:8080/userapp/users/kingson").build();
 
         warmUp(httpClient, request);
 
-        int repeatCount = 100;
+        int repeatCount = 1000;
 
         Reporter smeshReporter = new Reporter();
         execute("http://localhost:8080/userapp/users/kingson", repeatCount, httpClient, smeshReporter);
@@ -52,6 +52,7 @@ public class BenchmarkTest {
                 if (response.code() == 200) {
                     reporter.report(System.nanoTime() - startTime);
                 }
+                response.close();
             } catch (Throwable ignored) {
             }
         }

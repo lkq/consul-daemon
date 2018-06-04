@@ -16,7 +16,7 @@ routers:
 
 namers:
 - kind: io.l5d.consul
-  host: 172.17.0.2
+  host: ${consulHost}
   consistencyMode: stale
 
 telemetry:

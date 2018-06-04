@@ -17,7 +17,7 @@ public class SimpleHttpClient {
 
     public Response put(String url, String body) {
         RequestBody content = RequestBody.create(JSON, body);
-        Request request = new Request.Builder().url(url).put(content).build();
+        Request request = new Request.Builder().put(content).url(url).build();
         return execute(request);
     }
 

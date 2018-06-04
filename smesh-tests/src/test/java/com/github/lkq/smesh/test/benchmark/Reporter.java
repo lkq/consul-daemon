@@ -11,6 +11,6 @@ public class Reporter {
     }
 
     public String report() {
-        return "{\"total\": " + nanoTime / NANO_TO_MILLS + ", \"count\": " + count +", \"avg\": " + (count > 0 ? nanoTime / count / NANO_TO_MILLS : 0) +"}";
+        return "{\"total\": " + nanoTime + " ns, \"count\": " + count +", \"avg\": " + (count > 0 ? nanoTime / count : 0) +" ns}";
     }
 }
