@@ -36,8 +36,10 @@ public class Smesh implements ReconnectListener {
 
     public void deRegister() {
         this.alive = false;
-        webSocketClient.stop();
-        webSocketClient = null;
+        if (webSocketClient != null) {
+            webSocketClient.stop();
+            webSocketClient = null;
+        }
     }
 
     private synchronized void tryNextURI() {

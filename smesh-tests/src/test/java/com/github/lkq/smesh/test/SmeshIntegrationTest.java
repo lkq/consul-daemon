@@ -4,6 +4,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.hamcrest.CoreMatchers;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,7 @@ public class SmeshIntegrationTest extends IntegrationTestBase {
 
     private static Logger logger = LoggerFactory.getLogger(SmeshIntegrationTest.class);
 
+    @Tag("IntegrationTest")
     @Test
     void canRouteToTheCorrectServiceViaSmesh() throws InterruptedException, IOException {
         OkHttpClient client = new OkHttpClient();

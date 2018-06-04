@@ -19,7 +19,6 @@
         <module>smesh-tests</module>
     </modules>
 
-
     <distributionManagement>
         <repository>
             <id>releases</id>

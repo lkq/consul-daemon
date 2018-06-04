@@ -11,6 +11,7 @@ import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 import org.mockito.Matchers;
@@ -73,7 +74,7 @@ class SimpleDockerClientTest {
         Assertions.assertFalse(renamed);
     }
 
-    @IntegrationTest
+    @Tag("IntegrationTest")
     @Test
     void testContainerLifeCycle() {
         String containerID = null;
@@ -93,7 +94,7 @@ class SimpleDockerClientTest {
         }
     }
 
-    @IntegrationTest
+    @Tag("IntegrationTest")
     @Test
     void willReturnFalseIfContainerNotExists() {
         String currentName = "dummy-container-" + System.currentTimeMillis();
@@ -102,7 +103,7 @@ class SimpleDockerClientTest {
         MatcherAssert.assertThat(renamed, CoreMatchers.is(false));
     }
 
-    @IntegrationTest
+    @Tag("IntegrationTest")
     @Test
     void canRenameContainer() throws InterruptedException, IOException {
         String containerID = null;
@@ -126,7 +127,7 @@ class SimpleDockerClientTest {
         }
     }
 
-    @IntegrationTest
+    @Tag("IntegrationTest")
     @Test
     void pullImageAttachContainerLogsAndRemoveImage() {
         String containerName = "hello-world-" + System.currentTimeMillis();

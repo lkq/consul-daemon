@@ -13,6 +13,7 @@ import com.github.lkq.smesh.docker.ContainerBuilder;
 import com.github.lkq.smesh.docker.DockerClientFactory;
 import com.github.lkq.smesh.docker.SimpleDockerClient;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import spark.utils.StringUtils;
@@ -30,6 +31,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 class ContainerBuilderTest {
 
+    public static final String HELLO_WORLD_IMAGE = "hello-world:latest";
     private final String imageNameTag = "dummy-image";
     private final String containerName = "dummy-container";
 
@@ -110,16 +112,17 @@ class ContainerBuilderTest {
 
     }
 
-    @IntegrationTest
+    @Tag("IntegrationTest")
     @Test
     void canActuallyCreateContainer() {
         String containerID = null;
         DockerClient client = DockerClientFactory.create();
         try {
             SimpleDockerClient simpleDockerClient = SimpleDockerClient.create(client);
+            simpleDockerClient.pullImage(HELLO_WORLD_IMAGE);
 
             String expectedContainerName = "hello-world-" + System.currentTimeMillis();
-            ContainerBuilder containerBuilder = new ContainerBuilder(client, "hello-world:latest", expectedContainerName);
+            ContainerBuilder containerBuilder = new ContainerBuilder(client, HELLO_WORLD_IMAGE, expectedContainerName);
             containerID = containerBuilder.build();
 
             String containerName = simpleDockerClient.get().inspectContainerCmd(containerID).exec().getName();
