@@ -7,6 +7,14 @@
     <groupId>com.github.lkq</groupId>
     <artifactId>smesh-consul</artifactId>
     <version>0.1.0-SNAPSHOT</version>
+
+
+    <properties>
+        <dagger.version>2.17</dagger.version>
+        <junit.version>5.3.1</junit.version>
+        <mockito.version>2.23.0</mockito.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.github.lkq</groupId>
@@ -15,11 +23,26 @@
         </dependency>
         <dependency>
             <groupId>com.github.lkq</groupId>
+            <artifactId>insta-docker</artifactId>
+            <version>0.1.6-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.lkq</groupId>
             <artifactId>consul-client</artifactId>
             <version>0.1.0-SNAPSHOT</version>
         </dependency>
 
         <!--third party dependency-->
+        <dependency>
+            <groupId>com.google.dagger</groupId>
+            <artifactId>dagger</artifactId>
+            <version>${dagger.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.2.3</version>
+        </dependency>
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-ec2</artifactId>
@@ -35,19 +58,19 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.1.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-all</artifactId>
-            <version>1.3</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>1.10.19</version>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -57,13 +80,21 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.7.0</version>
+                <version>3.8.0</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>com.google.dagger</groupId>
+                            <artifactId>dagger-compiler</artifactId>
+                            <version>${dagger.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.19.1</version>
                 <dependencies>
@@ -75,7 +106,7 @@
                     <dependency>
                         <groupId>org.junit.jupiter</groupId>
                         <artifactId>junit-jupiter-engine</artifactId>
-                        <version>5.1.0</version>
+                        <version>${junit.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>

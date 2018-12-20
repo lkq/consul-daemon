@@ -2,23 +2,26 @@ package com.github.lkq.smesh.consul;
 
 import com.github.lkq.smesh.AppVersion;
 import com.github.lkq.smesh.Env;
+import com.github.lkq.smesh.consul.aws.EC2;
+import com.github.lkq.smesh.consul.aws.EC2Factory;
 import com.github.lkq.smesh.consul.client.ConsulClient;
 import com.github.lkq.smesh.consul.client.ResponseParser;
 import com.github.lkq.smesh.consul.client.http.SimpleHttpClient;
 import com.github.lkq.smesh.consul.command.ConsulCommandBuilder;
-import com.github.lkq.smesh.consul.aws.EC2;
-import com.github.lkq.smesh.consul.aws.EC2Factory;
 import com.github.lkq.smesh.docker.ContainerNetwork;
-import com.github.lkq.smesh.logging.JulToSlf4jBridge;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import java.io.File;
 import java.net.InetAddress;
 import java.util.List;
+import java.util.logging.LogManager;
 
 public class Launcher {
 
     public static void main(String[] args) {
-        JulToSlf4jBridge.setup();
+        LogManager.getLogManager().reset();
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        SLF4JBridgeHandler.install();
         new Launcher().start();
     }
 
