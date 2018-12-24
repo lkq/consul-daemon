@@ -1,5 +1,7 @@
 package com.github.lkq.smesh.consul.container;
 
+import com.github.lkq.instadocker.InstaDocker;
+import com.github.lkq.smesh.consul.config.ConsulContext;
 import com.github.lkq.smesh.context.ContainerContext;
 import com.github.lkq.smesh.docker.ContainerLogger;
 import com.github.lkq.smesh.docker.SimpleDockerClient;
@@ -14,6 +16,19 @@ public class ConsulController {
 
     public ConsulController(SimpleDockerClient dockerClient) {
         this.dockerClient = dockerClient;
+    }
+
+    public InstaDocker startNewInstance(ConsulContext context) {
+        logger.info("creating container: {}", context);
+        InstaDocker instaDocker = new InstaDocker(context.imageName(), context.hostName()).init();
+        instaDocker.container()
+                .hostName(context.hostName())
+                .volumeBindings(context.volumeBindings())
+                .portBindings(context.portBindings())
+                .environmentVariables(context.environmentVariables())
+                .commands(context.commands())
+                .network(context.network());
+        return instaDocker;
     }
 
     public Boolean startNewInstance(ContainerContext context) {
