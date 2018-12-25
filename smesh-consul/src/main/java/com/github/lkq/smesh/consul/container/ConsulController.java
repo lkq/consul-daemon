@@ -8,17 +8,22 @@ import com.github.lkq.smesh.docker.SimpleDockerClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class ConsulController {
 
     private static Logger logger = LoggerFactory.getLogger(ConsulController.class);
 
     private SimpleDockerClient dockerClient;
 
+    @Inject
     public ConsulController(SimpleDockerClient dockerClient) {
         this.dockerClient = dockerClient;
     }
 
-    public InstaDocker startNewInstance(ConsulContext context) {
+    public InstaDocker createContainer(ConsulContext context) {
         logger.info("creating container: {}", context);
         InstaDocker instaDocker = new InstaDocker(context.imageName(), context.hostName()).init();
         instaDocker.container()

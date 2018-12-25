@@ -1,6 +1,7 @@
 package com.github.lkq.smesh.consul.app;
 
 import com.github.lkq.smesh.consul.config.Config;
+import com.github.lkq.smesh.docker.SimpleDockerClient;
 import dagger.Module;
 import dagger.Provides;
 
@@ -18,5 +19,10 @@ public class AppModule {
     @Provides @Singleton
     public Config config() {
         return appContext.createConfig();
+    }
+
+    @Provides @Singleton
+    public SimpleDockerClient dockerClient() {
+        return appContext.createDockerClient();
     }
 }

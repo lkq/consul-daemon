@@ -1,24 +1,16 @@
 package com.github.lkq.smesh.consul.config;
 
 public class Config {
+    private ConsulContext consulContext;
     private String imageName;
     private String containerName;
 
-    public String imageName() {
-        return imageName;
+    public ConsulContext consulContext() {
+        return consulContext;
     }
 
-    public Config imageName(String imageName) {
-        this.imageName = imageName;
-        return this;
-    }
-
-    public String containerName() {
-        return containerName;
-    }
-
-    public Config containerName(String containerName) {
-        this.containerName = containerName;
+    public Config consulContext(ConsulContext consulContext) {
+        this.consulContext = consulContext;
         return this;
     }
 }
