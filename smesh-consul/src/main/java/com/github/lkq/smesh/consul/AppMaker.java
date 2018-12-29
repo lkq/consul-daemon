@@ -14,11 +14,15 @@ import com.github.lkq.smesh.docker.ContainerNetwork;
 import com.github.lkq.smesh.docker.SimpleDockerClient;
 import com.github.lkq.smesh.server.WebServer;
 import com.github.lkq.timeron.Timer;
+import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 public class AppMaker {
+    private static final Logger logger = getLogger("smesh-consul");
 
     public App makeApp(int restPort, String nodeName, ContainerNetwork network, ConsulCommandBuilder commandBuilder, String hostDataPath, String appVersion, ConsulClient consulClient) {
 
@@ -31,7 +35,7 @@ public class AppMaker {
         VersionRegister versionRegister = new VersionRegister(consulClient, Constants.APP_NAME + "-" + nodeName, appVersion, 10000);
 
         AppInfo appInfo = new AppInfo(consulClient, context.nodeName());
-        ConsulController consulController = new ConsulController(SimpleDockerClient.create());
+        ConsulController consulController = new ConsulController(SimpleDockerClient.create(), logger);
         ServiceRegistrar registrar = new ServiceRegistrar(consulClient);
         RegistrationRoutes registrationRoutes = new RegistrationRoutes(registrar);
         WebServer webServer = new WebServer(restPort, registrationRoutes, new ConsulRoutes(appInfo));

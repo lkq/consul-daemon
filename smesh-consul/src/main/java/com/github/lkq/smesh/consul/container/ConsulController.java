@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 @Singleton
@@ -17,15 +18,19 @@ public class ConsulController {
     private static Logger logger = LoggerFactory.getLogger(ConsulController.class);
 
     private SimpleDockerClient dockerClient;
+    private Logger containerLogger;
 
     @Inject
-    public ConsulController(SimpleDockerClient dockerClient) {
+    public ConsulController(SimpleDockerClient dockerClient, @Named("containerLogger") Logger containerLogger) {
         this.dockerClient = dockerClient;
+        this.containerLogger = containerLogger;
     }
 
     public InstaDocker createContainer(ConsulContext context) {
         logger.info("creating container: {}", context);
-        InstaDocker instaDocker = new InstaDocker(context.imageName(), context.hostName()).init();
+        InstaDocker instaDocker = new InstaDocker(context.imageName(), context.hostName())
+                .dockerLogger(containerLogger)
+                .init();
         instaDocker.container()
                 .hostName(context.hostName())
                 .volumeBindings(context.volumeBindings())

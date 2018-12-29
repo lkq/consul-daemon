@@ -16,6 +16,10 @@
         <appender-ref ref="ContainerLogger"/>
     </logger>
 
+    <logger name="smesh-consul" level="info" additivity="false">
+        <appender-ref ref="ContainerLogger"/>
+    </logger>
+
     <logger name="com.github.lkq.smesh.test.AttachLogging" level="info" additivity="false">
         <appender-ref ref="ApplicationLogAppender"/>
     </logger>

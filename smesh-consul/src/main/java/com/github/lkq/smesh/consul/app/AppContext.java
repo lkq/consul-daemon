@@ -1,6 +1,7 @@
 package com.github.lkq.smesh.consul.app;
 
 import com.github.lkq.smesh.consul.Constants;
+import com.github.lkq.smesh.consul.Main;
 import com.github.lkq.smesh.consul.aws.EC2;
 import com.github.lkq.smesh.consul.aws.EC2Factory;
 import com.github.lkq.smesh.consul.client.ConsulClient;
@@ -11,7 +12,8 @@ import com.github.lkq.smesh.consul.config.ConsulContext;
 import com.github.lkq.smesh.consul.exception.SmeshConsulException;
 import com.github.lkq.smesh.consul.profile.ProfileFactory;
 import com.github.lkq.smesh.docker.SimpleDockerClient;
-import sun.rmi.rmic.Main;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -48,5 +50,9 @@ public class AppContext {
 
     public ConsulClient createConsulClient() {
         return new ConsulClient(new SimpleHttpClient(), new ResponseParser(), Constants.CONSUL_URL);
+    }
+
+    public Logger createContainerLogger() {
+        return LoggerFactory.getLogger("smesh-consul");
     }
 }

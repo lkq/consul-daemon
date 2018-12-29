@@ -3,7 +3,13 @@ package com.github.lkq.smesh.consul.register;
 import com.github.lkq.smesh.consul.client.http.Response;
 import com.google.gson.JsonObject;
 
+import javax.inject.Inject;
+
 public class ResponseFactory {
+    @Inject
+    public ResponseFactory() {
+    }
+
     public String responseNormal(Response response) {
         JsonObject res = new JsonObject();
         res.addProperty("status", response.status() == 200 ? "success" : "fail");

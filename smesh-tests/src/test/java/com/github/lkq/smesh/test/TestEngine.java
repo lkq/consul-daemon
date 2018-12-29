@@ -17,6 +17,7 @@ import com.github.lkq.smesh.smesh4j.Smesh;
 import com.github.lkq.smesh.smesh4j.WebSocketClientFactory;
 import com.github.lkq.smesh.test.app.UserAppImageBuilder;
 import com.github.lkq.smesh.test.app.UserAppPackager;
+import com.github.lkq.smesh.test.consul.ConsulMainLocal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,9 +59,9 @@ public class TestEngine {
 
     public synchronized void startEverything() throws IOException, InterruptedException {
         if (!started) {
-            consulContainer = startConsul(REG_PORT);
+            consulContainer = startNewConsul(REG_PORT);
             linkerdContainer = startLinkerd(LINKERD_PORT, consulContainer);
-            userAppContainer = startUserApp(8081, "ws://localhost:" + REG_PORT + "/register/v1");
+            userAppContainer = startUserApp(8081, "ws://localhost:" + REG_PORT + "/smesh/register/v1");
             started = true;
         } else {
             logger.info("test engine already started");
@@ -68,7 +69,7 @@ public class TestEngine {
     }
 
     public void stopEverything() {
-        consulApp.stop();
+        stopConsul();
         linkerdApp.stop();
         simpleDockerClient.stopContainer(userAppContainer);
     }
@@ -102,6 +103,14 @@ public class TestEngine {
                 consulClient);
 
         return consulApp.start(true);
+    }
+
+    public String startNewConsul(int port) {
+        return ConsulMainLocal.start(port);
+    }
+
+    public void stopConsul() {
+        ConsulMainLocal.stop();
     }
 
     /**
