@@ -1,6 +1,5 @@
 package com.github.lkq.smesh.consul.controller;
 
-import com.github.lkq.smesh.consul.VersionRegister;
 import com.github.lkq.smesh.consul.client.ConsulClient;
 import com.github.lkq.smesh.consul.profile.Profile;
 import com.github.lkq.smesh.consul.profile.ProfileFactory;
@@ -12,7 +11,7 @@ import javax.inject.Singleton;
 
 @Singleton
 public class VersionController {
-    private static Logger logger = LoggerFactory.getLogger(VersionRegister.class);
+    private static Logger logger = LoggerFactory.getLogger(VersionController.class);
     public static final int RETRY_INTERVAL = 1000;
 
     private ConsulClient consulClient;

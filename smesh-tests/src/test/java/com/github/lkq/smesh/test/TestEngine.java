@@ -1,12 +1,6 @@
 package com.github.lkq.smesh.test;
 
 import com.github.dockerjava.api.command.InspectContainerResponse;
-import com.github.lkq.smesh.consul.App;
-import com.github.lkq.smesh.consul.AppMaker;
-import com.github.lkq.smesh.consul.client.ConsulClient;
-import com.github.lkq.smesh.consul.client.ResponseParser;
-import com.github.lkq.smesh.consul.client.http.SimpleHttpClient;
-import com.github.lkq.smesh.consul.command.ConsulCommandBuilder;
 import com.github.lkq.smesh.context.PortBinding;
 import com.github.lkq.smesh.docker.ContainerLogger;
 import com.github.lkq.smesh.docker.ContainerNetwork;
@@ -21,10 +15,8 @@ import com.github.lkq.smesh.test.consul.ConsulMainLocal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 
 import static com.github.lkq.smesh.linkerd.Constants.VAR_CONSUL_HOST;
@@ -41,7 +33,6 @@ public class TestEngine {
     private UserAppPackager packager = new UserAppPackager();
     private UserAppImageBuilder imageBuilder = new UserAppImageBuilder(DockerClientFactory.create());
 
-    private App consulApp;
     private com.github.lkq.smesh.linkerd.App linkerdApp;
 
     private static Boolean started = false;
@@ -72,37 +63,6 @@ public class TestEngine {
         stopConsul();
         linkerdApp.stop();
         simpleDockerClient.stopContainer(userAppContainer);
-    }
-
-    /**
-     * start a local consul docker container with binding port 8500 (due to unable to use host network in mac)
-     * @return container id
-     * @param appPort
-     */
-    public String startConsul(int appPort) {
-        AppMaker appMaker = new AppMaker();
-
-        ConsulCommandBuilder serverCommand = ConsulCommandBuilder.server(true, Collections.emptyList())
-                .ui(true)
-                .clientIP("0.0.0.0")
-                .bootstrap(true);
-
-        String nodeName = "consul";
-        String localDataPath = ClassLoader.getSystemResource(".").getPath() + "data/" + nodeName + "-" + System.currentTimeMillis();
-        if (new File(localDataPath).mkdirs()) {
-            logger.info("created config dir: {}", localDataPath);
-        }
-        ConsulClient consulClient = new ConsulClient(new SimpleHttpClient(), new ResponseParser(), "http://localhost:8500");
-        consulApp = appMaker.makeApp(
-                appPort,
-                nodeName,
-                ContainerNetwork.CONSUL_MAC,
-                serverCommand,
-                localDataPath,
-                "1.2.3",
-                consulClient);
-
-        return consulApp.start(true);
     }
 
     public String startNewConsul(int port) {

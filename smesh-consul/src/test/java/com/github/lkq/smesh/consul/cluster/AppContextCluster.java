@@ -107,8 +107,6 @@ public class AppContextCluster extends AppContext {
 
         List<String> commands = new ArrayList<>(Arrays.asList("agent", "-server", "-ui", "-client=0.0.0.0"));
         if (members.size() == 0) {
-//            commands.add("-bootstrap-expect=" + members.size());
-//        } else {
             commands.add("-bootstrap");
         }
 
