@@ -1,6 +1,8 @@
 package com.github.lkq.smesh.consul;
 
 import com.github.dockerjava.api.command.InspectContainerResponse;
+import com.github.lkq.smesh.consul.app.AppContext;
+import com.github.lkq.smesh.consul.app.AppModule;
 import com.github.lkq.smesh.consul.client.ConsulClient;
 import com.github.lkq.smesh.consul.client.ResponseParser;
 import com.github.lkq.smesh.consul.client.http.SimpleHttpClient;
@@ -59,6 +61,18 @@ public class ClusterNode {
         } catch (Exception e) {
             logger.error("failed to start cluster node: " + nodeIndex, e);
         }
+    }
+
+    public String startNode(int httpPort, AppContext appContext) {
+        Main appMain = DaggerMain.builder()
+                .appModule(new AppModule(appContext))
+                .build();
+        com.github.lkq.smesh.consul.app.App app = appMain.app();
+
+        app.start(httpPort);
+
+        Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
+        return app.instaDocker().container().containerId().orElse(null);
     }
 
     private String nodeName(int nodeIndex) {

@@ -16,12 +16,12 @@ public interface Main {
     App app();
 
     static void main(String[] args) {
+        int port = ConsulUtils.parseInt(args.length > 0 ? args[0] : null, 0);
         Main appMain = DaggerMain.builder()
                 .appModule(new AppModule(new AppContext()))
                 .build();
         App app = appMain.app();
 
-        int port = ConsulUtils.parseInt(args.length > 0 ? args[0] : null, 0);
         app.start(port);
     }
 }
