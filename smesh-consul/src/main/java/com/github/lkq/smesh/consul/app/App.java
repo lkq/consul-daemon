@@ -4,7 +4,7 @@ package com.github.lkq.smesh.consul.app;
 import com.github.lkq.instadocker.InstaDocker;
 import com.github.lkq.smesh.consul.WebServer;
 import com.github.lkq.smesh.consul.config.Config;
-import com.github.lkq.smesh.consul.container.ConsulController;
+import com.github.lkq.smesh.consul.controller.ConsulController;
 import com.github.lkq.smesh.consul.controller.VersionController;
 
 import javax.inject.Inject;
