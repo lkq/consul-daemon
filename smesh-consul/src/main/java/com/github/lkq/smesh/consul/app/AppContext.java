@@ -11,8 +11,8 @@ import com.github.lkq.smesh.consul.client.http.SimpleHttpClient;
 import com.github.lkq.smesh.consul.config.Config;
 import com.github.lkq.smesh.consul.config.ConsulContext;
 import com.github.lkq.smesh.consul.exception.SmeshConsulException;
-import com.github.lkq.smesh.consul.profile.ProfileFactory;
 import com.github.lkq.smesh.docker.SimpleDockerClient;
+import com.github.lkq.smesh.profile.ProfileFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -18,7 +18,7 @@ public class LocalLinkerdLauncher {
         String localConfigPath = AppMaker.class.getProtectionDomain().getCodeSource().getLocation().getPath();
 
         HashMap<String, String> configVariables = new HashMap<>();
-        configVariables.put(VAR_CONSUL_HOST, "127.0.0.1");
+        configVariables.put(VAR_CONSUL_HOST, "127.0.0.2");
 
         App app = new AppMaker().makeApp(1026, ContainerNetwork.LINKERD_MAC, configVariables, localConfigPath, "1.2.3");
 

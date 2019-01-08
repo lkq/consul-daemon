@@ -5,9 +5,9 @@ import com.github.lkq.instadocker.docker.entity.VolumeBinding;
 import com.github.lkq.smesh.consul.Constants;
 import com.github.lkq.smesh.consul.app.AppContext;
 import com.github.lkq.smesh.consul.config.Config;
-import com.github.lkq.smesh.consul.profile.Profile;
-import com.github.lkq.smesh.consul.profile.ProfileFactory;
 import com.github.lkq.smesh.docker.SimpleDockerClient;
+import com.github.lkq.smesh.profile.Profile;
+import com.github.lkq.smesh.profile.ProfileFactory;
 import org.slf4j.Logger;
 
 import java.io.File;

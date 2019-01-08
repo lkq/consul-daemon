@@ -27,7 +27,7 @@ public class AppContextLocal extends AppContext {
     @Override
     public Config createConfig() {
         Config config = super.createConfig();
-        config.linkerdContext().templateVariables(ImmutableMap.of(VAR_CONSUL_HOST, "127.0.0.1"));
+        config.linkerdContext().templateVariables(ImmutableMap.of(VAR_CONSUL_HOST, "127.0.0.2"));
         return config;
     }
 }

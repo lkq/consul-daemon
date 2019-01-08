@@ -1,8 +1,8 @@
 package com.github.lkq.smesh.consul.controller;
 
 import com.github.lkq.smesh.consul.client.ConsulClient;
-import com.github.lkq.smesh.consul.profile.Profile;
-import com.github.lkq.smesh.consul.profile.ProfileFactory;
+import com.github.lkq.smesh.profile.Profile;
+import com.github.lkq.smesh.profile.ProfileFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
