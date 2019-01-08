@@ -9,13 +9,13 @@ import java.util.HashMap;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-class ConfigProcessorTest {
+class TemplateProcessorTest {
 
-    private ConfigProcessor configProcessor;
+    private TemplateProcessor templateProcessor;
 
     @BeforeEach
     void setUp() {
-        configProcessor = new ConfigProcessor();
+        templateProcessor = new TemplateProcessor();
     }
 
     @Test
@@ -23,7 +23,7 @@ class ConfigProcessorTest {
 
         HashMap<String, String> variables = new HashMap<>();
         variables.put(com.github.lkq.smesh.linkerd.Constants.VAR_CONSUL_HOST, "172.17.0.2");
-        String content = configProcessor.load("/test-template", "smesh-linkerd.yaml", variables, ConfigProcessorTest.class);
+        String content = templateProcessor.load("/test-template", "smesh-linkerd.yaml", variables, TemplateProcessorTest.class);
 
         assertThat(content, is(
                 "admin:\n" +

@@ -3,7 +3,6 @@ package com.github.lkq.smesh.test;
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.lkq.smesh.context.PortBinding;
 import com.github.lkq.smesh.docker.ContainerLogger;
-import com.github.lkq.smesh.docker.ContainerNetwork;
 import com.github.lkq.smesh.docker.DockerClientFactory;
 import com.github.lkq.smesh.docker.SimpleDockerClient;
 import com.github.lkq.smesh.smesh4j.Service;
@@ -18,9 +17,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
-
-import static com.github.lkq.smesh.linkerd.Constants.VAR_CONSUL_HOST;
 
 public class TestEngine {
     public static final String USER_APP = "userapp";
@@ -33,8 +29,6 @@ public class TestEngine {
 
     private UserAppPackager packager = new UserAppPackager();
     private UserAppImageBuilder imageBuilder = new UserAppImageBuilder(DockerClientFactory.create());
-
-    private com.github.lkq.smesh.linkerd.App linkerdApp;
 
     private static Boolean started = false;
 
@@ -82,20 +76,8 @@ public class TestEngine {
     /**
      * start a local linkerd docker container with binding port 8080 (due to unable to use host network in mac)
      * @return container id
-     * @param appPort
+     * @param port
      */
-    public String startLinkerd(int appPort, String consulContainer) {
-
-        String hostConfigPath = ClassLoader.getSystemResource("").getPath();
-
-        HashMap<String, String> configVariables = createLinkerdConfigVariables(consulContainer);
-
-        com.github.lkq.smesh.linkerd.AppMaker appMaker = new com.github.lkq.smesh.linkerd.AppMaker();
-        linkerdApp = appMaker.makeApp(appPort, ContainerNetwork.LINKERD_MAC, configVariables, hostConfigPath, "1.2.3");
-
-        return linkerdApp.start();
-    }
-
     public String startNewLinerd(int port, String consulContainer) {
         return LinkerdMainLocal.start(port, consulContainer);
     }
@@ -151,14 +133,5 @@ public class TestEngine {
         } catch (Exception e) {
             logger.error("failed to register user app", e);
         }
-    }
-
-    private HashMap<String, String> createLinkerdConfigVariables(String consulContainer) {
-        SimpleDockerClient docker = SimpleDockerClient.create();
-        InspectContainerResponse consul = docker.inspectContainer(consulContainer);
-        String consulIP = consul.getNetworkSettings().getNetworks().get("bridge").getIpAddress();
-        HashMap<String, String> configVariables = new HashMap<>();
-        configVariables.put(VAR_CONSUL_HOST, consulIP);
-        return configVariables;
     }
 }

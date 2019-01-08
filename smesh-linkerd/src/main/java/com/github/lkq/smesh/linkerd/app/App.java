@@ -4,14 +4,11 @@ package com.github.lkq.smesh.linkerd.app;
 import com.github.lkq.instadocker.InstaDocker;
 import com.github.lkq.smesh.linkerd.WebServer;
 import com.github.lkq.smesh.linkerd.config.Config;
-import com.github.lkq.smesh.linkerd.config.ConfigProcessor;
+import com.github.lkq.smesh.linkerd.config.TemplateProcessor;
 import com.github.lkq.smesh.linkerd.config.LinkerdContext;
-import com.github.lkq.smesh.linkerd.container.LinkerdController;
-import com.google.common.collect.ImmutableMap;
+import com.github.lkq.smesh.linkerd.controller.LinkerdController;
 
 import javax.inject.Inject;
-
-import static com.github.lkq.smesh.linkerd.Constants.VAR_CONSUL_HOST;
 
 public class App {
 
@@ -19,19 +16,19 @@ public class App {
     private LinkerdController linkerdController;
     private WebServer webServer;
     private InstaDocker container;
-    private ConfigProcessor configProcessor;
+    private TemplateProcessor templateProcessor;
 
     @Inject
-    public App(Config config, LinkerdController linkerdController, WebServer webServer, ConfigProcessor configProcessor) {
+    public App(Config config, LinkerdController linkerdController, WebServer webServer, TemplateProcessor templateProcessor) {
         this.config = config;
         this.linkerdController = linkerdController;
         this.webServer = webServer;
-        this.configProcessor = configProcessor;
+        this.templateProcessor = templateProcessor;
     }
 
     public void start(int httpPort) {
         LinkerdContext context = config.linkerdContext();
-        configProcessor.process("/template", "smesh-linkerd.yaml", String.join("/", context.hostConfigFilePath(), context.configFileName()), context.templateVariables());
+        templateProcessor.process("/template", "smesh-linkerd.yaml", String.join("/", context.hostConfigFilePath(), context.configFileName()), context.templateVariables());
         container = linkerdController.createContainer(context);
         container.start(config.cleanStart(), 60);
         webServer.start(httpPort);

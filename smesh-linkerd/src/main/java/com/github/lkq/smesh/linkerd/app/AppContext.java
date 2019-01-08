@@ -3,7 +3,6 @@ package com.github.lkq.smesh.linkerd.app;
 import com.github.lkq.instadocker.docker.entity.PortBinding;
 import com.github.lkq.instadocker.docker.entity.VolumeBinding;
 import com.github.lkq.smesh.docker.SimpleDockerClient;
-import com.github.lkq.smesh.linkerd.AppMaker;
 import com.github.lkq.smesh.linkerd.Constants;
 import com.github.lkq.smesh.linkerd.Main;
 import com.github.lkq.smesh.linkerd.config.Config;
@@ -40,7 +39,7 @@ public class AppContext {
 
     public Config createConfig() {
         Profile profile = createProfileFactory("dummy").create();
-        String hostConfigFilePath = AppMaker.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        String hostConfigFilePath = Main.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         String configFileName = Constants.LINKERD_CONFIG_FILE_PREFIX + "-" + profile.version() + ".yaml";
         return new Config()
                 .cleanStart(true)

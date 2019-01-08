@@ -2,7 +2,7 @@ package com.github.lkq.smesh.linkerd.config;
 
 import com.github.lkq.smesh.Constants;
 import com.github.lkq.smesh.exception.SmeshException;
-import com.github.lkq.smesh.linkerd.AppMaker;
+import com.github.lkq.smesh.linkerd.Main;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -21,12 +21,12 @@ import java.util.Map;
  * a freemarker template processor
  */
 @Singleton
-public class ConfigProcessor {
+public class TemplateProcessor {
 
-    private static Logger logger = LoggerFactory.getLogger(ConfigProcessor.class);
+    private static Logger logger = LoggerFactory.getLogger(TemplateProcessor.class);
 
     @Inject
-    public ConfigProcessor() {
+    public TemplateProcessor() {
     }
 
     /**
@@ -39,7 +39,7 @@ public class ConfigProcessor {
      */
     public String process(String sourceFolder, String sourceFileName, String targetFilePathName, Map<String, String> variables) {
 
-        String configContent = load(sourceFolder, sourceFileName, variables, AppMaker.class);
+        String configContent = load(sourceFolder, sourceFileName, variables, Main.class);
 
         try {
             File targetFile = new File(targetFilePathName);
