@@ -1,10 +1,11 @@
 package com.github.lkq.smesh.test;
 
 import com.github.dockerjava.api.command.InspectContainerResponse;
-import com.github.lkq.smesh.context.PortBinding;
-import com.github.lkq.smesh.docker.ContainerLogger;
+import com.github.lkq.instadocker.InstaDocker;
+import com.github.lkq.instadocker.docker.DockerContainer;
 import com.github.lkq.smesh.docker.DockerClientFactory;
 import com.github.lkq.smesh.docker.SimpleDockerClient;
+import com.github.lkq.smesh.exception.SmeshException;
 import com.github.lkq.smesh.smesh4j.Service;
 import com.github.lkq.smesh.smesh4j.Smesh;
 import com.github.lkq.smesh.smesh4j.WebSocketClientFactory;
@@ -45,8 +46,8 @@ public class TestEngine {
 
     public synchronized void startEverything() throws IOException, InterruptedException {
         if (!started) {
-            consulContainer = startNewConsul(REG_PORT);
-            linkerdContainer = startNewLinerd(LINKERD_PORT, consulContainer);
+            consulContainer = startConsul(REG_PORT);
+            linkerdContainer = startLinerd(LINKERD_PORT, consulContainer);
             userAppContainer = startUserApp(8081, "ws://localhost:" + REG_PORT + "/smesh/register/v1");
             started = true;
         } else {
@@ -65,7 +66,7 @@ public class TestEngine {
      * @return container id
      * @param port
      */
-    public String startNewConsul(int port) {
+    public String startConsul(int port) {
         return ConsulMainLocal.start(port);
     }
 
@@ -78,7 +79,7 @@ public class TestEngine {
      * @return container id
      * @param port
      */
-    public String startNewLinerd(int port, String consulContainer) {
+    public String startLinerd(int port, String consulContainer) {
         return LinkerdMainLocal.start(port, consulContainer);
     }
 
@@ -98,25 +99,21 @@ public class TestEngine {
     }
 
     public String quickStartUserApp(int restPort, String registerURL, String artifactPath, String artifactName) {
-        logger.info("test server build success: {}{}", artifactPath, artifactName);
-        if (simpleDockerClient.imageExists(USER_APP)) {
-            simpleDockerClient.removeImage(USER_APP);
-        }
+        logger.info("installing test app: {}{}", artifactPath, artifactName);
         String image = imageBuilder.build(artifactPath, artifactName, registerURL, USER_APP);
+        InstaDocker userApp = new InstaDocker(image, USER_APP)
+                .dockerLogger(LoggerFactory.getLogger("UserApp"))
+                .init();
+        DockerContainer container = userApp.container();
+        container.portBindings(Arrays.asList(new com.github.lkq.instadocker.docker.entity.PortBinding(restPort)));
 
-        if (simpleDockerClient.containerExists(USER_APP)) {
-            simpleDockerClient.stopContainer(USER_APP);
-            simpleDockerClient.removeContainer(USER_APP);
+        if (container.ensureExists() && container.ensureRunning()) {
+            String containerId = container.containerId().get();
+            registerUserApp(containerId, restPort, registerURL);
+            return containerId;
+        } else {
+            throw new SmeshException("failed to start user app");
         }
-        String containerId = simpleDockerClient.createContainer(image, USER_APP)
-                .withPortBinders(Arrays.asList(new PortBinding(restPort, PortBinding.Protocol.TCP)))
-                .build();
-        simpleDockerClient.startContainer(containerId);
-        simpleDockerClient.attachLogging(containerId, new ContainerLogger());
-
-        registerUserApp(containerId, restPort, registerURL);
-
-        return containerId;
     }
 
     private void registerUserApp(String containerId, int restPort, String registerURL) {
