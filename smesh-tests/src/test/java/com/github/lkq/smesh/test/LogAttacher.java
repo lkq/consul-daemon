@@ -8,21 +8,21 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-public class AttachLogging {
-    private static Logger logger = LoggerFactory.getLogger(AttachLogging.class);
+public class LogAttacher {
+    private static Logger logger = LoggerFactory.getLogger(LogAttacher.class);
 
     private final BufferedReader logReader;
     private ArtifactExtractor artifactExtractor;
 
     private boolean keepGoing = true;
 
-    public static AttachLogging attach(InputStream inputStream, ArtifactExtractor artifactExtractor) {
-        AttachLogging attachLogging = new AttachLogging(inputStream, artifactExtractor);
-        attachLogging.start();
-        return attachLogging;
+    public static LogAttacher attach(InputStream inputStream, ArtifactExtractor artifactExtractor) {
+        LogAttacher logAttacher = new LogAttacher(inputStream, artifactExtractor);
+        logAttacher.start();
+        return logAttacher;
     }
 
-    public AttachLogging(InputStream inputStream, ArtifactExtractor artifactExtractor) {
+    public LogAttacher(InputStream inputStream, ArtifactExtractor artifactExtractor) {
         this.logReader = new BufferedReader(new InputStreamReader(inputStream));
         this.artifactExtractor = artifactExtractor;
     }

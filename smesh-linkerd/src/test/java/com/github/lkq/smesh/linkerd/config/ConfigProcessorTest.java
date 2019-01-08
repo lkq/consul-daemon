@@ -19,11 +19,11 @@ class ConfigProcessorTest {
     }
 
     @Test
-    void canExportConfig() throws IOException {
+    void canLoadTemplate() throws IOException {
 
         HashMap<String, String> variables = new HashMap<>();
         variables.put(com.github.lkq.smesh.linkerd.Constants.VAR_CONSUL_HOST, "172.17.0.2");
-        String content = configProcessor.process("/test-template", "smesh-linkerd.yaml", variables, ConfigProcessorTest.class);
+        String content = configProcessor.load("/test-template", "smesh-linkerd.yaml", variables, ConfigProcessorTest.class);
 
         assertThat(content, is(
                 "admin:\n" +

@@ -30,7 +30,7 @@
         </encoder>
     </appender>
 
-    <logger name="com.github.lkq.smesh.docker.ContainerLogger" level="info" additivity="false">
+    <logger name="smesh-consul" level="info" additivity="false">
         <appender-ref ref="ConsulLogAppend"/>
     </logger>
 

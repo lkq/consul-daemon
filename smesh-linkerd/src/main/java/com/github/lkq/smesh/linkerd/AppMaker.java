@@ -36,18 +36,18 @@ public class AppMaker {
      */
     public App makeApp(int restPort, ContainerNetwork network, HashMap<String, String> configVariables, String hostConfigPath, String appVersion) {
 
-        String configFileName = LINKERD_CONFIG_PREFIX + "-" + appVersion + ".yaml";
+        String configFileName = LINKERD_CONFIG_FILE_PREFIX + "-" + appVersion + ".yaml";
 
-        processConfig(new ConfigProcessor(), configVariables, "/template", CONFIG_FINENAME, hostConfigPath, configFileName);
+        processConfig(new ConfigProcessor(), configVariables, "/template", "smesh-linkerd.yaml", hostConfigPath, configFileName);
 
         LinkerdContextFactory contextFactory = new LinkerdContextFactory();
         ContainerContext context = contextFactory.createDefaultContext()
-                .volumeBindings(new VolumeBinding(hostConfigPath, CONTAINER_CONFIG_PATH))
+                .volumeBindings(new VolumeBinding(hostConfigPath, LINKERD_CONFIG_FILE_PATH))
                 .portBindings(network.portBindings())
                 .network(network.network())
-                .commandBuilder(new LinkerdCommandBuilder(CONTAINER_CONFIG_PATH + "/" + configFileName));
+                .commandBuilder(new LinkerdCommandBuilder(LINKERD_CONFIG_FILE_PATH + "/" + configFileName));
 
-        LinkerdController linkerdController = new LinkerdController(SimpleDockerClient.create());
+        LinkerdController linkerdController = new LinkerdController(logger, SimpleDockerClient.create());
         WebServer webServer = new WebServer(restPort, new LinkerdRoutes());
 
         return new App(context, linkerdController, webServer);
@@ -55,7 +55,7 @@ public class AppMaker {
 
     private void processConfig(ConfigProcessor processor, HashMap<String, String> variables, String templateRoot, String sourceFileName, String hostConfigRoot, String targetFileName) {
 
-        String configContent = processor.process(templateRoot, sourceFileName, variables, AppMaker.class);
+        String configContent = processor.load(templateRoot, sourceFileName, variables, AppMaker.class);
 
         try {
             File targetFile = new File(hostConfigRoot, targetFileName);

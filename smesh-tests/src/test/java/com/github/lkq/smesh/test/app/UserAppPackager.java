@@ -1,7 +1,7 @@
 package com.github.lkq.smesh.test.app;
 
 import com.github.lkq.smesh.exception.SmeshException;
-import com.github.lkq.smesh.test.AttachLogging;
+import com.github.lkq.smesh.test.LogAttacher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.utils.StringUtils;
@@ -26,7 +26,7 @@ public class UserAppPackager {
             Process mvn = new ProcessBuilder("mvn", "install", "-DskipTests=true").directory(new File(projectRoot, "user-app")).start();
 
             ArtifactExtractor extractor = new ArtifactExtractor(ARTIFACT_PATTERN, "path", "name");
-            AttachLogging logging = AttachLogging.attach(mvn.getInputStream(), extractor);
+            LogAttacher logging = LogAttacher.attach(mvn.getInputStream(), extractor);
 
             mvn.waitFor();
             logging.stop();

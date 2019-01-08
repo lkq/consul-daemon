@@ -8,6 +8,12 @@
     <artifactId>smesh-linkerd</artifactId>
     <version>0.1.0-SNAPSHOT</version>
 
+    <properties>
+        <dagger.version>2.17</dagger.version>
+        <junit.version>5.3.1</junit.version>
+        <mockito.version>2.23.0</mockito.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.github.lkq</groupId>
@@ -20,12 +26,34 @@
             <version>2.3.28</version>
         </dependency>
 
+        <!--third party dependency-->
+        <dependency>
+            <groupId>com.google.dagger</groupId>
+            <artifactId>dagger</artifactId>
+            <version>${dagger.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.2.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.lkq</groupId>
+            <artifactId>insta-docker</artifactId>
+            <version>0.2.0-SNAPSHOT</version>
+        </dependency>
+
 
         <!--testing depencency-->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.1.0</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -51,6 +79,13 @@
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>com.google.dagger</groupId>
+                            <artifactId>dagger-compiler</artifactId>
+                            <version>${dagger.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
             <plugin>
@@ -65,7 +100,7 @@
                     <dependency>
                         <groupId>org.junit.jupiter</groupId>
                         <artifactId>junit-jupiter-engine</artifactId>
-                        <version>5.1.0</version>
+                        <version>${junit.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>
