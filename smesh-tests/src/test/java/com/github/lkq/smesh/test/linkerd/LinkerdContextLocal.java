@@ -1,11 +1,11 @@
 package com.github.lkq.smesh.test.linkerd;
 
 import com.github.dockerjava.api.command.InspectContainerResponse;
-import com.github.lkq.smesh.docker.SimpleDockerClient;
 import com.github.lkq.smesh.linkerd.app.AppContext;
 import com.github.lkq.smesh.linkerd.config.Config;
 import com.github.lkq.smesh.profile.Profile;
 import com.github.lkq.smesh.profile.ProfileFactory;
+import com.github.lkq.smesh.test.DockerClientFactory;
 import org.slf4j.Logger;
 
 import java.util.HashMap;
@@ -21,6 +21,7 @@ public class LinkerdContextLocal extends AppContext {
     public static final String NODE_NAME = "linkerd";
     public static final String ARTIFACT_VERSION = "0.1.0";
     public static final String ARTIFACT_NAME = "smesh-linkerd";
+
     private String consulContainer;
 
     public LinkerdContextLocal(String consulContainer) {
@@ -45,9 +46,8 @@ public class LinkerdContextLocal extends AppContext {
     }
 
     private HashMap<String, String> createTemplateVariables(String consulContainer) {
-        SimpleDockerClient docker = SimpleDockerClient.create();
-        InspectContainerResponse consul = docker.inspectContainer(consulContainer);
-        String consulIP = consul.getNetworkSettings().getNetworks().get("bridge").getIpAddress();
+        InspectContainerResponse inspectConsulContainer = DockerClientFactory.create().inspectContainerCmd(consulContainer).exec();
+        String consulIP = inspectConsulContainer.getNetworkSettings().getNetworks().get("bridge").getIpAddress();
         HashMap<String, String> configVariables = new HashMap<>();
         configVariables.put(VAR_CONSUL_HOST, consulIP);
         return configVariables;

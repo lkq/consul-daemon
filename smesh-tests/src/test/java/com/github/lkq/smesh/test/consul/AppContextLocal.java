@@ -5,7 +5,6 @@ import com.github.lkq.instadocker.docker.entity.VolumeBinding;
 import com.github.lkq.smesh.consul.Constants;
 import com.github.lkq.smesh.consul.app.AppContext;
 import com.github.lkq.smesh.consul.config.Config;
-import com.github.lkq.smesh.docker.SimpleDockerClient;
 import com.github.lkq.smesh.profile.Profile;
 import com.github.lkq.smesh.profile.ProfileFactory;
 import org.slf4j.Logger;
@@ -61,9 +60,5 @@ public class AppContextLocal extends AppContext {
                 .version(ARTIFACT_VERSION);
         willReturn(profile).given(profileFactory).create();
         return profileFactory;
-    }
-
-    public SimpleDockerClient createDockerClient() {
-        return SimpleDockerClient.create();
     }
 }

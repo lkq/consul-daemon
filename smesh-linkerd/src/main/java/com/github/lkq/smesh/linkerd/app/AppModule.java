@@ -1,6 +1,5 @@
 package com.github.lkq.smesh.linkerd.app;
 
-import com.github.lkq.smesh.docker.SimpleDockerClient;
 import com.github.lkq.smesh.linkerd.config.Config;
 import com.github.lkq.smesh.profile.ProfileFactory;
 import com.google.gson.Gson;
@@ -28,11 +27,6 @@ public class AppModule {
     @Provides @Singleton
     public Config config() {
         return appContext.createConfig();
-    }
-
-    @Provides @Singleton
-    public SimpleDockerClient dockerClient() {
-        return appContext.createDockerClient();
     }
 
     @Provides @Singleton

@@ -2,7 +2,6 @@ package com.github.lkq.smesh.linkerd.app;
 
 import com.github.lkq.instadocker.docker.entity.PortBinding;
 import com.github.lkq.instadocker.docker.entity.VolumeBinding;
-import com.github.lkq.smesh.docker.SimpleDockerClient;
 import com.github.lkq.smesh.linkerd.Constants;
 import com.github.lkq.smesh.linkerd.Main;
 import com.github.lkq.smesh.linkerd.config.Config;
@@ -27,10 +26,6 @@ public class AppContext {
         } catch (IOException e) {
             throw new SmeshLinkerdException("failed to create profile factory", e);
         }
-    }
-
-    public SimpleDockerClient createDockerClient() {
-        return SimpleDockerClient.create();
     }
 
     public Logger createContainerLogger() {

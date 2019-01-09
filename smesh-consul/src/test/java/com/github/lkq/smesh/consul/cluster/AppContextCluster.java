@@ -4,12 +4,12 @@ import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.lkq.instadocker.docker.entity.PortBinding;
 import com.github.lkq.instadocker.docker.entity.VolumeBinding;
 import com.github.lkq.smesh.consul.Constants;
+import com.github.lkq.smesh.consul.DockerClientFactory;
 import com.github.lkq.smesh.consul.app.AppContext;
 import com.github.lkq.smesh.consul.client.ConsulClient;
 import com.github.lkq.smesh.consul.client.ResponseParser;
 import com.github.lkq.smesh.consul.client.http.SimpleHttpClient;
 import com.github.lkq.smesh.consul.config.Config;
-import com.github.lkq.smesh.docker.SimpleDockerClient;
 import com.github.lkq.smesh.profile.Profile;
 import com.github.lkq.smesh.profile.ProfileFactory;
 import org.slf4j.Logger;
@@ -103,7 +103,7 @@ public class AppContextCluster extends AppContext {
             logger.info("created config dir: {}", hostDataPath);
         }
 
-        List<String> members = runningNodeIPs(createDockerClient());
+        List<String> members = runningNodeIPs();
 
         List<String> commands = new ArrayList<>(Arrays.asList("agent", "-server", "-ui", "-client=0.0.0.0"));
         if (members.size() == 0) {
@@ -142,11 +142,11 @@ public class AppContextCluster extends AppContext {
         return profileFactory;
     }
 
-    private List<String> runningNodeIPs(SimpleDockerClient dockerClient) {
+    private List<String> runningNodeIPs() {
         List<String> runningNodeIPs = new ArrayList<>();
         for (int nodeIndex = 0; nodeIndex < CLUSTER_SIZE; nodeIndex++) {
             String nodeName = nodeName(nodeIndex);
-            InspectContainerResponse memberNode = dockerClient.inspectContainer(nodeName);
+            InspectContainerResponse memberNode = DockerClientFactory.create().inspectContainerCmd(nodeName).exec();
             if (memberNode != null && memberNode.getState().getRunning() != null && memberNode.getState().getRunning()) {
                 // collect cluster member ips
                 String nodeIP = memberNode.getNetworkSettings().getNetworks().get("bridge").getIpAddress();
