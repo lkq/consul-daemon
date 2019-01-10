@@ -1,4 +1,4 @@
-package com.github.lkq.smesh;
+package com.github.lkq.smesh.consul;
 
 import spark.utils.StringUtils;
 

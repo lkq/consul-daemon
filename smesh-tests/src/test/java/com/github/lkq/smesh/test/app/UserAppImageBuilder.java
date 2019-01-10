@@ -2,7 +2,6 @@ package com.github.lkq.smesh.test.app;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.core.command.BuildImageResultCallback;
-import com.github.lkq.smesh.Constants;
 import com.github.lkq.smesh.exception.SmeshException;
 import com.github.lkq.smesh.test.DockerClientFactory;
 import com.google.common.collect.ImmutableSet;
@@ -23,6 +22,7 @@ import java.util.Map;
  * build a docker image from the UserApp package
  */
 public class UserAppImageBuilder {
+    public static String ENCODING_UTF8 = "UTF-8";
 
     private static Logger logger = LoggerFactory.getLogger(UserAppImageBuilder.class);
 
@@ -71,7 +71,7 @@ public class UserAppImageBuilder {
             File resourceRoot = new File(resourceRootURL.getPath() + "/template");
             Configuration config = new Configuration(Configuration.VERSION_2_3_28);
             config.setTemplateLoader(new FileTemplateLoader(resourceRoot));
-            Template template = config.getTemplate(DOCKERFILE_NAME, Constants.ENCODING_UTF8);
+            Template template = config.getTemplate(DOCKERFILE_NAME, ENCODING_UTF8);
 
             Map<String, String> variables = new HashMap<>();
             variables.put(VAR_ARTIFACT_PATH, artifactPath);
@@ -82,9 +82,9 @@ public class UserAppImageBuilder {
             targetFolder.mkdir();
             File targetFile = new File(targetFolder, DOCKERFILE_NAME);
 
-            template.process(variables, new FileWriterWithEncoding(targetFile, Constants.ENCODING_UTF8));
+            template.process(variables, new FileWriterWithEncoding(targetFile, ENCODING_UTF8));
             logger.info("created docker file: {}", targetFile.getAbsolutePath());
-            logger.info(FileUtils.readFileToString(targetFile, Constants.ENCODING_UTF8));
+            logger.info(FileUtils.readFileToString(targetFile, ENCODING_UTF8));
             return targetFile.getAbsolutePath();
         } catch (Exception e) {
             throw new SmeshException("failed to prepare docker file", e);

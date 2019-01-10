@@ -1,13 +1,11 @@
-package com.github.lkq.smesh;
+package com.github.lkq.smesh.consul;
 
-import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 
 class EnvTest {
 
@@ -26,6 +24,6 @@ class EnvTest {
         String values = "127.0.0.2 127.0.0.3 127.0.0.4";
         System.setProperty(TEST_KEY, values);
         String value = Env.get(TEST_KEY);
-        assertThat(value, CoreMatchers.is(values));
+        Assertions.assertEquals(values, value);
     }
 }

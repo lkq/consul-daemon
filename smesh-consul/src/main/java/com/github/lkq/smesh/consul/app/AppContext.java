@@ -1,7 +1,7 @@
 package com.github.lkq.smesh.consul.app;
 
-import com.github.lkq.smesh.Env;
 import com.github.lkq.smesh.consul.Constants;
+import com.github.lkq.smesh.consul.Env;
 import com.github.lkq.smesh.consul.Main;
 import com.github.lkq.smesh.consul.aws.EC2;
 import com.github.lkq.smesh.consul.aws.EC2Factory;
@@ -11,7 +11,7 @@ import com.github.lkq.smesh.consul.client.http.SimpleHttpClient;
 import com.github.lkq.smesh.consul.config.Config;
 import com.github.lkq.smesh.consul.config.ConsulContext;
 import com.github.lkq.smesh.consul.exception.SmeshConsulException;
-import com.github.lkq.smesh.profile.ProfileFactory;
+import com.github.lkq.smesh.consul.profile.ProfileFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

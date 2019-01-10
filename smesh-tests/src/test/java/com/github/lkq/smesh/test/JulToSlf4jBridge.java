@@ -1,4 +1,4 @@
-package com.github.lkq.smesh.logging;
+package com.github.lkq.smesh.test;
 
 import org.slf4j.bridge.SLF4JBridgeHandler;
 

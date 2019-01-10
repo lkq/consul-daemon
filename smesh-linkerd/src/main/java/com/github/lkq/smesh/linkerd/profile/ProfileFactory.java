@@ -1,4 +1,4 @@
-package com.github.lkq.smesh.profile;
+package com.github.lkq.smesh.linkerd.profile;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;

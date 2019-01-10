@@ -1,4 +1,4 @@
-package com.github.lkq.smesh.profile;
+package com.github.lkq.smesh.consul.profile;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -10,8 +10,8 @@ import com.github.lkq.smesh.consul.client.ConsulClient;
 import com.github.lkq.smesh.consul.client.ResponseParser;
 import com.github.lkq.smesh.consul.client.http.SimpleHttpClient;
 import com.github.lkq.smesh.consul.config.Config;
-import com.github.lkq.smesh.profile.Profile;
-import com.github.lkq.smesh.profile.ProfileFactory;
+import com.github.lkq.smesh.consul.profile.Profile;
+import com.github.lkq.smesh.consul.profile.ProfileFactory;
 import org.slf4j.Logger;
 
 import java.io.File;

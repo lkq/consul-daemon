@@ -1,7 +1,7 @@
 package com.github.lkq.smesh.linkerd.config;
 
-import com.github.lkq.smesh.Constants;
 import com.github.lkq.smesh.exception.SmeshException;
+import com.github.lkq.smesh.linkerd.Constants;
 import com.github.lkq.smesh.linkerd.Main;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;
@@ -45,7 +45,7 @@ public class TemplateProcessor {
             File targetFile = new File(targetFilePathName);
             FileUtils.writeStringToFile(targetFile,
                     configContent,
-                    com.github.lkq.smesh.Constants.ENCODING_UTF8);
+                    Constants.ENCODING_UTF8);
             String writtenFilePath = targetFile.getAbsolutePath();
             logger.info("writing linkerd config to: {}", writtenFilePath);
             return writtenFilePath;

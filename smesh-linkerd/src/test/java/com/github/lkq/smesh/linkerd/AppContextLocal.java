@@ -2,8 +2,8 @@ package com.github.lkq.smesh.linkerd;
 
 import com.github.lkq.smesh.linkerd.app.AppContext;
 import com.github.lkq.smesh.linkerd.config.Config;
-import com.github.lkq.smesh.profile.Profile;
-import com.github.lkq.smesh.profile.ProfileFactory;
+import com.github.lkq.smesh.linkerd.profile.Profile;
+import com.github.lkq.smesh.linkerd.profile.ProfileFactory;
 import com.google.common.collect.ImmutableMap;
 
 import static com.github.lkq.smesh.linkerd.Constants.VAR_CONSUL_HOST;

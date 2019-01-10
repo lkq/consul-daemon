@@ -11,7 +11,6 @@
 
 
     <modules>
-        <module>smesh-common</module>
         <module>consul-client</module>
         <module>smesh-consul</module>
         <module>smesh-linkerd</module>

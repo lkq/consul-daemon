@@ -1,6 +1,5 @@
 package com.github.lkq.smesh.test;
 
-import com.github.lkq.smesh.logging.JulToSlf4jBridge;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 

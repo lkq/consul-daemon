@@ -1,6 +1,6 @@
 package com.github.lkq.smesh.linkerd.handler;
 
-import com.github.lkq.smesh.profile.ProfileFactory;
+import com.github.lkq.smesh.linkerd.profile.ProfileFactory;
 import com.google.gson.Gson;
 import spark.Request;
 import spark.Response;

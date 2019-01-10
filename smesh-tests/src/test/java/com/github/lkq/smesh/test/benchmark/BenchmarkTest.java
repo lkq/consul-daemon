@@ -1,7 +1,7 @@
 package com.github.lkq.smesh.test.benchmark;
 
-import com.github.lkq.smesh.Retry;
-import com.github.lkq.smesh.logging.JulToSlf4jBridge;
+import com.github.lkq.smesh.test.JulToSlf4jBridge;
+import com.github.lkq.smesh.test.Retry;
 import com.github.lkq.smesh.test.TestEngine;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;

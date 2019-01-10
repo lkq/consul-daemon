@@ -3,8 +3,8 @@ package com.github.lkq.smesh.test.linkerd;
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.lkq.smesh.linkerd.app.AppContext;
 import com.github.lkq.smesh.linkerd.config.Config;
-import com.github.lkq.smesh.profile.Profile;
-import com.github.lkq.smesh.profile.ProfileFactory;
+import com.github.lkq.smesh.linkerd.profile.Profile;
+import com.github.lkq.smesh.linkerd.profile.ProfileFactory;
 import com.github.lkq.smesh.test.DockerClientFactory;
 import org.slf4j.Logger;
 

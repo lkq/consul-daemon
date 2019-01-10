@@ -3,7 +3,7 @@ package com.github.lkq.smesh.consul.app;
 import com.github.lkq.smesh.consul.client.ConsulClient;
 import com.github.lkq.smesh.consul.client.ServiceRegistrar;
 import com.github.lkq.smesh.consul.config.Config;
-import com.github.lkq.smesh.profile.ProfileFactory;
+import com.github.lkq.smesh.consul.profile.ProfileFactory;
 import com.google.gson.Gson;
 import dagger.Module;
 import dagger.Provides;

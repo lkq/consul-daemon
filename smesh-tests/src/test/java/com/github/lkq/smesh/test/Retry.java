@@ -1,12 +1,14 @@
-package com.github.lkq.smesh;
+package com.github.lkq.smesh.test;
+
+import com.github.lkq.paramer.Paramer;
 
 import java.util.function.Supplier;
 
 public class Retry {
     public static boolean exec(int repeatCount, int interval, Supplier<Boolean> supplier) {
-        Param.isPositive(repeatCount, "repeat count should be greater than 0");
-        Param.isPositive(interval, "interval should be greater than 0");
-        Param.isNotNull(supplier, "supplier should be provided");
+        Paramer.requires().positive(repeatCount, "repeat count should be greater than 0")
+                .positive(interval, "interval should be greater than 0")
+                .notNull(supplier, "supplier should be provided");
 
         for (int i = 0; i < repeatCount; i++) {
             try {
@@ -25,6 +27,7 @@ public class Retry {
     private static void delay(int interval) {
         try {
             Thread.sleep(interval);
-        } catch (InterruptedException ignored) { }
+        } catch (InterruptedException ignored) {
+        }
     }
 }
