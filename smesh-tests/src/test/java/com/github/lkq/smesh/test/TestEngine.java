@@ -16,9 +16,7 @@ public class TestEngine {
     private static Boolean started = false;
 
     private static TestEngine instance = new TestEngine();
-    private String consulContainer;
-    private String linkerdContainer;
-    private String userAppContainer;
+    private String consulContainerId;
     private UserAppLocal userApp;
 
     public static TestEngine get() {
@@ -29,8 +27,8 @@ public class TestEngine {
 
     public synchronized void startEverything() {
         if (!started) {
-            consulContainer = startConsul(REG_PORT);
-            linkerdContainer = startLinerd(LINKERD_PORT, consulContainer);
+            consulContainerId = startConsul(REG_PORT);
+            startLinerd(LINKERD_PORT, consulContainerId);
             userApp = startUserApp(8081, REG_PORT);
             started = true;
         } else {
@@ -73,12 +71,12 @@ public class TestEngine {
     /**
      * build a docker image containing UserApp and start it
      * @return container id
-     * @param restPort
+     * @param servicePort
      * @param regPort
      */
-    public UserAppLocal startUserApp(int restPort, int regPort) {
+    public UserAppLocal startUserApp(int servicePort, int regPort) {
         UserAppLocal userApp = new UserAppLocal();
-        userApp.start(restPort, regPort);
+        userApp.start(servicePort, "ws://localhost:" + regPort + "/smesh/register/v1");
         return userApp;
     }
 

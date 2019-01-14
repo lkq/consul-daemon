@@ -146,7 +146,7 @@ public class AppContextCluster extends AppContext {
         List<String> runningNodeIPs = new ArrayList<>();
         for (int nodeIndex = 0; nodeIndex < CLUSTER_SIZE; nodeIndex++) {
             String nodeName = nodeName(nodeIndex);
-            InspectContainerResponse memberNode = DockerClientFactory.create().inspectContainerCmd(nodeName).exec();
+            InspectContainerResponse memberNode = DockerClientFactory.get().inspectContainerCmd(nodeName).exec();
             if (memberNode != null && memberNode.getState().getRunning() != null && memberNode.getState().getRunning()) {
                 // collect cluster member ips
                 String nodeIP = memberNode.getNetworkSettings().getNetworks().get("bridge").getIpAddress();

@@ -15,17 +15,21 @@ import java.net.URL;
 public class UserAppPackager {
 
     private static Logger logger = LoggerFactory.getLogger(UserAppPackager.class);
+    /**
+     * mvn command path, assume mvn already added to the system path
+     */
+    public static final String MVN_CMD_PATH = "mvn";
 
-    public static final String ARTIFACT_PATTERN = "^(.*) Installing (?<path>.*)/(?<name>user-app-\\d+\\.\\d+\\.\\d+.*\\.jar) to .*";
+    public static final String INSTALL_ARTIFACT_PATTERN = "^(.*) Installing (?<path>.*)/(?<name>user-app-\\d+\\.\\d+\\.\\d+.*\\.jar) to .*";
 
     public String[] buildPackage() {
         try {
             URL classRoot = ClassLoader.getSystemResource("");
             File projectRoot = new File(classRoot.getFile()).getParentFile().getParentFile();
             logger.info("running mvn in {}", projectRoot);
-            Process mvn = new ProcessBuilder("mvn", "install", "-DskipTests=true").directory(new File(projectRoot, "user-app")).start();
+            Process mvn = new ProcessBuilder(MVN_CMD_PATH, "install", "-DskipTests=true").directory(new File(projectRoot, "user-app")).start();
 
-            ArtifactExtractor extractor = new ArtifactExtractor(ARTIFACT_PATTERN, "path", "name");
+            ArtifactExtractor extractor = new ArtifactExtractor(INSTALL_ARTIFACT_PATTERN, "path", "name");
             LogAttacher logging = LogAttacher.attach(mvn.getInputStream(), extractor);
 
             mvn.waitFor();

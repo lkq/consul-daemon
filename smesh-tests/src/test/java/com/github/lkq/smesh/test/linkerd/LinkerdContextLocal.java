@@ -46,7 +46,7 @@ public class LinkerdContextLocal extends AppContext {
     }
 
     private HashMap<String, String> createTemplateVariables(String consulContainer) {
-        InspectContainerResponse inspectConsulContainer = DockerClientFactory.create().inspectContainerCmd(consulContainer).exec();
+        InspectContainerResponse inspectConsulContainer = DockerClientFactory.get().inspectContainerCmd(consulContainer).exec();
         String consulIP = inspectConsulContainer.getNetworkSettings().getNetworks().get("bridge").getIpAddress();
         HashMap<String, String> configVariables = new HashMap<>();
         configVariables.put(VAR_CONSUL_HOST, consulIP);

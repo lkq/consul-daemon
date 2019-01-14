@@ -29,7 +29,6 @@ public class UserAppImageBuilder {
     public static final String DOCKERFILE_NAME = "userapp.dockerfile";
     public static final String VAR_ARTIFACT_PATH = "artifactPath";
     public static final String VAR_ARTIFACT_NAME = "artifactName";
-    public static final String VAR_REGISTER_URL = "registerURL";
     private final DockerClient dockerClient;
 
     public UserAppImageBuilder(DockerClient dockerClient) {
@@ -37,6 +36,12 @@ public class UserAppImageBuilder {
     }
 
     public String build(String artifactPath, String artifactName, String registerURL, String imageTag) {
+
+        try {
+            dockerClient.removeImageCmd(imageTag).withForce(true).exec();
+        } catch (Exception ignored) {
+
+        }
         try {
             File dockerFile = new File(prepareDockerFile(artifactPath, artifactName, registerURL));
             File baseDir = dockerFile.getParentFile();
@@ -76,7 +81,6 @@ public class UserAppImageBuilder {
             Map<String, String> variables = new HashMap<>();
             variables.put(VAR_ARTIFACT_PATH, artifactPath);
             variables.put(VAR_ARTIFACT_NAME, artifactName);
-            variables.put(VAR_REGISTER_URL, registerURL);
 
             File targetFolder = new File(resourceRoot, "docker-file-" + System.currentTimeMillis());
             targetFolder.mkdir();
@@ -93,7 +97,7 @@ public class UserAppImageBuilder {
 
     public static void main(String[] args) {
         String[] artifact = new UserAppPackager().buildPackage();
-        UserAppImageBuilder imageBuilder = new UserAppImageBuilder(DockerClientFactory.create());
+        UserAppImageBuilder imageBuilder = new UserAppImageBuilder(DockerClientFactory.get());
         imageBuilder.build(artifact[0], artifact[1], "http://172.17.0.2:1025", "userapp");
     }
 }

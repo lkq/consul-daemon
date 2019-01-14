@@ -4,4 +4,4 @@ ENV LANG C.UTF-8
 
 COPY ${artifactName} /app/${artifactName}
 WORKDIR /app
-CMD ["java", "-jar", "/app/${artifactName}", "${registerURL}"]
+CMD ["java", "-jar", "/app/${artifactName}"]

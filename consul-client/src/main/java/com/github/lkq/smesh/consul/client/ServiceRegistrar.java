@@ -9,13 +9,14 @@ import com.google.gson.JsonParser;
  */
 public class ServiceRegistrar {
     private ConsulClient client;
+    private JsonParser jsonParser;
 
     public ServiceRegistrar(ConsulClient client) {
         this.client = client;
+        this.jsonParser = new JsonParser();
     }
 
     public Response deRegister(String service) {
-        JsonParser jsonParser = new JsonParser();
         JsonElement jsonElement = jsonParser.parse(service);
         String serviceId = jsonElement.getAsJsonObject().get("id").getAsString();
         return client.deregister(serviceId);

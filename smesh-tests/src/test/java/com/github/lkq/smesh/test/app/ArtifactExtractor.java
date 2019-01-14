@@ -48,13 +48,13 @@ public class ArtifactExtractor {
      * for junit
      */
     public ArtifactExtractor() {
-        this(UserAppPackager.ARTIFACT_PATTERN, "path", "name");
+        this(UserAppPackager.INSTALL_ARTIFACT_PATTERN, "path", "name");
     }
 
     @Test
     void testMatch() {
 
-        ArtifactExtractor extractor = new ArtifactExtractor(UserAppPackager.ARTIFACT_PATTERN, "path", "name");
+        ArtifactExtractor extractor = new ArtifactExtractor(UserAppPackager.INSTALL_ARTIFACT_PATTERN, "path", "name");
 
         List<String> lines = Arrays.asList("[mvn] [INFO] Installing /Users/kingson/Sandbox/smesh/smesh-tests/target/smesh-tests-0.1.0-SNAPSHOT.jar to /Users/kingson/.m2/repository/com/github/lkq/smesh-tests/0.1.0-SNAPSHOT/smesh-tests-0.1.0-SNAPSHOT.jar",
                 "[mvn] [INFO] Installing /Users/kingson/Sandbox/smesh/smesh-tests/dependency-reduced-pom.xml to /Users/kingson/.m2/repository/com/github/lkq/smesh-tests/0.1.0-SNAPSHOT/smesh-tests-0.1.0-SNAPSHOT.pom");

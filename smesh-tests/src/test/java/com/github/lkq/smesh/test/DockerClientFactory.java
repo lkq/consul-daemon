@@ -8,7 +8,7 @@ public class DockerClientFactory {
 
     private static DockerClient _instance;
 
-    public static synchronized DockerClient create() {
+    public static synchronized DockerClient get() {
         if (_instance == null) {
             DefaultDockerClientConfig.Builder configBuilder = DefaultDockerClientConfig.createDefaultConfigBuilder();
             _instance = DockerClientBuilder.getInstance(configBuilder.build()).build();
